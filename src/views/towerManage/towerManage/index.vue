@@ -74,6 +74,10 @@
                 <el-form-item label="单价" :prop="!editType ? 'price' : ''">
                     <el-input v-model="form.price" type="number" placeholder="请输入单价" :disabled="editType" />
                 </el-form-item>
+                <!-- 封面图 -->
+                <el-form-item label="封面图" prop="faceImg">
+                    <ImageUpload v-model="form.faceImg" :disabled="editType" :limit="1" />
+                </el-form-item>
                 <el-divider content-position="center">攀塔商品信息信息</el-divider>
                 <el-row :gutter="10" class="mb8" v-if="!editType">
                     <el-col :span="1.5">
@@ -101,11 +105,14 @@
                         <el-table-column label="商品概率" prop="reference" align="center" />
                         <el-table-column label="类型" prop="type" align="center">
                             <template slot-scope="scope">
-                                <el-select v-model="scope.row.type" placeholder="请选择类型" clearable :disabled="editType">
-                                    <el-option label="升级物品" value="1" :disabled="disabledChange(1)" />
-                                    <el-option label="降级类型" value="2" :disabled="disabledChange(2)" />
-                                    <el-option label="赠送物品" value="3" :disabled="disabledChange(3)" />
-                                </el-select>
+                                <el-form-item :prop="'wxTowerCommodityList.' + scope.$index + '.type'" :rules="{ required: true, message: '选择商品类型', trigger: 'blur' }">
+                                    <el-select v-model="scope.row.type" placeholder="请选择类型" clearable :disabled="editType">
+                                        <el-option label="升级物品" value="1" :disabled="disabledChange(1)" />
+                                        <el-option label="降级类型" value="2" :disabled="disabledChange(2)" />
+                                        <el-option label="赠送物品" value="3" />
+                                        <el-option label="售卖物品" value="4" />
+                                    </el-select>
+                                </el-form-item>
                             </template>
                         </el-table-column>
                         <el-table-column label="备注" prop="remark" align="center" />
@@ -201,6 +208,7 @@ export default {
             rules: {
                 layers: [{ required: true, message: "请输入攀塔层数", trigger: "blur" }],
                 price: [{ required: true, message: "请输入单价", trigger: "blur" }],
+                faceImg: [{ required: true, message: "请添加封面图", trigger: "change" }],
                 wxTowerCommodityList: [{ required: true, type: "array", message: "请添加商品", trigger: "change" }],
             },
             openGoods: false,
@@ -240,6 +248,7 @@ export default {
                 id: null,
                 layers: null,
                 price: null,
+                faceImg: null,
                 wxTowerCommodityList: [],
             };
             this.resetForm("form");
@@ -358,6 +367,7 @@ export default {
                 referencePrice: null,
                 reference: null,
                 remark: null,
+                type: '4'
             };
             this.resetForm("commodityForm");
         },
@@ -377,7 +387,7 @@ export default {
                         // 新增提交
                         this.form.wxTowerCommodityList.push({
                             ...this.commodityForm,
-                            type: null,
+                            type: '4',
                         });
                         this.openGoods = false;
                     };
