@@ -590,10 +590,6 @@ export default {
         submitGoodsForm() {
             this.$refs["commodityForm"].validate(valid => {
                 if (valid) {
-                    // if (this.form.wxSuitCommodityList.find(item => item.commodityId === this.commodityForm.commodityId)) {
-                    //     this.$message.error('商品已存在,请勿重复添加');
-                    //     return;
-                    // };
                     if (this.editId) {
                         // 修改提交
                         this.form.wxSuitCommodityList =
@@ -611,7 +607,7 @@ export default {
                             isSale: "0",
                             isDouble: "0",
                         };
-                        if(this.form.suitType == 1 || this.form.suitType == 2) {
+                        if(this.form.suitType == 1 || this.form.suitType == 2 || this.form.suitType == 4) {
                             obj.isSale = "1";
                         }
                         this.form.suitType == 3 ? obj.isSale = '1' : "";

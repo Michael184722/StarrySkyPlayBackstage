@@ -6,7 +6,7 @@
             </el-form-item>
             <el-form-item label="商品等级" prop="level">
                 <el-select v-model="queryParams.level" placeholder="请选择商品等级" clearable>
-                    <el-option v-for="dict in dict.type.level" :key="dict.value" :label="dict.label" :value="dict.value" />
+                    <el-option v-for="dict in dict.type.level" :key="dict.label" :label="dict.label" :value="dict.value" />
                 </el-select>
             </el-form-item>
             <el-form-item label="更新时间">
@@ -194,6 +194,7 @@ export default {
             const id = row.id || this.ids
             getCommodity(id).then(response => {
                 this.form = response.data;
+                this.form.level = response.data.level.toString();
                 this.open = true;
                 this.title = "修改商城商品管理";
             });
