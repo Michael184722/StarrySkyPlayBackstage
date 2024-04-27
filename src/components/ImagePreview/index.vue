@@ -1,5 +1,5 @@
 <template>
-    <el-image :src="`${realSrc}`" fit="cover" :style="`width:${realWidth};height:${realHeight};`" :preview-src-list="realSrcList">
+    <el-image ref="elImage" :src="`${realSrc}`" fit="cover" :style="`width:${realWidth};height:${realHeight};`" :preview-src-list="realSrcList">
         <div slot="error" class="image-slot">
             <i class="el-icon-picture-outline"></i>
         </div>
@@ -27,6 +27,11 @@ export default {
         view: {
             type: Boolean,
             default: true
+        }
+    },
+    mounted() {
+        if (this.view) {
+            // console.log(this.$refs.elImage.clickHandler(), "AAAA");
         }
     },
     computed: {

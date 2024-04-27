@@ -51,10 +51,10 @@
                 </template>
             </el-table-column>
             <el-table-column label="上架时间" align="center" prop="upTime" width="150" />
-            <el-table-column label="操作" align="center" width="180">
+            <el-table-column label="操作" align="center" width="260">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="queryLook(scope.row)" v-hasPermi="['suitManage:suitManage:query']">查看</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['suitManage:suitManage:edit']">修改</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-edit" @click="queryLook(scope.row)" v-hasPermi="['suitManage:suitManage:query']">箱子修改</el-button>
                     <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['suitManage:suitManage:remove']">删除</el-button>
                 </template>
             </el-table-column>
@@ -96,12 +96,12 @@
                     <template v-if="form.drawNum">
                         <el-tag v-for="(tag, index) in form.drawNum" :key="index" closable @click="clickBtn(index)" @close="form.drawNum = form.drawNum.filter((item, i) => index != i)"
                             class="formEltag">
-                            <el-input type="number" :ref="'elInput' + (index + 1)" v-if="active == index" :value="tag" size="mini" style="width: 100px;" @blur="active = null"
+                            <el-input type="number" :ref="'elInput' + (index + 1)" v-if="active == index" :value="tag" size="mini" style="width: 100px;" @blur="drawNumChangeBlur"
                                 @input="(e) => form.drawNum = form.drawNum.map((item, i) => index == i ? e : item)" />
                             <span v-else>{{ tag }}</span>
                         </el-tag>
                     </template>
-                    <el-button size="mini" type="primary" v-if="form.drawNum && form.drawNum.length < 4" @click="form.drawNum.push(0)">新增</el-button>
+                    <el-button size="mini" type="primary" v-if="form.drawNum && form.drawNum.length < 4" @click="form.drawNum.push(1)">新增</el-button>
                 </el-form-item>
                 <el-form-item label="上/下架" prop="status">
                     <el-switch v-model="form.status" active-value="1" inactive-value="0" />
@@ -112,71 +112,73 @@
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
                 </el-form-item>
-                <el-divider content-position="center">抽赏套商品信息</el-divider>
-                <el-row :gutter="10" class="mb8">
-                    <el-col :span="1.5">
-                        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxSuitCommodity">添加</el-button>
-                    </el-col>
-                    <el-col :span="1.5" :offset="2" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">期望值：{{ expectedValue.exVal.toFixed(2) }}元</el-col>
-                    <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValue.profitAndLoss.toFixed(2) }}元</el-col>
-                </el-row>
-                <el-form-item prop="wxSuitCommodityList" label-width="10px">
-                    <el-table :data="form.wxSuitCommodityList" ref="wxSuitCommodity">
-                        <el-table-column label="序号" align="center" type="index" width="50" />
-                        <el-table-column label="商品名称" prop="commodityName" align="center">
-                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "commodityName") }}</template>
-                        </el-table-column>
-                        <el-table-column label="商品图片" prop="img" align="center">
-                            <template slot-scope="scope">
-                                <ImagePreview :src="queryProducts(scope.row.commodityId, 'faceImg')" width="100px" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="商品等级" prop="levelName" align="center">
-                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "levelName") }}</template>
-                        </el-table-column>
-                        <el-table-column label="商品原价" prop="price" align="center">
-                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
-                        </el-table-column>
-                        <el-table-column label="商品参考价" prop="referencePrice" align="center" />
-                        <el-table-column label="商品概率" prop="reference" align="center" />
-                        <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
-                            <template slot-scope="scope">{{ scope.row.num }}</template>
-                        </el-table-column>
-                        <template v-if="form.suitType == 4">
-                            <el-table-column label="是否双倍赠送" align="center">
+                <template  v-if="!editType">
+                    <el-divider content-position="center">抽赏套商品信息</el-divider>
+                    <el-row :gutter="10" class="mb8">
+                        <el-col :span="1.5">
+                            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxSuitCommodity">添加</el-button>
+                        </el-col>
+                        <el-col :span="1.5" :offset="2" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">期望值：{{ expectedValue.exVal.toFixed(2) }}元</el-col>
+                        <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValue.profitAndLoss.toFixed(2) }}元</el-col>
+                    </el-row>
+                    <el-form-item prop="wxSuitCommodityList" label-width="10px">
+                        <el-table :data="form.wxSuitCommodityList" ref="wxSuitCommodity">
+                            <el-table-column label="序号" align="center" type="index" width="50" />
+                            <el-table-column label="商品名称" prop="commodityName" align="center">
+                                <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "commodityName") }}</template>
+                            </el-table-column>
+                            <el-table-column label="商品图片" prop="img" align="center">
                                 <template slot-scope="scope">
-                                    <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1"
-                                        @change="switchTypeChange($event, scope.row, 'isDouble')" />
+                                    <ImagePreview :src="queryProducts(scope.row.commodityId, 'faceImg')" width="100px" />
                                 </template>
                             </el-table-column>
-                        </template>
-                        <template v-if="form.suitType == 4">
-                            <el-table-column label="赠送次数" align="center" width="160">
+                            <el-table-column label="商品等级" prop="levelName" align="center">
+                                <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "levelName") }}</template>
+                            </el-table-column>
+                            <el-table-column label="商品原价" prop="price" align="center">
+                                <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
+                            </el-table-column>
+                            <el-table-column label="商品参考价" prop="referencePrice" align="center" />
+                            <el-table-column label="商品概率" prop="reference" align="center" />
+                            <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
+                                <template slot-scope="scope">{{ scope.row.num }}</template>
+                            </el-table-column>
+                            <template v-if="form.suitType == 4">
+                                <el-table-column label="是否双倍赠送" align="center">
+                                    <template slot-scope="scope">
+                                        <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1"
+                                            @change="switchTypeChange($event, scope.row, 'isDouble')" />
+                                    </template>
+                                </el-table-column>
+                            </template>
+                            <template v-if="form.suitType == 4">
+                                <el-table-column label="赠送次数" align="center" width="160">
+                                    <template slot-scope="scope">
+                                        <el-input v-model="scope.row.sendNum" size="mini" type="number" placeholder="请输入赠送次数" />
+                                        <!-- @blur="switchTypeChange($event, scope.row, 'sendNum')" -->
+                                    </template>
+                                </el-table-column>
+                            </template>
+                            <el-table-column label="是否售卖" prop="isSale" align="center">
                                 <template slot-scope="scope">
-                                    <el-input v-model="scope.row.sendNum" size="mini" type="number" placeholder="请输入赠送次数" />
-                                    <!-- @blur="switchTypeChange($event, scope.row, 'sendNum')" -->
+                                    <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4" @change="sellChange($event, scope.row)" />
                                 </template>
                             </el-table-column>
-                        </template>
-                        <el-table-column label="是否售卖" prop="isSale" align="center">
-                            <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4" @change="sellChange($event, scope.row)" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="是否赠送" prop="isSend" align="center">
-                            <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1" @change="giftsChange($event, scope.row)" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="备注" prop="remark" align="center" />
-                        <el-table-column label="操作" align="center">
-                            <template slot-scope="scope">
-                                <el-button size="mini" type="text" icon="el-icon-edit" @click="commodityUpdate(scope.row)">修改</el-button>
-                                <el-button size="mini" type="text" icon="el-icon-delete" @click="commodityDelete(scope.row)">删除</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
+                            <el-table-column label="是否赠送" prop="isSend" align="center">
+                                <template slot-scope="scope">
+                                    <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1" @change="giftsChange($event, scope.row)" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="备注" prop="remark" align="center" />
+                            <el-table-column label="操作" align="center">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" type="text" icon="el-icon-edit" @click="commodityUpdate(scope.row)">修改</el-button>
+                                    <el-button size="mini" type="text" icon="el-icon-delete" @click="commodityDelete(scope.row)">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-form-item>
+                </template>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -204,7 +206,7 @@
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
                 </el-form-item>
                 <el-form-item label="抽中概率" prop="reference">
-                    <el-input v-model="commodityForm.reference" type="number" placeholder="请输入抽中概率">
+                    <el-input v-model="commodityForm.reference" type="number" max="100" placeholder="请输入抽中概率" @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
                         <template slot="append">%</template>
                     </el-input>
                 </el-form-item>
@@ -222,32 +224,36 @@
             </div>
         </el-dialog>
         <!-- 查看详情 -->
-        <el-dialog title="详情" :visible.sync="openInfo" width="800px" append-to-body class="suitManage">
+        <el-dialog title="套信息" :visible.sync="openInfo" width="1200px" append-to-body class="suitManage">
             <h3>基本信息</h3>
             <div class="sm-info">
                 <div>套名称：{{ lookInfo.suitName }}</div>
                 <div>
-                    套类型：{{ lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 3 ? "无限池" : "/" }}
+                    {{ lookInfo.suitType }}
+                    套类型：{{ lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 4 ? "无限池" : "/" }}
                 </div>
                 <div v-if="lookInfo.suitType == 3">单抽积分：{{ lookInfo.integral }}积分</div>
                 <div v-else>单抽价格：{{ lookInfo.price }}元</div>
                 <div>查看等级：{{ lookInfo.levelName }}</div>
                 <div>上下架：{{ lookInfo.status == 1 ? "上架" : "下架" }}</div>
             </div>
-            <h3 style="margin-top: 35px">箱子列表（{{ lookInfo.boxNum }}个）</h3>
+            <h3 style="margin-top: 35px; display: flex; align-items: center;">
+                <div>箱子列表（{{ lookInfo.boxNum }}个）</div>
+                <el-button type="primary" size="mini" style="margin-left: 20px;">新增箱子</el-button>
+            </h3>
             <div class="sm-list">
                 <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxInfo = item; boxType = true">
-                    <ImagePreview :src="lookInfo.faceImg" :view="false" width="100px" height="100px" />
-                    <div style="margin: 5px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
+                    <ImagePreview :src="lookInfo.faceImg" :view="false" width="160px" height="150px" />
+                    <div style="margin: 10px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
                 </div>
             </div>
         </el-dialog>
         <!-- 箱子详情 -->
-        <el-dialog title="箱子详情" :visible.sync="boxType" width="800px" append-to-body class="suitManage">
+        <el-dialog title="箱子信息" :visible.sync="boxType" width="1800px" append-to-body class="suitManage">
             <h3>商品</h3>
-            <div class="sm-list" style="grid-template-columns: repeat(4, 1fr); gap: 20px 48px;">
+            <div class="sm-list" style="grid-template-columns: repeat(8, 1fr); gap: 20px 48px;">
                 <div class="sm-list-item" v-for="(item, index) in boxInfo.commodityList" :key="index" style="border-radius: 10px;text-align: left;">
-                    <ImagePreview :src="item.faceImg" width="150px" height="200px" />
+                    <ImagePreview :ref="'ImagePreview' + (index + 1)" :src="item.faceImg" width="180px" height="200px" />
                     <div style="padding-left: 5px; margin-top: 5px">{{ item.commodityName }}</div>
                     <div style="display: flex;justify-content: space-between; font-size: 12px; padding: 5px 5px 10px">
                         <div>参考价:{{ item.referencePrice }}元</div>
@@ -256,6 +262,15 @@
                     <!-- <div style="font-size: 12px">{{ item.remark }}</div> -->
                     <div class="sm-list-item-type">{{ item.typeName }}&nbsp;&nbsp;{{ item.num }}&nbsp;/&nbsp;{{item.totalNum }}</div>
                     <div class="sm-list-item-tips" v-if="item.num == 0">已售完</div>
+                    <div class="sm-list-item-Fun">
+                        <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="item.faceImg" @click="lookImage(index + 1)"></i>
+                        <!-- 修改 -->
+                        <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;"></i>
+                        <!-- @click="editGoods(index + 1)" -->
+                        <!-- 删除 -->
+                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;"></i>
+                        <!-- @click="delGoods(index + 1)" -->
+                    </div>
                 </div>
             </div>
             <h3 style="margin-top: 35px">中赏排行</h3>
@@ -359,6 +374,7 @@ export default {
             boxType: false,
             boxInfo: {},
             active: null,
+            editType: false,
         };
     },
     created() {
@@ -438,6 +454,21 @@ export default {
             this.resetForm("queryForm");
             this.handleQuery();
         },
+        // 按钮设置
+        drawNumChangeBlur() {
+            this.form.drawNum = this.form.drawNum.map(item  => {
+                item && (item = Number(item));
+                !item && (item = 1);
+                item && item < 1 && (item = 1);
+                item && item > 100 && (item = 100);
+                return item;
+            });
+            this.active = null;
+        },
+        // 查看大图ImagePreview
+        lookImage(index) {
+            this.$refs['ImagePreview' + index][0].$refs.elImage.clickHandler();
+        },
         /** 上下架 */
         switchChange(e, row) {
             let obj = {
@@ -454,6 +485,7 @@ export default {
         handleAdd() {
             this.reset();
             this.open = true;
+            this.editType = false;
             this.getCommodityList();
             this.title = "添加抽赏套管理";
         },
@@ -469,6 +501,7 @@ export default {
         /** 修改按钮操作 */
         async handleUpdate(row) {
             this.reset();
+            this.editType = true;
             const id = row.id || this.ids;
             this.getCommodityList();
             await getSuitManage(id).then(response => {
@@ -711,9 +744,11 @@ export default {
             grid-template-columns: repeat(6, 1fr);
 
             .sm-list-item {
+                overflow: hidden;
                 text-align: center;
                 position: relative;
                 border-radius: 10px;
+                box-sizing: border-box;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
                 .sm-list-item-type {
@@ -730,6 +765,7 @@ export default {
                 .sm-list-item-tips {
                     top: 0;
                     left: 0;
+                    z-index: 10;
                     width: 100%;
                     height: 100%;
                     display: flex;
@@ -739,6 +775,45 @@ export default {
                     border-radius: 10px;
                     background: #00000086;
                     justify-content: center;
+                }
+                
+                .sm-list-item-Fun {
+                    top: 0;
+                    left: 0;
+                    z-index: 20;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    color: #FFFFFF;
+                    position: absolute;
+                    align-items: center;
+                    border-radius: 10px;
+                    transition: all 0.3s;
+                    background: #00000000;
+                    justify-content: space-around;
+
+                    > i {
+                        transform: translateY(550%);
+                    }
+
+                    >i:nth-of-type(1) {
+                        transition: all 0.3s;
+                    }
+                    >i:nth-of-type(2) {
+                        transition: all 0.4s;
+                    }
+                    >i:nth-of-type(3) {
+                        transition: all 0.5s;
+                    }
+                }
+            }
+
+            .sm-list-item:hover {
+                .sm-list-item-Fun {
+                    background: #000000a2;
+                    > i {
+                        transform: translateY(0%);
+                    }
                 }
             }
         }

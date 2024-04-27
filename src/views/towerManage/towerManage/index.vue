@@ -148,7 +148,7 @@
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
                 </el-form-item>
                 <el-form-item label="抽中概率" prop="reference">
-                    <el-input v-model="commodityForm.reference" type="number" placeholder="请输入抽中概率">
+                    <el-input v-model="commodityForm.reference" type="number" placeholder="请输入抽中概率" @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
                         <template slot="append">%</template>
                     </el-input>
                 </el-form-item>

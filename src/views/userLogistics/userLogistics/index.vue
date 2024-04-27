@@ -68,7 +68,17 @@
             </el-table-column>
             <el-table-column label="昵称" align="center" prop="nickName" width="200" />
             <el-table-column label="手机号" align="center" prop="userPhone" width="180" />
-            <el-table-column label="商品名称" align="center" prop="commodityName" width="200" />
+            <el-table-column label="商品" align="center" prop="commodityName">
+                <template slot-scope="scope">
+                    <el-popover placement="right" trigger="click">
+                        <el-table v-if="scope.row.commodityName" :data="scope.row.commodityName.split(',').map(item => { return { commodityName: item } })">
+                            <el-table-column width="400" property="commodityName" label="商品名称"></el-table-column>
+                        </el-table>
+                        <el-button slot="reference" type="primary" size="mini" @click="">查看</el-button>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column label="商品名称" align="center" prop="commodityName" width="200" /> -->
             <el-table-column label="商品数量" align="center" prop="num" width="200" />
             <el-table-column label="商品总价" align="center" prop="totalMoney" width="200" />
             <el-table-column label="物流单号" align="center" prop="logisticsNo" width="200" />
@@ -89,8 +99,8 @@
             </el-table-column>
             <el-table-column label="收货人姓名" align="center" prop="name" width="150" />
             <el-table-column label="收获人手机号" align="center" prop="phone" width="150" />
-            <el-table-column label="收货人地区" align="center" prop="region" width="100" />
-            <el-table-column label="收货人地址" align="center" prop="address" width="200" />
+            <el-table-column label="收货人地区" align="center" prop="region" width="300" />
+            <el-table-column label="收货人地址" align="center" prop="address" width="400" />
             <el-table-column label="申请时间" align="center" prop="createTime" width="180">
                 <template slot-scope="scope">
                     <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>

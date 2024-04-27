@@ -58,17 +58,33 @@
                 </template>
             </el-table-column>
             <el-table-column label="昵称" align="center" prop="nickName" />
-            <el-table-column label="商品名称" align="center" prop="commodityName" />
+            <el-table-column label="商品" align="center" prop="commodityName">
+                <template slot-scope="scope">
+                    <el-popover placement="right" trigger="click">
+                        <el-table v-if="scope.row.commodityName" :data="scope.row.commodityName.split(',').map(item => { return { commodityName: item } })">
+                            <el-table-column width="400" property="commodityName" label="商品名称"></el-table-column>
+                            <el-table-column width="200" label="商品等级" align="center">
+                                <template slot-scope="scopeItem">
+                                    <el-tag v-if="scope.row.level && scope.row.level.split(',')[scopeItem.$index]">{{ scope.row.level.split(',')[scopeItem.$index] }}</el-tag>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button slot="reference" type="primary" size="mini" @click="">查看</el-button>
+                    </el-popover>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column label="商品名称" align="center" prop="commodityName" /> -->
             <el-table-column label="数量" align="center" prop="num" />
-            <el-table-column label="商品等级" align="center" prop="level">
+            <!-- <el-table-column label="商品等级" align="center" prop="level">
                 <template slot-scope="scope">
                     <dict-tag :options="dict.type.level" :value="scope.row.level" />
                 </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="类型" align="center" prop="status">
                 <template slot-scope="scope">
-                    <template v-for="(item, index) in [{label: '已成交', value: 1},{label: '未成交', value: 0}]">
-                        <el-tag :key="index" v-if="item.value == scope.row.status" :type=" scope.row.status == 0 && 'danger'">{{item.label}}</el-tag>
+                    <template v-for="(item, index) in [{ label: '已成交', value: 1 }, { label: '未成交', value: 0 }]">
+                        <el-tag :key="index" v-if="item.value == scope.row.status && scope.row.status == 0" type="danger">{{ item.label }}</el-tag>
+                        <el-tag :key="index" v-if="item.value == scope.row.status &&  scope.row.status != 0">{{ item.label }}</el-tag>
                     </template>
                 </template>
             </el-table-column>
@@ -92,7 +108,7 @@
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改交易区对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -186,7 +202,7 @@ export default {
         /** 查询交易区列表 */
         getList() {
             this.loading = true;
-            if(this.buyTime.length) {
+            if (this.buyTime.length) {
                 this.queryParams.params.buyTimeBegin = this.buyTime[0];
                 this.queryParams.params.buyTimeEnd = this.buyTime[1];
             };
