@@ -79,7 +79,7 @@
             <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
             <el-table-column label="是否参与流水排行" align="center" prop="isWarter" width="130">
                 <template slot-scope="scope">
-                    <el-switch v-model="scope.row.isWarter" active-value="0" inactive-value="1" @change="switchChange($event, scope.row, 'isWarter')" />
+                    <el-switch v-model="scope.row.isWarter" active-value="1" inactive-value="0" @change="switchChange($event, scope.row, 'isWarter')" />
                 </template>
             </el-table-column>
             <el-table-column label="封号" align="center" prop="delFlag">
@@ -147,7 +147,7 @@
                     <el-input v-model="form.water" placeholder="请输入流水金额" />
                 </el-form-item>
                 <el-form-item label="是否参与流水排行" prop="isWarter">
-                    <el-switch v-model="form.isWarter" active-value="0" inactive-value="1" />
+                    <el-switch v-model="form.isWarter" active-value="1" inactive-value="0" />
                 </el-form-item>
                 <el-form-item label="头像" prop="wxAvatar">
                     <ImageUpload v-model="form.wxAvatar" :limit="1" />
@@ -175,7 +175,7 @@
                     <div class="form-box-con-item">总金额：{{ info.totalMoney }}</div>
                     <div class="form-box-con-item">积分余额：{{ info.integral }}</div>
                     <div class="form-box-con-item">流水金额：{{ info.water }}</div>
-                    <div class="form-box-con-item">是否参与流水排行：{{ info.isWarter == 0 ? '是' : '否' }}</div>
+                    <div class="form-box-con-item">是否参与流水排行：{{ info.isWarter == 1 ? '是' : '否' }}</div>
                     <div class="form-box-con-item">创建时间：{{ info.createTime }}</div>
                 </div>
             </div>
@@ -481,7 +481,7 @@ export default {
                 totalMoney: null,
                 integral: null,
                 water: null,
-                isWarter: null,
+                isWarter: '1',
             };
             this.resetForm("form");
         },

@@ -9,7 +9,7 @@ const CompressionPlugin = require('compression-webpack-plugin')
 
 const name = process.env.VUE_APP_TITLE || '若依管理系统' // 网页标题
 
-const port = process.env.port || process.env.npm_config_port || 800 // 端口
+const port = process.env.port || process.env.npm_config_port || 8080 // 端口
 
 // vue.config.js 配置说明
 //官方vue.config.js 参考文档 https://cli.vuejs.org/zh/config/#css-loaderoptions
@@ -36,9 +36,9 @@ module.exports = {
             // detail: https://cli.vuejs.org/config/#devserver-proxy
             [process.env.VUE_APP_BASE_API]: {
                 // target: `http://192.168.11.174:8090/wxApp`,
-                target: `http://120.46.55.124/wxApp`,
+                // target: `http://120.46.55.124/wxApp`,
                 // target: `https://www.xkmwygw.com/wxApp`,
-                // target: `http://9mqjuk.natappfree.cc/wxApp`,
+                target: `http://y6w9nu.natappfree.cc/wxApp`,
                 changeOrigin: true,
                 pathRewrite: {
                     ['^' + process.env.VUE_APP_BASE_API]: ''
