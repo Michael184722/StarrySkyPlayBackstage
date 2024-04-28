@@ -17,7 +17,11 @@
 
 		<el-table v-loading="loading" :data="orderList">
 			<el-table-column label="序号" type="index" width="55" align="center" />
-			<el-table-column label="头像" align="center" prop="wxAvatar" />
+			<el-table-column label="头像" align="center" prop="wxAvatar">
+				<template slot-scope="scope">
+					<ImagePreview :src="scope.row.wxAvatar" :width="50" :height="50" />
+				</template>
+			</el-table-column>
 			<el-table-column label="昵称" align="center" prop="nickName" />
 			<el-table-column label="ID" align="center" prop="commodityId" />
 			<el-table-column label="手机号" align="center" prop="phone" />

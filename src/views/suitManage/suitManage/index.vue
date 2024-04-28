@@ -69,7 +69,7 @@
                     <el-input v-model="form.suitName" placeholder="请输入套名称" />
                 </el-form-item>
                 <el-form-item label="套类型" prop="suitType">
-                    <el-select v-model="form.suitType" placeholder="请选择套类型" clearable style="width: 100%;" @change="suitTypeChange">
+                    <el-select v-model="form.suitType" placeholder="请选择套类型" clearable style="width: 100%;" @change="suitTypeChange" :disabled="editType">
                         <el-option v-for="(dict, key, index) in suitTypeData" :key="index" :label="dict" :value="key" />
                     </el-select>
                 </el-form-item>
@@ -84,7 +84,7 @@
                     <el-input v-model="form.lotteryNum" type="number" placeholder="请输入抽奖次数" />
                 </el-form-item>
                 <el-form-item label="箱子数量" prop="boxNum" v-if="form.suitType != 4" :rules="[{ required: true, message: '请输入箱子数量', trigger: 'blur' }]">
-                    <el-input v-model="form.boxNum" type="number" placeholder="请输入盒子数量" />
+                    <el-input v-model="form.boxNum" type="number" placeholder="请输入盒子数量" :disabled="editType" />
                 </el-form-item>
                 <el-form-item label="查看等级" prop="levelId">
                     <el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;">
@@ -112,7 +112,7 @@
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
                 </el-form-item>
-                <template  v-if="!editType">
+                <template v-if="!editType">
                     <el-divider content-position="center">抽赏套商品信息</el-divider>
                     <el-row :gutter="10" class="mb8">
                         <el-col :span="1.5">
@@ -161,12 +161,14 @@
                             </template>
                             <el-table-column label="是否售卖" prop="isSale" align="center">
                                 <template slot-scope="scope">
-                                    <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4" @change="sellChange($event, scope.row)" />
+                                    <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4"
+                                        @change="sellChange($event, scope.row)" />
                                 </template>
                             </el-table-column>
                             <el-table-column label="是否赠送" prop="isSend" align="center">
                                 <template slot-scope="scope">
-                                    <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1" @change="giftsChange($event, scope.row)" />
+                                    <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1"
+                                        @change="giftsChange($event, scope.row)" />
                                 </template>
                             </el-table-column>
                             <el-table-column label="备注" prop="remark" align="center" />
@@ -229,7 +231,6 @@
             <div class="sm-info">
                 <div>套名称：{{ lookInfo.suitName }}</div>
                 <div>
-                    {{ lookInfo.suitType }}
                     套类型：{{ lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 4 ? "无限池" : "/" }}
                 </div>
                 <div v-if="lookInfo.suitType == 3">单抽积分：{{ lookInfo.integral }}积分</div>
@@ -239,7 +240,7 @@
             </div>
             <h3 style="margin-top: 35px; display: flex; align-items: center;">
                 <div>箱子列表（{{ lookInfo.boxNum }}个）</div>
-                <el-button type="primary" size="mini" style="margin-left: 20px;">新增箱子</el-button>
+                <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
             </h3>
             <div class="sm-list">
                 <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxInfo = item; boxType = true">
@@ -250,29 +251,38 @@
         </el-dialog>
         <!-- 箱子详情 -->
         <el-dialog title="箱子信息" :visible.sync="boxType" width="1800px" append-to-body class="suitManage">
-            <h3>商品</h3>
-            <div class="sm-list" style="grid-template-columns: repeat(8, 1fr); gap: 20px 48px;">
+            <h3>
+                商品
+                <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewGoods">新增商品</el-button>
+            </h3>
+            <div class="sm-list" style="grid-template-columns: repeat(6, 1fr); gap: 20px 48px;">
                 <div class="sm-list-item" v-for="(item, index) in boxInfo.commodityList" :key="index" style="border-radius: 10px;text-align: left;">
-                    <ImagePreview :ref="'ImagePreview' + (index + 1)" :src="item.faceImg" width="180px" height="200px" />
-                    <div style="padding-left: 5px; margin-top: 5px">{{ item.commodityName }}</div>
-                    <div style="display: flex;justify-content: space-between; font-size: 12px; padding: 5px 5px 10px">
-                        <div>参考价:{{ item.referencePrice }}元</div>
-                        <div>概率:{{ item.reference ? item.reference + "%" : "" }}</div>
+                    <ImagePreview :ref="'ImagePreview' + (index + 1)" :src="item.faceImg" width="250px" height="200px" />
+                    <div class="sm-list-item-text">{{ item.commodityName }}</div>
+                    <div class="sm-list-item-text">
+                        <div>原价：{{ item.price }} 元</div>
+                        <div>参考价：{{ item.referencePrice }} 元</div>
                     </div>
-                    <!-- <div style="font-size: 12px">{{ item.remark }}</div> -->
-                    <div class="sm-list-item-type">{{ item.typeName }}&nbsp;&nbsp;{{ item.num }}&nbsp;/&nbsp;{{item.totalNum }}</div>
+                    <div class="sm-list-item-text">
+                        <div>等级：{{ item.typeName }}</div>
+                        <div>概率：{{ item.reference ? item.reference + "%" : "" }}</div>
+                    </div>
+                    <div class="sm-list-item-text">{{ item.remark }}</div>
+                    <div class="sm-list-item-salesType" v-if="item.isSale == 1">售卖</div>
+                    <div class="sm-list-item-salesType" v-if="item.isSend == 1">赠送</div>
+
+                    <div class="sm-list-item-type">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
                     <div class="sm-list-item-tips" v-if="item.num == 0">已售完</div>
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="item.faceImg" @click="lookImage(index + 1)"></i>
-                        <!-- 修改 -->
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;"></i>
                         <!-- @click="editGoods(index + 1)" -->
-                        <!-- 删除 -->
                         <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;"></i>
                         <!-- @click="delGoods(index + 1)" -->
                     </div>
                 </div>
             </div>
+            <el-divider content-position="center">箱子抽赏信息</el-divider>
             <h3 style="margin-top: 35px">中赏排行</h3>
             <el-table :data="boxInfo.rankList">
                 <el-table-column label="排名" align="center" prop="rank" />
@@ -299,6 +309,70 @@
                 <el-table-column label="商品等级" align="center" prop="level" />
                 <el-table-column label="中赏时间" align="center" prop="createTime" />
             </el-table>
+        </el-dialog>
+
+        <!-- 新增盒子商品 -->
+        <el-dialog title="新增商品" :visible.sync="openGoodType" width="1200px" append-to-body class="suitManage">
+            <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
+                <el-form-item label="商品名称" prop="commodityId">
+                    <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;">
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName" :value="dict.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="商品等级">
+                    <el-input :value="queryProducts(boxProductForm.commodityId, 'levelName')" placeholder="请选择商品" disabled />
+                </el-form-item>
+                <el-form-item label="商品单价">
+                    <el-input :value="queryProducts(boxProductForm.commodityId, 'price')" placeholder="请选择商品" disabled />
+                </el-form-item>
+                <el-form-item label="商品数量" prop="num" v-if="lookInfo.suitType != 4" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
+                    <el-input v-model="boxProductForm.num" type="number" placeholder="请输入商品数量" />
+                </el-form-item>
+                <el-form-item label="参考价" prop="referencePrice">
+                    <el-input v-model="boxProductForm.referencePrice" type="number" placeholder="请输入商品参考价" />
+                </el-form-item>
+                <el-form-item label="抽中概率" prop="reference">
+                    <el-input v-model="boxProductForm.reference" type="number" max="100" placeholder="请输入抽中概率" @input="(val) => { boxProductForm.reference = val <= 100 ? val : 100 }">
+                        <template slot="append">%</template>
+                    </el-input>
+                </el-form-item>
+                <!-- 是否售卖 -->
+                <el-form-item label="是否售卖" prop="isSale" :rules="[{ required: true, message: '请选择是否售卖', trigger: 'change' }]">
+                    <el-radio-group v-model="boxProductForm.isSale" :disabled="lookInfo.suitType == 3 ||  lookInfo.suitType == 4" @input="boxProductForm.isSale == '1' ? boxProductForm.isSend = '0' : boxProductForm.isSend = '1'">
+                        <el-radio label="1">是</el-radio>
+                        <el-radio label="0">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <!-- 是否赠送 -->
+                <el-form-item label="是否赠送" prop="isSend" :rules="[{ required: true, message: '请选择是否赠送', trigger: 'change' }]" v-if="lookInfo.suitType != 4">
+                    <el-radio-group v-model="boxProductForm.isSend" :disabled="lookInfo.suitType == 3 ||  lookInfo.suitType == 4" @input="boxProductForm.isSend == '1' ? boxProductForm.isSale = '0' : boxProductForm.isSale = '1'">
+                        <el-radio label="1">是</el-radio>
+                        <el-radio label="0">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <!-- 是否双倍赠送 -->
+                <el-form-item label="是否双倍赠送" prop="isDouble" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请选择是否双倍赠送', trigger: 'change' }]">
+                    <el-radio-group v-model="boxProductForm.isDouble">
+                        <el-radio label="1">是</el-radio>
+                        <el-radio label="0">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <!-- 赠送次数 -->
+                <el-form-item label="赠送次数" prop="sendNum" v-if="boxProductForm.isDouble == 1" :rules="[{ required: true, message: '请输入赠送次数', trigger: 'blur' }]">
+                    <el-input v-model="boxProductForm.sendNum" type="number" placeholder="请输入赠送次数" />
+                </el-form-item>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="boxProductForm.remark" type="textarea" placeholder="请输入内容" />
+                </el-form-item>
+                <!-- 商品图片-->
+                <el-form-item label="商品图片">
+                    <ImagePreview :src="queryProducts(boxProductForm.commodityId, 'faceImg')" width="300px" :height="boxProductForm.commodityId ? '' : '200px'" />
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitBoxProductForm">确 定</el-button>
+                <el-button @click="cancelBoxProductForm">取 消</el-button>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -375,6 +449,10 @@ export default {
             boxInfo: {},
             active: null,
             editType: false,
+            editRow: {},
+            boxProductForm: {},
+            boxProductRules: {},
+            openGoodType: false,
         };
     },
     created() {
@@ -456,7 +534,7 @@ export default {
         },
         // 按钮设置
         drawNumChangeBlur() {
-            this.form.drawNum = this.form.drawNum.map(item  => {
+            this.form.drawNum = this.form.drawNum.map(item => {
                 item && (item = Number(item));
                 !item && (item = 1);
                 item && item < 1 && (item = 1);
@@ -489,14 +567,78 @@ export default {
             this.getCommodityList();
             this.title = "添加抽赏套管理";
         },
+        resetGoods() {
+            this.boxProductForm = {
+                num: null,
+                commodityId: null,
+                referencePrice: null,
+                reference: null,
+                remark: null,
+                isSale: null,
+                isSend: null,
+                isDouble: null,
+                sendNum: 0,
+            };
+            this.resetForm("boxProductForm");
+        },
         /** 查看详情 */
         queryLook(row) {
+            this.editRow = row;
             const id = row.id || this.ids;
             this.getCommodityList();
             getDetail(id).then(res => {
                 this.lookInfo = res.data;
+                console.log(this.lookInfo, "this.lookInfo");
                 this.openInfo = true;
             });
+        },
+        // 新增盒子
+        addNewBox() {
+            this.$modal.confirm('是否确认新增盒子？').then(() => {
+                let obj = this.lookInfo.mapList[this.lookInfo.mapList.length - 1];
+                obj.commodityList = obj.commodityList.map(item => {
+                    item.boxIndex++;
+                    return item;
+                });
+                this.lookInfo.mapList.push(obj);
+            });
+        },
+        // 新增盒子商品
+        addNewGoods() {
+            this.resetGoods();
+            this.commodityReset();
+            // lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 4 ? "无限池"
+            if(this.lookInfo.suitType == 1) {
+                // 是否售卖
+                this.boxProductForm.isSale = "1";
+                // 是否赠送
+                this.boxProductForm.isSend = "0";
+            }
+            this.openGoodType = true;
+        },
+        // 关闭新增商品
+        cancelBoxProductForm() {
+            this.openGoodType = false;
+            this.commodityReset();
+        },
+        // 给盒子提交新的商品
+        submitBoxProductForm() {
+            console.log(this.boxProductForm, "this.boxProductForm");
+            let obj = {
+                boxIndex: null,
+                commodityId: this.boxProductForm.commodityId,
+                commodityName: this.queryProducts(this.boxProductForm.commodityId, 'commodityName'),
+                faceImg: this.queryProducts(this.boxProductForm.commodityId, 'faceImg'),
+                isDouble: this.boxProductForm.isDouble,
+                isSale: this.boxProductForm.isSale,
+                isSend: this.boxProductForm.isSend,
+                num: this.boxProductForm.num,
+                price: this.queryProducts(this.boxProductForm.commodityId, 'price'),
+                reference: this.boxProductForm.reference,
+                referencePrice: this.boxProductForm.referencePrice,
+                remark: this.boxProductForm.remark,
+                sendNum: this.boxProductForm.sendNum,
+            }
         },
         /** 修改按钮操作 */
         async handleUpdate(row) {
@@ -640,7 +782,7 @@ export default {
                             isSale: "0",
                             isDouble: "0",
                         };
-                        if(this.form.suitType == 1 || this.form.suitType == 2 || this.form.suitType == 4) {
+                        if (this.form.suitType == 1 || this.form.suitType == 2 || this.form.suitType == 4) {
                             obj.isSale = "1";
                         }
                         this.form.suitType == 3 ? obj.isSale = '1' : "";
@@ -662,10 +804,10 @@ export default {
         /** 类型选择限制 */
         suitTypeChange() {
             this.$nextTick(() => {
-                if(this.form.suitType == 1 || this.form.suitType == 2) {
+                if (this.form.suitType == 1 || this.form.suitType == 2) {
                     this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
-                        if(item.isSale == 1) item.isSend = "0";
-                        else if(item.isSale == 0) item.isSend = "1";
+                        if (item.isSale == 1) item.isSend = "0";
+                        else if (item.isSale == 0) item.isSend = "1";
                         item.isDouble = "0";
                         return item;
                     });
@@ -751,15 +893,37 @@ export default {
                 box-sizing: border-box;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
-                .sm-list-item-type {
+                .sm-list-item-text {
+                    width: 100%;
+                    display: flex;
+                    font-size: 12px;
+                    padding: 5px 10px;
+                    align-items: center;
+                    box-sizing: border-box;
+                    justify-content: space-between;
+                }
+
+                .sm-list-item-salesType {
+                    top: 0;
                     right: 0;
-                    top: 173px;
-                    padding: 5px;
                     font-size: 12px;
                     color: #FFFFFF;
+                    padding: 5px 20px;
                     position: absolute;
-                    background: #c942ffad;
-                    border-top-left-radius: 10px;
+                    background: #9442ffad;
+                    border-bottom-left-radius: 10px;
+                }
+
+                .sm-list-item-type {
+                    top: 58%;
+                    left: 50%;
+                    font-size: 12px;
+                    color: #5e5e5e;
+                    padding: 8px 15px;
+                    position: absolute;
+                    border-radius: 5px;
+                    background: #09a79918;
+                    transform: translate(-50%, -50%);
                 }
 
                 .sm-list-item-tips {
@@ -776,7 +940,7 @@ export default {
                     background: #00000086;
                     justify-content: center;
                 }
-                
+
                 .sm-list-item-Fun {
                     top: 0;
                     left: 0;
@@ -792,16 +956,18 @@ export default {
                     background: #00000000;
                     justify-content: space-around;
 
-                    > i {
-                        transform: translateY(550%);
+                    >i {
+                        transform: translateY(8em);
                     }
 
                     >i:nth-of-type(1) {
                         transition: all 0.3s;
                     }
+
                     >i:nth-of-type(2) {
                         transition: all 0.4s;
                     }
+
                     >i:nth-of-type(3) {
                         transition: all 0.5s;
                     }
@@ -811,7 +977,8 @@ export default {
             .sm-list-item:hover {
                 .sm-list-item-Fun {
                     background: #000000a2;
-                    > i {
+
+                    >i {
                         transform: translateY(0%);
                     }
                 }
