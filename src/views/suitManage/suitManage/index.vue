@@ -625,7 +625,7 @@ export default {
         submitBoxProductForm() {
             console.log(this.boxProductForm, "this.boxProductForm");
             let obj = {
-                boxIndex: null,
+                boxIndex: this.lookInfo.boxNum,
                 commodityId: this.boxProductForm.commodityId,
                 commodityName: this.queryProducts(this.boxProductForm.commodityId, 'commodityName'),
                 faceImg: this.queryProducts(this.boxProductForm.commodityId, 'faceImg'),
@@ -638,6 +638,8 @@ export default {
                 referencePrice: this.boxProductForm.referencePrice,
                 remark: this.boxProductForm.remark,
                 sendNum: this.boxProductForm.sendNum,
+                totalNum: this.lookInfo.suitType != 4 ? this.boxProductForm.num : this.boxProductForm.totalNum,
+                typeName: this.queryProducts(this.boxProductForm.commodityId, 'levelName'),
             }
         },
         /** 修改按钮操作 */
