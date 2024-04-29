@@ -42,6 +42,14 @@ export function updateSuitManage(data) {
     })
 }
 
+export function updateSuitManageEditBox(data) {
+    return request({
+        url: '/suitManage/suitManage/editBox',
+        method: 'put',
+        data: data
+    })
+}
+
 // 删除抽赏套管理
 export function delSuitManage(id) {
     return request({

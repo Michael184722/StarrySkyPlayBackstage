@@ -101,7 +101,8 @@
                             <span v-else>{{ tag }}</span>
                         </el-tag>
                     </template>
-                    <el-button size="mini" type="primary" v-if="form.drawNum && form.drawNum.length < 4" @click="form.drawNum.push(1)">新增</el-button>
+                    <el-button size="mini" type="primary" v-if="form.drawNum && form.drawNum.length < 4"
+                        @click="form.drawNum.push(form.drawNum.length == 0 ? 1 : form.drawNum.length == 1 ? form.drawNum[0] + 2 : form.drawNum.length == 2 ? form.drawNum[1] + 2 : form.drawNum.length == 3 ? form.drawNum[2] + 5 : 100)">新增</el-button>
                 </el-form-item>
                 <el-form-item label="上/下架" prop="status">
                     <el-switch v-model="form.status" active-value="1" inactive-value="0" />
@@ -112,7 +113,7 @@
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
                 </el-form-item>
-                <template v-if="!editType">
+                <template v-if="form.suitType && !editType">
                     <el-divider content-position="center">抽赏套商品信息</el-divider>
                     <el-row :gutter="10" class="mb8">
                         <el-col :span="1.5">
@@ -141,13 +142,18 @@
                             <el-table-column label="商品参考价" prop="referencePrice" align="center" />
                             <el-table-column label="商品概率" prop="reference" align="center" />
                             <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
-                                <template slot-scope="scope">{{ scope.row.num }}</template>
+                                <template slot-scope="scope">
+                                    <template v-if="scope.row.num && scope.row.num != 0">{{ scope.row.num }}</template>
+                                    <el-form-item v-else :prop="'wxSuitCommodityList.' + scope.$index + '.num'" :rules="{ required: true, message: '请输入商品数量', trigger: 'blur' }">
+                                        <el-input v-model="scope.row.num" placeholder="请输入商品数量" />
+                                    </el-form-item>
+                                </template>
                             </el-table-column>
                             <template v-if="form.suitType == 4">
                                 <el-table-column label="是否双倍赠送" align="center">
                                     <template slot-scope="scope">
-                                        <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1"
-                                            @change="switchTypeChange($event, scope.row, 'isDouble')" />
+                                        <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1" />
+                                        <!-- @change="switchTypeChange($event, scope.row, 'isDouble')" -->
                                     </template>
                                 </el-table-column>
                             </template>
@@ -243,21 +249,26 @@
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
             </h3>
             <div class="sm-list">
-                <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxInfo = item; boxType = true">
+                <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxIndex = (index + 1); boxInfo = item; boxType = true">
                     <ImagePreview :src="lookInfo.faceImg" :view="false" width="160px" height="150px" />
                     <div style="margin: 10px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
                 </div>
             </div>
+            <div class="dialog-submit">
+                <el-button type="primary" @click="addProductsToTheBox">确 定</el-button>
+                <el-button @click="cancelAddingNewProductsToTheBox">取 消</el-button>
+            </div>
         </el-dialog>
         <!-- 箱子详情 -->
         <el-dialog title="箱子信息" :visible.sync="boxType" width="1800px" append-to-body class="suitManage">
+            <el-divider content-position="center">箱子新增商品</el-divider>
             <h3>
                 商品
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewGoods">新增商品</el-button>
             </h3>
             <div class="sm-list" style="grid-template-columns: repeat(6, 1fr); gap: 20px 48px;">
                 <div class="sm-list-item" v-for="(item, index) in boxInfo.commodityList" :key="index" style="border-radius: 10px;text-align: left;">
-                    <ImagePreview :ref="'ImagePreview' + (index + 1)" :src="item.faceImg" width="250px" height="200px" />
+                    <ImagePreview :ref="'ImagePreview' + (index + 1)" :src="item.faceImg" width="250px" height="250px" />
                     <div class="sm-list-item-text">{{ item.commodityName }}</div>
                     <div class="sm-list-item-text">
                         <div>原价：{{ item.price }} 元</div>
@@ -272,15 +283,16 @@
                     <div class="sm-list-item-salesType" v-if="item.isSend == 1">赠送</div>
 
                     <div class="sm-list-item-type">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
-                    <div class="sm-list-item-tips" v-if="item.num == 0">已售完</div>
+                    <div class="sm-list-item-tips" v-if="lookInfo.suitType != 4 && item.num == 0">已售完</div>
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="item.faceImg" @click="lookImage(index + 1)"></i>
-                        <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;"></i>
-                        <!-- @click="editGoods(index + 1)" -->
-                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;"></i>
-                        <!-- @click="delGoods(index + 1)" -->
+                        <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editGoods(item, index)"></i>
+                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" @click="delGoods(item, index)"></i>
                     </div>
                 </div>
+            </div>
+            <div class="dialog-submit" style="margin-bottom: 100px;">
+                <el-button @click="boxType = false">关 闭</el-button>
             </div>
             <el-divider content-position="center">箱子抽赏信息</el-divider>
             <h3 style="margin-top: 35px">中赏排行</h3>
@@ -338,21 +350,23 @@
                 </el-form-item>
                 <!-- 是否售卖 -->
                 <el-form-item label="是否售卖" prop="isSale" :rules="[{ required: true, message: '请选择是否售卖', trigger: 'change' }]">
-                    <el-radio-group v-model="boxProductForm.isSale" :disabled="lookInfo.suitType == 3 ||  lookInfo.suitType == 4" @input="boxProductForm.isSale == '1' ? boxProductForm.isSend = '0' : boxProductForm.isSend = '1'">
+                    <el-radio-group v-model="boxProductForm.isSale" style="margin-top: 10px" :disabled="lookInfo.suitType == 3 || lookInfo.suitType == 4"
+                        @input="boxProductForm.isSale == '1' ? boxProductForm.isSend = '0' : boxProductForm.isSend = '1'">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <!-- 是否赠送 -->
                 <el-form-item label="是否赠送" prop="isSend" :rules="[{ required: true, message: '请选择是否赠送', trigger: 'change' }]" v-if="lookInfo.suitType != 4">
-                    <el-radio-group v-model="boxProductForm.isSend" :disabled="lookInfo.suitType == 3 ||  lookInfo.suitType == 4" @input="boxProductForm.isSend == '1' ? boxProductForm.isSale = '0' : boxProductForm.isSale = '1'">
+                    <el-radio-group v-model="boxProductForm.isSend" style="margin-top: 10px" :disabled="lookInfo.suitType == 3 || lookInfo.suitType == 4"
+                        @input="boxProductForm.isSend == '1' ? boxProductForm.isSale = '0' : boxProductForm.isSale = '1'">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <!-- 是否双倍赠送 -->
                 <el-form-item label="是否双倍赠送" prop="isDouble" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请选择是否双倍赠送', trigger: 'change' }]">
-                    <el-radio-group v-model="boxProductForm.isDouble">
+                    <el-radio-group v-model="boxProductForm.isDouble" style="margin-top: 10px">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
                     </el-radio-group>
@@ -380,7 +394,8 @@
 <script>
 import { listLevelSet } from "@/api/levelSet/levelSet";
 import { listCommodity } from "@/api/commodity/commodity";
-import { listSuitManage, getSuitManage, delSuitManage, addSuitManage, updateSuitManage, getDetail } from "@/api/suitManage/suitManage";
+import { delSuitCommodity } from "@/api/suitCommodity/suitCommodity";
+import { listSuitManage, getSuitManage, delSuitManage, addSuitManage, updateSuitManage, getDetail, updateSuitManageEditBox } from "@/api/suitManage/suitManage";
 
 export default {
     name: "SuitManage",
@@ -441,27 +456,27 @@ export default {
             },
             goodsOptions: [],
             editId: null,
-            suitTypeStutus: false,
             levelOptions: [],
             openInfo: false,
             lookInfo: {},
             boxType: false,
             boxInfo: {},
+            boxIndex: 0,
             active: null,
             editType: false,
             editRow: {},
             boxProductForm: {},
-            boxProductRules: {},
+            boxProductRules: {
+                commodityId: [{ required: true, message: "请选择商品", trigger: "change" }],
+                referencePrice: [{ required: true, message: "请输入参考价", trigger: "blur" }],
+                reference: [{ required: true, message: "请输入抽中概率", trigger: "blur" }],
+            },
             openGoodType: false,
+            editIndex: null,
         };
     },
     created() {
         this.getList();
-    },
-    watch: {
-        'form.suitType'(newVal, oldVal) {
-            oldVal == 4 && (this.suitTypeStutus = true);
-        }
     },
     computed: {
         expectedValue() {
@@ -543,10 +558,6 @@ export default {
             });
             this.active = null;
         },
-        // 查看大图ImagePreview
-        lookImage(index) {
-            this.$refs['ImagePreview' + index][0].$refs.elImage.clickHandler();
-        },
         /** 上下架 */
         switchChange(e, row) {
             let obj = {
@@ -577,7 +588,7 @@ export default {
                 isSale: null,
                 isSend: null,
                 isDouble: null,
-                sendNum: 0,
+                sendNum: null,
             };
             this.resetForm("boxProductForm");
         },
@@ -587,34 +598,76 @@ export default {
             const id = row.id || this.ids;
             this.getCommodityList();
             getDetail(id).then(res => {
-                this.lookInfo = res.data;
-                console.log(this.lookInfo, "this.lookInfo");
+                this.lookInfo = { ...res.data };
                 this.openInfo = true;
             });
         },
         // 新增盒子
         addNewBox() {
             this.$modal.confirm('是否确认新增盒子？').then(() => {
-                let obj = this.lookInfo.mapList[this.lookInfo.mapList.length - 1];
-                obj.commodityList = obj.commodityList.map(item => {
-                    item.boxIndex++;
-                    return item;
+                let arr = [];
+                let obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
+                obj.commodityList.forEach(item => {
+                    arr.push({ ...item, id: null, boxIndex: (item.boxIndex + 1) });
                 });
-                this.lookInfo.mapList.push(obj);
+                obj.commodityList = arr;
+                this.lookInfo.mapList.push({ ...obj });
             });
+        },
+        // 编辑盒子商品信息进行提交
+        addProductsToTheBox() {
+            this.$modal.confirm('是否确认修改箱子信息？').then(() => {
+                let obj = {
+                    id: this.lookInfo.id,
+                    wxSuitCommodityList: [],
+                };
+                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t })));
+                updateSuitManageEditBox(obj).then(res => {
+                    this.$modal.msgSuccess("修改成功");
+                    this.openInfo = false;
+                    this.getList();
+                });
+            });
+        },
+        // 取消编辑盒子商品信息进行提交
+        cancelAddingNewProductsToTheBox() {
+            this.openInfo = false;
         },
         // 新增盒子商品
         addNewGoods() {
             this.resetGoods();
             this.commodityReset();
             // lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 4 ? "无限池"
-            if(this.lookInfo.suitType == 1) {
-                // 是否售卖
-                this.boxProductForm.isSale = "1";
-                // 是否赠送
-                this.boxProductForm.isSend = "0";
-            }
+            // if (this.lookInfo.suitType == 1 || this.lookInfo.suitType == 2 || this.lookInfo.suitType == 3) {
+            // 是否售卖
+            this.boxProductForm.isSale = "1";
+            // 是否赠送
+            this.boxProductForm.isSend = "0";
+            // };
+            if (this.lookInfo.suitType == 4) this.boxProductForm.isDouble = '0';
+            this.editIndex = null;
             this.openGoodType = true;
+        },
+        // 查看大图ImagePreview
+        lookImage(index) {
+            this.$refs['ImagePreview' + index][0].$refs.elImage.clickHandler();
+        },
+        // 修改盒子商品
+        editGoods(item, index) {
+            this.resetGoods();
+            this.commodityReset();
+            this.editIndex = index;
+            this.boxProductForm = { ...item };
+            this.openGoodType = true;
+        },
+        // 删除商品
+        delGoods(row, index) {
+            this.$modal.confirm('当前删不进行提交也会删除箱子中的商品，请再次确认是否删除？').then(() => {
+                return row.id ? delSuitCommodity(row.id) : this.boxInfo.commodityList.splice(index, 1);
+            }).then(() => {
+                row.id && this.boxInfo.commodityList.splice(index, 1);
+                this.$modal.msgSuccess("删除成功");
+            });
         },
         // 关闭新增商品
         cancelBoxProductForm() {
@@ -623,24 +676,37 @@ export default {
         },
         // 给盒子提交新的商品
         submitBoxProductForm() {
-            console.log(this.boxProductForm, "this.boxProductForm");
-            let obj = {
-                boxIndex: this.lookInfo.boxNum,
-                commodityId: this.boxProductForm.commodityId,
-                commodityName: this.queryProducts(this.boxProductForm.commodityId, 'commodityName'),
-                faceImg: this.queryProducts(this.boxProductForm.commodityId, 'faceImg'),
-                isDouble: this.boxProductForm.isDouble,
-                isSale: this.boxProductForm.isSale,
-                isSend: this.boxProductForm.isSend,
-                num: this.boxProductForm.num,
-                price: this.queryProducts(this.boxProductForm.commodityId, 'price'),
-                reference: this.boxProductForm.reference,
-                referencePrice: this.boxProductForm.referencePrice,
-                remark: this.boxProductForm.remark,
-                sendNum: this.boxProductForm.sendNum,
-                totalNum: this.lookInfo.suitType != 4 ? this.boxProductForm.num : this.boxProductForm.totalNum,
-                typeName: this.queryProducts(this.boxProductForm.commodityId, 'levelName'),
-            }
+            this.$refs["boxProductForm"].validate(valid => {
+                if (valid) {
+                    let obj = {
+                        id: this.boxProductForm.id || null,
+                        boxIndex: this.boxIndex,
+                        commodityId: this.boxProductForm.commodityId,
+                        commodityName: this.queryProducts(this.boxProductForm.commodityId, 'commodityName'),
+                        faceImg: this.queryProducts(this.boxProductForm.commodityId, 'faceImg'),
+                        isDouble: this.boxProductForm.isDouble,
+                        isSale: this.boxProductForm.isSale,
+                        isSend: this.boxProductForm.isSend,
+                        num: this.boxProductForm.num,
+                        price: this.queryProducts(this.boxProductForm.commodityId, 'price'),
+                        reference: this.boxProductForm.reference,
+                        referencePrice: this.boxProductForm.referencePrice,
+                        remark: this.boxProductForm.remark,
+                        sendNum: this.boxProductForm.sendNum,
+                        totalNum: this.lookInfo.suitType != 4 ? this.boxProductForm.num : this.boxProductForm.totalNum,
+                        typeName: this.queryProducts(this.boxProductForm.commodityId, 'levelName'),
+                    };
+                    if (this.editIndex) {
+                        // 修改
+                        this.boxInfo.commodityList = this.boxInfo.commodityList.map((item, index) => {
+                            if (index == this.editIndex) item = { ...obj };
+                            return item;
+                        });
+                    } else this.boxInfo.commodityList.push({ ...obj });
+                    this.$set(this.lookInfo.mapList, this.boxIndex - 1, this.boxInfo);
+                    this.openGoodType = false;
+                };
+            });
         },
         /** 修改按钮操作 */
         async handleUpdate(row) {
@@ -806,30 +872,22 @@ export default {
         /** 类型选择限制 */
         suitTypeChange() {
             this.$nextTick(() => {
-                if (this.form.suitType == 1 || this.form.suitType == 2) {
-                    this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
-                        if (item.isSale == 1) item.isSend = "0";
-                        else if (item.isSale == 0) item.isSend = "1";
-                        item.isDouble = "0";
-                        return item;
-                    });
-                } else if (this.form.suitType == 3 || this.form.suitType == 4) {
+                this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
+                    item.isSale = '1';
+                    item.isSend = '0';
+                    item.isDouble = "0";
+                    item.sendNum = null;
+                    return item;
+                });
+                if (this.form.suitType == 4) {
                     this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
                         item.isSale = "1";
                         item.isSend = "0";
                         item.isDouble = "0";
-                        item.num = 1;
+                        item.sendNum = 1;
                         return item;
                     });
-                } else {
-                    this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
-                        this.suitTypeStutus && (item.isSale = "0") && (item.num = 1);
-                        item.isSend = "0";
-                        item.isDouble = "0";
-                        return item;
-                    });
-                };
-                this.suitTypeStutus = false;
+                }
             });
         },
         clickBtn(index) {
@@ -917,15 +975,15 @@ export default {
                 }
 
                 .sm-list-item-type {
-                    top: 58%;
                     left: 50%;
+                    top: 230px;
                     font-size: 12px;
-                    color: #5e5e5e;
+                    color: #ffffff;
                     padding: 8px 15px;
                     position: absolute;
                     border-radius: 5px;
-                    background: #09a79918;
                     transform: translate(-50%, -50%);
+                    background: rgba(61, 184, 176, 0.67);
                 }
 
                 .sm-list-item-tips {
@@ -1002,5 +1060,13 @@ export default {
     align-items: center;
     box-sizing: border-box;
     justify-content: space-between;
+}
+
+.dialog-submit {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    justify-content: center;
 }
 </style>
