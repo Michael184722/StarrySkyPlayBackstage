@@ -1,8 +1,8 @@
 <template>
     <div class="app-container">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-            <el-form-item label="ID" prop="openId">
-                <el-input v-model="queryParams.openId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" />
+            <el-form-item label="ID" prop="userId">
+                <el-input v-model="queryParams.userId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item label="昵称" prop="nickName">
                 <el-input v-model="queryParams.nickName" placeholder="请输入昵称" clearable @keyup.enter.native="handleQuery" />
@@ -419,6 +419,7 @@ export default {
                 historyIntegral: null,
                 water: null,
                 isWarter: null,
+                userId: null,
             },
             // 表单参数
             form: {},

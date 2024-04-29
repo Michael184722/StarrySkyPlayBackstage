@@ -249,7 +249,7 @@
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
             </h3>
             <div class="sm-list">
-                <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxIndex = (index + 1); boxInfo = item; boxType = true">
+                <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxIndex = (index + 1); boxInfo = { ...item, pageNum: 1, pageSize: 5, total: item.recordList.length }; boxType = true">
                     <ImagePreview :src="lookInfo.faceImg" :view="false" width="160px" height="150px" />
                     <div style="margin: 10px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
                 </div>
@@ -309,7 +309,7 @@
                 <el-table-column label="中赏次数" align="center" prop="num" />
             </el-table>
             <h3 style="margin-top: 35px">中赏记录</h3>
-            <el-table :data="boxInfo.recordList">
+            <el-table :data="boxInfo.recordList ? boxInfo.recordList.slice((boxInfo.pageNum - 1) * boxInfo.pageSize, boxInfo.pageNum * boxInfo.pageSize) : []">
                 <el-table-column label="序号" type="index" align="center" />
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
@@ -321,6 +321,11 @@
                 <el-table-column label="商品等级" align="center" prop="level" />
                 <el-table-column label="中赏时间" align="center" prop="createTime" />
             </el-table>
+            <!-- 本地分页 -->
+            <div class="pagination" style="display: flex; justify-content: flex-end; margin: 40px auto;">
+                <el-pagination background layout="total, prev, pager, next, jumper" :current-page="boxInfo.pageNum" :page-size="boxInfo.pageSize"
+                    :total="boxInfo.total" @current-change="boxInfoPageChange"></el-pagination>
+            </div>
         </el-dialog>
 
         <!-- 新增盒子商品 -->
@@ -497,6 +502,9 @@ export default {
         },
     },
     methods: {
+        boxInfoPageChange(e) {
+            console.log(this.boxInfo.pageNum, this.boxInfo.pageSize, e);
+        },
         /** 计算百分值 */
         getPercent(val) {
             return val / 100;

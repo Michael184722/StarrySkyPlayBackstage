@@ -36,6 +36,7 @@
 		</el-form>
 		<!--  底部  -->
 		<div class="el-login-footer">
+			<div align=center><a href="http://beian.miit.gov.cn/" target=_blank>宁ICP备2024003683号-2</a></div>
 			<!-- <span>Copyright © 2018-2023 ruoyi.vip All Rights Reserved.</span> -->
 		</div>
 	</div>
