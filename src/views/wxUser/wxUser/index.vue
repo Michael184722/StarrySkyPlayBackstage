@@ -93,11 +93,12 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="200">
+            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="260">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="lookUseInfo(scope.row)" v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">修改</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleGift(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">赠送</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-edit" @click="clearCase(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">清空箱子</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -379,7 +380,7 @@
 
 <script>
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -559,10 +560,17 @@ export default {
             console.log(row, "row");
             listCommodity().then(res => {
                 this.give.openId = row.openId;
-                console.log(res, "PPP");
                 this.commodityList = res.rows;
                 this.giveType = true;
-            })
+            });
+        },
+        clearCase(row) {
+            this.$modal.confirm('是否确认清空当前用户的箱子？').then(function () {
+                return delCase(row.openId);
+            }).then(() => {
+                this.getList();
+                this.$modal.msgSuccess("清除成功");
+            }).catch(() => { });
         },
         cancelGive() {
             this.giveType = false;

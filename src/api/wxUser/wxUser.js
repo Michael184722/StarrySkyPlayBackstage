@@ -60,3 +60,11 @@ export function delWxUser(openId) {
         method: 'delete'
     })
 }
+
+
+export function delCase(openId) {
+    return request({
+        url: '/wxUser/wxUser/delUserPackage/' + openId,
+        method: 'delete'
+    })
+}

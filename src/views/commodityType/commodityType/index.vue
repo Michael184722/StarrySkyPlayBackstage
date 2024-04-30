@@ -1,10 +1,8 @@
 <template>
     <div class="app-container">
-        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
-            label-width="68px">
+        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
             <el-form-item label="类型名称" prop="dictLabel">
-                <el-input v-model="queryParams.dictLabel" placeholder="请输入商品名称" clearable
-                    @keyup.enter.native="handleQuery" />
+                <el-input v-model="queryParams.dictLabel" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -13,8 +11,7 @@
         </el-form>
         <el-row :gutter="10" class="mb8">
             <el-col :span="1.5">
-                <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
-                    v-hasPermi="['commodity:commodity:add']">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['commodity:commodity:add']">新增</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -28,7 +25,13 @@
                     <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
                 </template>
             </el-table-column>
-            <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
+            <el-table-column label="抽中概率" align="center" prop="remark">
+                <template slot-scope="scope">
+                    <el-tag v-if="scope.row.remark == 1" type="success">低</el-tag>
+                    <el-tag v-if="scope.row.remark == 2" type="warning">中</el-tag>
+                    <el-tag v-if="scope.row.remark == 3" type="danger">高</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
                 <template slot-scope="scope">
                     <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -36,15 +39,12 @@
             </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
-                        v-hasPermi="['system:dict:edit']">修改</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
-                        v-hasPermi="['system:dict:remove']">删除</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:dict:edit']">修改</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['system:dict:remove']">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
-        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
-            :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
                 <el-form-item label="类型名称" prop="dictLabel">
@@ -58,12 +58,16 @@
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
                     <el-radio-group v-model="form.status">
-                        <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{
-            dict.label }}</el-radio>
+                        <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="备注" prop="remark">
-                    <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
+                <el-form-item label="抽中概率" prop="remark">
+                    <!-- <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input> -->
+                    <el-select v-model="form.remark" placeholder="请选择抽中概率">
+                      <el-option label="高" value="3"></el-option>
+                      <el-option label="中" value="2"></el-option>
+                      <el-option label="低" value="1"></el-option>
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -117,7 +121,10 @@ export default {
                 ],
                 status: [
                     { required: true, message: "商品状态不能为空", trigger: "blur" }
-                ]
+                ],
+                remark: [
+                    { required: true, message: "请选择抽中概率", trigger: "change" }
+                ],
             },
             // 商品分类树选项
             commodityCateOptions: [],
