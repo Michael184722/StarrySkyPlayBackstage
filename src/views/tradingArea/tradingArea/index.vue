@@ -61,15 +61,16 @@
             <el-table-column label="商品" align="center" prop="commodityName">
                 <template slot-scope="scope">
                     <el-popover placement="right" trigger="click">
-                        <el-table v-if="scope.row.commodityName" :data="scope.row.commodityName.split(',').map(item => { return { commodityName: item } })">
+                        <el-table v-if="scope.row.userPackageList.length" :data="scope.row.userPackageList">
                             <el-table-column width="400" property="commodityName" label="商品名称"></el-table-column>
-                            <el-table-column width="200" label="商品等级" align="center">
-                                <template slot-scope="scopeItem">
-                                    <el-tag v-if="scope.row.level && scope.row.level.split(',')[scopeItem.$index]">{{ scope.row.level.split(',')[scopeItem.$index] }}</el-tag>
+                            <el-table-column width="200" label="商品等级" align="center" property="levelName" />
+                            <el-table-column width="200" label="商品图片" align="center" property="commodityImg">
+                                <template slot-scope="scope">
+                                    <ImagePreview :src="scope.row.commodityImg" width="50px" height="50px" />
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-button slot="reference" type="primary" size="mini" @click="">查看</el-button>
+                        <el-button slot="reference" type="primary" size="mini">查看</el-button>
                     </el-popover>
                 </template>
             </el-table-column>

@@ -18,6 +18,42 @@ export function getBalance(query) {
     })
 }
 
+// 查询已赠送的商品列表
+export function listGivenGoods(query) {
+    return request({
+        url: '/userSendCommodity/userSendCommodity/list',
+        method: 'get',
+        params: query
+    })
+}
+
+// 查询交易记录
+export function listTradeRecord(query) {
+    return request({
+        url: '/tradeRecord/tradeRecord/list',
+        method: 'get',
+        params: query
+    })
+}
+
+// 查询积分记录列表
+export function listIntegralRecord(query) {
+    return request({
+        url: '/integralRecord/integralRecord/list',
+        method: 'get',
+        params: query
+    })
+}
+
+// 发货记录
+export function listSendRecord(query) {
+    return request({
+        url: '/userLogistics/userLogistics/list',
+        method: 'get',
+        params: query
+    })
+}
+
 // 查询小程序用户信息详细
 export function getWxUser(openId) {
     return request({

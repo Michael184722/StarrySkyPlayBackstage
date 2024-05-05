@@ -9,6 +9,24 @@ export function listSuitManage(query) {
     })
 }
 
+// 查询排行列表
+export function listSuitManageRank(query) {
+    return request({
+        url: '/suitManage/suitManage/suitRankList',
+        method: 'get',
+        params: query
+    })
+}
+
+// 查询中赏记录
+export function listSuitManageRecord(query) {
+    return request({
+        url: '/suitManage/suitManage/suitRecordList',
+        method: 'get',
+        params: query
+    })
+}
+
 // 查询抽赏套管理详细
 export function getSuitManage(id) {
     return request({
@@ -55,5 +73,14 @@ export function delSuitManage(id) {
     return request({
         url: '/suitManage/suitManage/' + id,
         method: 'delete'
+    })
+}
+
+// 删除盒子
+export function delSuitManageBox(data) {
+    return request({
+        url: '/suitManage/suitManage/delBox',
+        method: 'post',
+        data,
     })
 }

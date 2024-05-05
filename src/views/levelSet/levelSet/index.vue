@@ -48,17 +48,17 @@
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
                 <el-form-item label="开始金额" prop="startMoney">
-                    <el-input v-model="form.startMoney" type="number" placeholder="请输入开始金额" />
+                    <el-input v-model="form.startMoney" type="number" :max="999999999999999" placeholder="请输入开始金额" maxlength="15" @input="form.startMoney = form.startMoney.replace(/\D/g, '').slice(0, 15)" />
                 </el-form-item>
                 <el-form-item label="结束金额" prop="endMoney">
-                    <el-input v-model="form.endMoney" type="number" placeholder="请输入结束金额" />
+                    <el-input v-model="form.endMoney" type="number" :max="999999999999999" placeholder="请输入结束金额" maxlength="15" @input="form.endMoney = form.endMoney.replace(/\D/g, '').slice(0, 15)" />
                 </el-form-item>
                 <el-form-item label="等级" prop="level">
                     <el-input v-model="form.level" placeholder="请输入等级" />
                 </el-form-item>
                 <el-form-item label="赠送商品">
-                    <el-select v-model="form.commodityId" placeholder="请选择" filterable style="width: 100%;">
-                        <el-option v-for="item in commodityList" :key="item.id" :label="item.commodityName" :value="item.id"></el-option>
+                    <el-select v-model="form.commodityId" placeholder="请选择" filterable style="width: 100%;" clearable>
+                        <el-option v-for="item in [{ commodityName: '不赠送', id: 0 }, ...commodityList]" :key="item.id" :label="item.commodityName" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">

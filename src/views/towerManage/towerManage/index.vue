@@ -57,6 +57,7 @@
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="handleUpdate(scope.row, true)" v-hasPermi="['towerManage:towerManage:query']">查看</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="towerRecord.row = scope.row; towerRecord.pageNum = 1; queryUpdate()" v-hasPermi="['towerManage:towerManage:query']">中赏记录</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row, false)" v-hasPermi="['towerManage:towerManage:edit']">修改</el-button>
                     <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['towerManage:towerManage:remove']">删除</el-button>
                 </template>
@@ -165,11 +166,33 @@
                 <el-button @click="cancelGoods">取 消</el-button>
             </div>
         </el-dialog>
+        <!-- 中奖记录 -->
+        <el-dialog title="中奖记录" :visible.sync="towerRecord.open" width="1500px" append-to-body>
+            <el-table v-loading="towerRecord.loading" :data="towerRecord.list">
+                <el-table-column label="序号" align="center" type="index" />
+                <el-table-column label="用户昵称" align="center" prop="nickName" />
+                <el-table-column label="用户头像" align="center" prop="wxAvatar">
+                    <template slot-scope="scope">
+                        <ImagePreview :src="scope.row.wxAvatar" :width="50" :height="50" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="商品名称" align="center" prop="commodityName" />
+                <el-table-column label="商品图片" align="center" prop="commodityImg">
+                    <template slot-scope="scope">
+                        <ImagePreview :src="scope.row.commodityImg" :width="50" :height="50" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="商品等级" align="center" prop="level" />
+                <el-table-column label="抽中时间" align="center" prop="createTime" />
+            </el-table>
+            <pagination v-show="towerRecord.total>0" :total="towerRecord.total" :page.sync="towerRecord.pageNum" :limit.sync="towerRecord.pageSize" @pagination="queryUpdate(form)" />
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import { listCommodity } from "@/api/commodity/commodity";
+import { listTowerRecord } from "@/api/towerRecord/towerRecord";
 import { listTowerManage, getTowerManage, delTowerManage, addTowerManage, updateTowerManage } from "@/api/towerManage/towerManage";
 
 export default {
@@ -222,6 +245,14 @@ export default {
             prTitle: null,
             editId: null,
             editType: false,
+            towerRecord: {
+                pageNum: 1,
+                pageSize: 10,
+                total: 0,
+                list: [],
+                loading: false,
+                open: false
+            }
         };
     },
     created() {
@@ -279,7 +310,23 @@ export default {
             getTowerManage(id).then(response => {
                 this.form = response.data;
                 this.open = true;
-                this.title = `${type ? '查看' : '修改'}修改攀塔信息`;
+                this.title = `${type ? '查看' : '修改'}攀塔信息`;
+            });
+        },
+        // 中赏记录
+        queryUpdate() {
+            this.towerRecord.loading = true;
+            listTowerRecord({
+                pageNum: this.towerRecord.pageNum,
+                pageSize: this.towerRecord.pageSize,
+                layers: this.towerRecord.row.layers
+            }).then(res => {
+                this.towerRecord.list = res.rows;
+                this.towerRecord.total = res.total;
+                this.towerRecord.loading = false;
+                this.towerRecord.open = true;
+            }).catch(() => {
+                this.towerRecord.loading = false;
             });
         },
         /** 提交按钮 */

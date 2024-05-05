@@ -245,13 +245,18 @@
                 <div>上下架：{{ lookInfo.status == 1 ? "上架" : "下架" }}</div>
             </div>
             <h3 style="margin-top: 35px; display: flex; align-items: center;">
-                <div>箱子列表（{{ lookInfo.boxNum }}个）</div>
+                <div>箱子列表（{{ lookInfo.mapList ? lookInfo.mapList.length : 0 }}个）</div>
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
             </h3>
-            <div class="sm-list">
-                <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index" @click="boxIndex = (index + 1); boxInfo = { ...item, pageNum: 1, pageSize: 5, total: item.recordList.length }; boxType = true">
-                    <ImagePreview :src="lookInfo.faceImg" :view="false" width="160px" height="150px" />
+            <div class="sm-list" v-if="lookInfo.mapList">
+                <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index">
+                    <ImagePreview ref="ImageFace1" :src="lookInfo.faceImg" width="160px" height="150px" />
                     <div style="margin: 10px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
+                    <div class="sm-list-item-Fun">
+                        <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="lookInfo.faceImg" @click="lookImage('ImageFace', 1)"></i>
+                        <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;"  @click="editClick(item, index)"></i>
+                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" @click="deleteBox(item, index)"></i>
+                    </div>
                 </div>
             </div>
             <div class="dialog-submit">
@@ -282,10 +287,10 @@
                     <div class="sm-list-item-salesType" v-if="item.isSale == 1">售卖</div>
                     <div class="sm-list-item-salesType" v-if="item.isSend == 1">赠送</div>
 
-                    <div class="sm-list-item-type">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
+                    <div class="sm-list-item-type" v-if="lookInfo.suitType != 4">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
                     <div class="sm-list-item-tips" v-if="lookInfo.suitType != 4 && item.num == 0">已售完</div>
                     <div class="sm-list-item-Fun">
-                        <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="item.faceImg" @click="lookImage(index + 1)"></i>
+                        <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="item.faceImg" @click="lookImage('ImagePreview', index + 1)"></i>
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editGoods(item, index)"></i>
                         <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" @click="delGoods(item, index)"></i>
                     </div>
@@ -296,7 +301,7 @@
             </div>
             <el-divider content-position="center">箱子抽赏信息</el-divider>
             <h3 style="margin-top: 35px">中赏排行</h3>
-            <el-table :data="boxInfo.rankList">
+            <el-table :data="rankValstate.list">
                 <el-table-column label="排名" align="center" prop="rank" />
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
@@ -308,8 +313,13 @@
                 <el-table-column label="商品等级" align="center" prop="level" />
                 <el-table-column label="中赏次数" align="center" prop="num" />
             </el-table>
+            <!-- 本地分页 -->
+            <div class="pagination" style="display: flex; justify-content: flex-end; margin: 40px auto;">
+                    <pagination v-show="rankValstate.total > 0" :total="rankValstate.total" :page.sync="rankValstate.pageNum" :limit.sync="rankValstate.pageSize" @pagination="getRankList" />
+            </div>
+
             <h3 style="margin-top: 35px">中赏记录</h3>
-            <el-table :data="boxInfo.recordList ? boxInfo.recordList.slice((boxInfo.pageNum - 1) * boxInfo.pageSize, boxInfo.pageNum * boxInfo.pageSize) : []">
+            <el-table :data="recordValstate.list">
                 <el-table-column label="序号" type="index" align="center" />
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
@@ -323,8 +333,7 @@
             </el-table>
             <!-- 本地分页 -->
             <div class="pagination" style="display: flex; justify-content: flex-end; margin: 40px auto;">
-                <el-pagination background layout="total, prev, pager, next, jumper" :current-page="boxInfo.pageNum" :page-size="boxInfo.pageSize"
-                    :total="boxInfo.total" @current-change="boxInfoPageChange"></el-pagination>
+                <pagination v-show="recordValstate.total > 0" :total="recordValstate.total" :page.sync="recordValstate.pageNum" :limit.sync="recordValstate.pageSize" @pagination="getRecordList" />
             </div>
         </el-dialog>
 
@@ -400,7 +409,7 @@
 import { listLevelSet } from "@/api/levelSet/levelSet";
 import { listCommodity } from "@/api/commodity/commodity";
 import { delSuitCommodity } from "@/api/suitCommodity/suitCommodity";
-import { listSuitManage, getSuitManage, delSuitManage, addSuitManage, updateSuitManage, getDetail, updateSuitManageEditBox } from "@/api/suitManage/suitManage";
+import { listSuitManage, getSuitManage, delSuitManage, addSuitManage, updateSuitManage, getDetail, updateSuitManageEditBox, delSuitManageBox, listSuitManageRank, listSuitManageRecord } from "@/api/suitManage/suitManage";
 
 export default {
     name: "SuitManage",
@@ -478,6 +487,18 @@ export default {
             },
             openGoodType: false,
             editIndex: null,
+            rankValstate: {
+                pageNum: 1,
+                pageSize: 10,
+                total: 0,
+                list: [],
+            },
+            recordValstate: {
+                pageNum: 1,
+                pageSize: 10,
+                total: 0,
+                list: [],
+            },
         };
     },
     created() {
@@ -502,9 +523,6 @@ export default {
         },
     },
     methods: {
-        boxInfoPageChange(e) {
-            console.log(this.boxInfo.pageNum, this.boxInfo.pageSize, e);
-        },
         /** 计算百分值 */
         getPercent(val) {
             return val / 100;
@@ -561,7 +579,7 @@ export default {
                 item && (item = Number(item));
                 !item && (item = 1);
                 item && item < 1 && (item = 1);
-                item && item > 100 && (item = 100);
+                item && item > 10000 && (item = 10000);
                 return item;
             });
             this.active = null;
@@ -614,12 +632,15 @@ export default {
         addNewBox() {
             this.$modal.confirm('是否确认新增盒子？').then(() => {
                 let arr = [];
-                let obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
-                obj.commodityList.forEach(item => {
-                    arr.push({ ...item, id: null, boxIndex: (item.boxIndex + 1) });
-                });
+                let obj = {};
+                if(this.lookInfo.mapList && this.lookInfo.mapList.length) {
+                    obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
+                    obj.commodityList.forEach(item => {
+                        arr.push({ ...item, id: null, boxIndex: (item.boxIndex + 1) });
+                    });
+                } else this.lookInfo.mapList = [];
                 obj.commodityList = arr;
-                this.lookInfo.mapList.push({ ...obj });
+                this.lookInfo.mapList.push({ ...obj, type: true });
             });
         },
         // 编辑盒子商品信息进行提交
@@ -657,8 +678,9 @@ export default {
             this.openGoodType = true;
         },
         // 查看大图ImagePreview
-        lookImage(index) {
-            this.$refs['ImagePreview' + index][0].$refs.elImage.clickHandler();
+        lookImage(val, index) {
+            console.log(val, index, this.$refs[val + index]);
+            this.$refs[val + index][0].$refs.elImage.clickHandler();
         },
         // 修改盒子商品
         editGoods(item, index) {
@@ -674,6 +696,53 @@ export default {
                 return row.id ? delSuitCommodity(row.id) : this.boxInfo.commodityList.splice(index, 1);
             }).then(() => {
                 row.id && this.boxInfo.commodityList.splice(index, 1);
+                this.$modal.msgSuccess("删除成功");
+            });
+        },
+        // 箱子修改
+        editClick(row, index) {
+            this.boxIndex = (index + 1);
+            this.boxInfo = { ...row };
+            this.rankValstate.pageNum = 1;
+            this.recordValstate.pageNum = 1;
+            this.getRankList();
+            this.getRecordList();
+            this.boxType = true;
+        },
+        // 查询排行列表
+        getRankList() {
+            let obj = {
+                pageNum: this.rankValstate.pageNum,
+                pageSize: this.rankValstate.pageSize,
+                suitId: this.lookInfo.id,
+                boxIndex: this.boxIndex,
+            };
+
+            listSuitManageRank(obj).then(res => {
+                this.rankValstate.total = res.total;
+                this.rankValstate.list = res.rows;
+            });
+        },
+        // 查询中赏记录
+        getRecordList() {
+            let obj = {
+                pageNum: this.recordValstate.pageNum,
+                pageSize: this.recordValstate.pageSize,
+                suitId: this.lookInfo.id,
+                boxIndex: this.boxIndex,
+            };
+            listSuitManageRecord(obj).then(res => {
+                this.recordValstate.total = res.total;
+                this.recordValstate.list = res.rows;
+            });
+        },
+        // 箱子删除
+        deleteBox(row, index) {
+            this.$modal.confirm('当前删不进行提交也会删除箱子，请再次确认是否删除？').then(() => {
+                return !row.type && delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: index + 1 });
+            }).then(() => {
+                this.lookInfo.mapList.splice(index, 1);
+                console.log(this.lookInfo.mapList);
                 this.$modal.msgSuccess("删除成功");
             });
         },
