@@ -113,80 +113,78 @@
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
                 </el-form-item>
-                <template v-if="form.suitType && !editType">
-                    <el-divider content-position="center">抽赏套商品信息</el-divider>
-                    <el-row :gutter="10" class="mb8">
-                        <el-col :span="1.5">
-                            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxSuitCommodity">添加</el-button>
-                        </el-col>
-                        <el-col :span="1.5" :offset="2" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">期望值：{{ expectedValue.exVal.toFixed(2) }}元</el-col>
-                        <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValue.profitAndLoss.toFixed(2) }}元</el-col>
-                    </el-row>
-                    <el-form-item prop="wxSuitCommodityList" label-width="10px">
-                        <el-table :data="form.wxSuitCommodityList" ref="wxSuitCommodity">
-                            <el-table-column label="序号" align="center" type="index" width="50" />
-                            <el-table-column label="商品名称" prop="commodityName" align="center">
-                                <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "commodityName") }}</template>
-                            </el-table-column>
-                            <el-table-column label="商品图片" prop="img" align="center">
-                                <template slot-scope="scope">
-                                    <ImagePreview :src="queryProducts(scope.row.commodityId, 'faceImg')" width="100px" />
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="商品等级" prop="levelName" align="center">
-                                <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "levelName") }}</template>
-                            </el-table-column>
-                            <el-table-column label="商品原价" prop="price" align="center">
-                                <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
-                            </el-table-column>
-                            <el-table-column label="商品参考价" prop="referencePrice" align="center" />
-                            <el-table-column label="商品概率" prop="reference" align="center" />
-                            <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
-                                <template slot-scope="scope">
-                                    <template v-if="scope.row.num && scope.row.num != 0">{{ scope.row.num }}</template>
-                                    <el-form-item v-else :prop="'wxSuitCommodityList.' + scope.$index + '.num'" :rules="{ required: true, message: '请输入商品数量', trigger: 'blur' }">
-                                        <el-input v-model="scope.row.num" placeholder="请输入商品数量" />
-                                    </el-form-item>
-                                </template>
-                            </el-table-column>
-                            <template v-if="form.suitType == 4">
-                                <el-table-column label="是否双倍赠送" align="center">
-                                    <template slot-scope="scope">
-                                        <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1" />
-                                        <!-- @change="switchTypeChange($event, scope.row, 'isDouble')" -->
-                                    </template>
-                                </el-table-column>
+                <el-divider content-position="center" v-if="form.suitType && !editType">抽赏套商品信息</el-divider>
+                <el-row :gutter="10" class="mb8">
+                    <el-col :span="1.5" v-if="form.suitType && !editType">
+                        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxSuitCommodity">添加</el-button>
+                    </el-col>
+                    <el-col :span="1.5" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">期望值：{{ expectedValue.exVal.toFixed(2) }}元</el-col>
+                    <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValue.profitAndLoss.toFixed(2) }}元</el-col>
+                </el-row>
+                <el-form-item prop="wxSuitCommodityList" label-width="10px" v-if="form.suitType && !editType">
+                    <el-table :data="form.wxSuitCommodityList" ref="wxSuitCommodity">
+                        <el-table-column label="序号" align="center" type="index" width="50" />
+                        <el-table-column label="商品名称" prop="commodityName" align="center">
+                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "commodityName") }}</template>
+                        </el-table-column>
+                        <el-table-column label="商品图片" prop="img" align="center">
+                            <template slot-scope="scope">
+                                <ImagePreview :src="queryProducts(scope.row.commodityId, 'faceImg')" width="100px" />
                             </template>
-                            <template v-if="form.suitType == 4">
-                                <el-table-column label="赠送次数" align="center" width="160">
-                                    <template slot-scope="scope">
-                                        <el-input v-model="scope.row.sendNum" size="mini" type="number" placeholder="请输入赠送次数" />
-                                        <!-- @blur="switchTypeChange($event, scope.row, 'sendNum')" -->
-                                    </template>
-                                </el-table-column>
+                        </el-table-column>
+                        <el-table-column label="商品等级" prop="levelName" align="center">
+                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "levelName") }}</template>
+                        </el-table-column>
+                        <el-table-column label="商品原价" prop="price" align="center">
+                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
+                        </el-table-column>
+                        <el-table-column label="商品参考价" prop="referencePrice" align="center" />
+                        <el-table-column label="商品概率" prop="reference" align="center" />
+                        <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
+                            <template slot-scope="scope">
+                                <template v-if="scope.row.num && scope.row.num != 0">{{ scope.row.num }}</template>
+                                <el-form-item v-else :prop="'wxSuitCommodityList.' + scope.$index + '.num'" :rules="{ required: true, message: '请输入商品数量', trigger: 'blur' }">
+                                    <el-input v-model="scope.row.num" placeholder="请输入商品数量" />
+                                </el-form-item>
                             </template>
-                            <el-table-column label="是否售卖" prop="isSale" align="center">
+                        </el-table-column>
+                        <template v-if="form.suitType == 4">
+                            <el-table-column label="是否双倍赠送" align="center">
                                 <template slot-scope="scope">
-                                    <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4"
-                                        @change="sellChange($event, scope.row)" />
+                                    <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1" />
+                                    <!-- @change="switchTypeChange($event, scope.row, 'isDouble')" -->
                                 </template>
                             </el-table-column>
-                            <el-table-column label="是否赠送" prop="isSend" align="center">
+                        </template>
+                        <template v-if="form.suitType == 4">
+                            <el-table-column label="赠送次数" align="center" width="160">
                                 <template slot-scope="scope">
-                                    <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1"
-                                        @change="giftsChange($event, scope.row)" />
+                                    <el-input v-model="scope.row.sendNum" size="mini" type="number" placeholder="请输入赠送次数" />
+                                    <!-- @blur="switchTypeChange($event, scope.row, 'sendNum')" -->
                                 </template>
                             </el-table-column>
-                            <el-table-column label="备注" prop="remark" align="center" />
-                            <el-table-column label="操作" align="center">
-                                <template slot-scope="scope">
-                                    <el-button size="mini" type="text" icon="el-icon-edit" @click="commodityUpdate(scope.row)">修改</el-button>
-                                    <el-button size="mini" type="text" icon="el-icon-delete" @click="commodityDelete(scope.row)">删除</el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </el-form-item>
-                </template>
+                        </template>
+                        <el-table-column label="是否售卖" prop="isSale" align="center">
+                            <template slot-scope="scope">
+                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4"
+                                    @change="sellChange($event, scope.row)" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="是否赠送" prop="isSend" align="center">
+                            <template slot-scope="scope">
+                                <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1"
+                                    @change="giftsChange($event, scope.row)" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="备注" prop="remark" align="center" />
+                        <el-table-column label="操作" align="center">
+                            <template slot-scope="scope">
+                                <el-button size="mini" type="text" icon="el-icon-edit" @click="commodityUpdate(scope.row)">修改</el-button>
+                                <el-button size="mini" type="text" icon="el-icon-delete" @click="commodityDelete(scope.row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -248,13 +246,17 @@
                 <div>箱子列表（{{ lookInfo.mapList ? lookInfo.mapList.length : 0 }}个）</div>
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
             </h3>
+            <!-- <el-row :gutter="10" class="mb8">
+                <el-col :span="1.5" :offset="0" style="font-size: 18px;" v-if="lookInfo.price && lookInfo.wxSuitCommodityList.length != 0">期望值：{{ expectedValued.exVal.toFixed(2) }}元</el-col>
+                <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="lookInfo.price && lookInfo.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValued.profitAndLoss.toFixed(2) }}元</el-col>
+            </el-row> -->
             <div class="sm-list" v-if="lookInfo.mapList">
                 <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index">
                     <ImagePreview ref="ImageFace1" :src="lookInfo.faceImg" width="160px" height="150px" />
                     <div style="margin: 10px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="lookInfo.faceImg" @click="lookImage('ImageFace', 1)"></i>
-                        <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;"  @click="editClick(item, index)"></i>
+                        <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editClick(item, index)"></i>
                         <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" @click="deleteBox(item, index)"></i>
                     </div>
                 </div>
@@ -315,7 +317,7 @@
             </el-table>
             <!-- 本地分页 -->
             <div class="pagination" style="display: flex; justify-content: flex-end; margin: 40px auto;">
-                    <pagination v-show="rankValstate.total > 0" :total="rankValstate.total" :page.sync="rankValstate.pageNum" :limit.sync="rankValstate.pageSize" @pagination="getRankList" />
+                <pagination v-show="rankValstate.total > 0" :total="rankValstate.total" :page.sync="rankValstate.pageNum" :limit.sync="rankValstate.pageSize" @pagination="getRankList" />
             </div>
 
             <h3 style="margin-top: 35px">中赏记录</h3>
@@ -521,6 +523,22 @@ export default {
             }
             return obj;
         },
+        // expectedValued() {
+        //     let obj = {
+        //         exVal: 0,
+        //         profitAndLoss: 0
+        //     };
+        //     if (this.lookInfo.price && this.lookInfo.wxSuitCommodityList.length != 0) {
+        //         this.lookInfo.wxSuitCommodityList.forEach(item => {
+        //             let num = this.queryProducts(item.commodityId, "price");
+        //             let price = num ? Number(Number(num).toFixed(2)) : 0;
+        //             let reference = item.reference ? Number(this.getPercent(Number(Number(item.reference).toFixed(2))).toFixed(2)) : 0;
+        //             obj.exVal += Number(Number(price * reference).toFixed(2));
+        //         });
+        //         obj.profitAndLoss = Number(this.lookInfo.price) - obj.exVal;
+        //     }
+        //     return obj;
+        // },
     },
     methods: {
         /** 计算百分值 */
@@ -633,7 +651,7 @@ export default {
             this.$modal.confirm('是否确认新增盒子？').then(() => {
                 let arr = [];
                 let obj = {};
-                if(this.lookInfo.mapList && this.lookInfo.mapList.length) {
+                if (this.lookInfo.mapList && this.lookInfo.mapList.length) {
                     obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
                     obj.commodityList.forEach(item => {
                         arr.push({ ...item, id: null, boxIndex: (item.boxIndex + 1) });

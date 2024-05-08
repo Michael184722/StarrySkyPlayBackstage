@@ -36,6 +36,24 @@ export function listTradeRecord(query) {
     })
 }
 
+// 查询交易统计
+export function listTradeStatistics(query) {
+    return request({
+        url: '/tradeRecord/tradeRecord/statis',
+        method: 'get',
+        params: query
+    })
+}
+
+// 查询积分记录统计
+export function listIntegralRecordStatistics(query) {
+    return request({
+        url: '/integralRecord/integralRecord/statis',
+        method: 'get',
+        params: query
+    })
+}
+
 // 查询积分记录列表
 export function listIntegralRecord(query) {
     return request({

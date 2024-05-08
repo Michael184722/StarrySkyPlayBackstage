@@ -85,9 +85,12 @@
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="500">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="lookUseInfo(scope.row)" v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; transactionRecords()" v-hasPermi="['wxUser:wxUser:query']">交易记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="integValidate.row = scope.row; integValidate.pageNum = 1; integralRecord()" v-hasPermi="['wxUser:wxUser:query']">积分记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()" v-hasPermi="['wxUser:wxUser:query']">发货记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; tranValidate.datetimerange = []; transactionRecords()"
+                        v-hasPermi="['wxUser:wxUser:query']">交易记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="integValidate.row = scope.row; integValidate.pageNum = 1; integValidate.datetimerange = []; integralRecord()"
+                        v-hasPermi="['wxUser:wxUser:query']">积分记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()"
+                        v-hasPermi="['wxUser:wxUser:query']">发货记录</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">修改</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleGift(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">赠送</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="clearCase(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">清空箱子</el-button>
@@ -263,7 +266,17 @@
         </el-dialog>
         <!-- 交易记录 -->
         <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1500px" append-to-body>
-            <el-table :data="tranValidate.list" max-height="650">
+            <el-row>
+                <el-col :span="1.5"><el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable /></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" @click="transactionRecords">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1">
+                    <div style="height: 100%; display: flex;align-items: center;">收入：{{ tranValidate.inMoney }}</div>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <div style="height: 100%; display: flex;align-items: center;">支出：{{ tranValidate.payMoney }}</div>
+                </el-col>
+            </el-row>
+            <el-table :data="tranValidate.list" max-height="650" style="margin-top: 30px;">
                 <!-- 序号 -->
                 <el-table-column label="序号" type="index" align="center" width="55" />
                 <!-- 交易场所 -->
@@ -289,8 +302,7 @@
                 <!-- 支出/收入 -->
                 <el-table-column label="支出/收入" align="center" prop="payType">
                     <template slot-scope="scope">
-                        <el-tag v-if="scope.row.payType == 1">支出</el-tag>
-                        <el-tag v-if="scope.row.payType == 2">收入</el-tag>
+                        <el-tag>{{ scope.row.payType }}：{{ scope.row.money }}</el-tag>
                     </template>
                 </el-table-column>
                 <!-- 交易商品名称 -->
@@ -314,7 +326,17 @@
         </el-dialog>
         <!-- 积分记录 -->
         <el-dialog title="积分记录" :visible.sync="integValidate.type" v-if="integValidate.type" width="1500px" append-to-body>
-            <el-table :data="integValidate.list" max-height="650">
+            <el-row>
+                <el-col :span="1.5"><el-date-picker v-model="integValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable /></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" @click="integralRecord">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1">
+                    <div style="height: 100%; display: flex;align-items: center;">收入：{{ integValidate.inIntegral }}</div>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <div style="height: 100%; display: flex;align-items: center;">支出：{{ integValidate.payIntegral }}</div>
+                </el-col>
+            </el-row>
+            <el-table :data="integValidate.list" max-height="650" style="margin-top: 30px;">
                 <!-- 序号 -->
                 <el-table-column label="序号" type="index" align="center" width="55" />
                 <!-- 交易场所 -->
@@ -332,7 +354,11 @@
                 <!-- 交易金额 -->
                 <el-table-column label="交易金额" align="center" prop="money" />
                 <!-- 交易积分 -->
-                <el-table-column label="交易积分" align="center" prop="integral" />
+                <el-table-column label="交易积分" align="center">
+                    <template slot-scope="scope">
+                        <el-tag>{{ (scope.row.floor == 6 ? '支出：' : '收入：') + scope.row.integral }}</el-tag>
+                    </template>
+                </el-table-column>
                 <!-- 交易商品名称 -->
                 <el-table-column label="交易商品名称" align="center" prop="commodityName" />
                 <!-- 交易商品图片 -->
@@ -389,7 +415,7 @@
 
 <script>
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listIntegralRecord, listSendRecord } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listIntegralRecord, listSendRecord, listTradeStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -470,6 +496,9 @@ export default {
                 list: [],
                 row: {},
                 type: false,
+                datetimerange: [],
+                inMoney: 0,
+                payMoney: 0,
             },
             integValidate: {
                 pageNum: 1,
@@ -478,6 +507,9 @@ export default {
                 list: [],
                 row: {},
                 type: false,
+                datetimerange: [],
+                inIntegral: 0,
+                payIntegral: 0,
             },
             shipValidate: {
                 pageNum: 1,
@@ -566,6 +598,7 @@ export default {
         },
         // 交易记录
         transactionRecords() {
+            this.queryTradeStatistics();
             listTradeRecord({
                 openId: this.tranValidate.row.openId,
                 pageNum: this.tranValidate.pageNum,
@@ -576,8 +609,16 @@ export default {
                 this.tranValidate.type = true;
             });
         },
+        // 查询交易统计
+        queryTradeStatistics() {
+            listTradeStatistics(this.addDateRange({ openId: this.tranValidate.row.openId }, this.tranValidate.datetimerange)).then(res => {
+                this.tranValidate.inMoney = res.data.inMoney;
+                this.tranValidate.payMoney = res.data.payMoney;
+            });
+        },
         // 积分记录
         integralRecord() {
+            this.queryTradeRecordStatistics();
             listIntegralRecord({
                 openId: this.integValidate.row.openId,
                 pageNum: this.integValidate.pageNum,
@@ -586,6 +627,13 @@ export default {
                 this.integValidate.list = res.rows;
                 this.integValidate.total = res.total;
                 this.integValidate.type = true;
+            });
+        },
+        // 查询积分记录统计
+        queryTradeRecordStatistics() {
+            listIntegralRecordStatistics(this.addDateRange({ openId: this.integValidate.row.openId }, this.integValidate.datetimerange)).then(res => {
+                this.integValidate.inIntegral = res.data.inIntegral;
+                this.integValidate.payIntegral = res.data.payIntegral;
             });
         },
         // 发货记录
