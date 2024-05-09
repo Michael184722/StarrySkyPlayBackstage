@@ -242,14 +242,14 @@
                 <div>查看等级：{{ lookInfo.levelName }}</div>
                 <div>上下架：{{ lookInfo.status == 1 ? "上架" : "下架" }}</div>
             </div>
+            <el-row :gutter="10" class="mb8" style="margin-top: 30px;">
+                <el-col :span="1.5" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">期望值：{{ expectedValue.exVal.toFixed(2) }}元</el-col>
+                <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="form.price && form.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValue.profitAndLoss.toFixed(2) }}元</el-col>
+            </el-row>
             <h3 style="margin-top: 35px; display: flex; align-items: center;">
                 <div>箱子列表（{{ lookInfo.mapList ? lookInfo.mapList.length : 0 }}个）</div>
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
             </h3>
-            <!-- <el-row :gutter="10" class="mb8">
-                <el-col :span="1.5" :offset="0" style="font-size: 18px;" v-if="lookInfo.price && lookInfo.wxSuitCommodityList.length != 0">期望值：{{ expectedValued.exVal.toFixed(2) }}元</el-col>
-                <el-col :span="1.5" :offset="1" style="font-size: 18px;" v-if="lookInfo.price && lookInfo.wxSuitCommodityList.length != 0">盈利/亏损：{{ expectedValued.profitAndLoss.toFixed(2) }}元</el-col>
-            </el-row> -->
             <div class="sm-list" v-if="lookInfo.mapList">
                 <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index">
                     <ImagePreview ref="ImageFace1" :src="lookInfo.faceImg" width="160px" height="150px" />
@@ -523,22 +523,6 @@ export default {
             }
             return obj;
         },
-        // expectedValued() {
-        //     let obj = {
-        //         exVal: 0,
-        //         profitAndLoss: 0
-        //     };
-        //     if (this.lookInfo.price && this.lookInfo.wxSuitCommodityList.length != 0) {
-        //         this.lookInfo.wxSuitCommodityList.forEach(item => {
-        //             let num = this.queryProducts(item.commodityId, "price");
-        //             let price = num ? Number(Number(num).toFixed(2)) : 0;
-        //             let reference = item.reference ? Number(this.getPercent(Number(Number(item.reference).toFixed(2))).toFixed(2)) : 0;
-        //             obj.exVal += Number(Number(price * reference).toFixed(2));
-        //         });
-        //         obj.profitAndLoss = Number(this.lookInfo.price) - obj.exVal;
-        //     }
-        //     return obj;
-        // },
     },
     methods: {
         /** 计算百分值 */
@@ -638,12 +622,19 @@ export default {
         },
         /** 查看详情 */
         queryLook(row) {
+            this.reset();
             this.editRow = row;
             const id = row.id || this.ids;
             this.getCommodityList();
-            getDetail(id).then(res => {
-                this.lookInfo = { ...res.data };
-                this.openInfo = true;
+            getSuitManage(id).then(response => {
+                for (let key in this.form) {
+                    this.form[key] = response.data[key];
+                };
+                this.form.drawNum = response.data.drawNum ? response.data.drawNum.split(',') : [];
+                getDetail(id).then(res => {
+                    this.lookInfo = { ...res.data };
+                    this.openInfo = true;
+                });
             });
         },
         // 新增盒子
@@ -668,7 +659,7 @@ export default {
                     id: this.lookInfo.id,
                     wxSuitCommodityList: [],
                 };
-                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t })));
+                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t, num: 0, totalNum: 0, lotteryNum: 0 })));
                 updateSuitManageEditBox(obj).then(res => {
                     this.$modal.msgSuccess("修改成功");
                     this.openInfo = false;

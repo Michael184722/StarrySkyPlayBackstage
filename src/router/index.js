@@ -177,7 +177,7 @@ Router.prototype.replace = function push(location) {
 }
 
 export default new Router({
-    base: process.env.NODE_ENV === "production" ? "/xkmw" : "",
+    base: process.env.NODE_ENV === "production" ? process.env.VUE_APP_LOGOUT_URL : "",
     mode: 'history', // 去掉url中的#
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes

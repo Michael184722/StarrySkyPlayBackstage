@@ -37,6 +37,7 @@ module.exports = {
             [process.env.VUE_APP_BASE_API]: {
                 // target: `http://192.168.11.174:8080/wxApp`,
                 // target: `http://120.46.55.124/wxApp`,
+                // target: `https://www.xkmwygw.com/wxTestApp`,
                 target: `https://www.xkmwygw.com/wxApp`,
                 // target: `http://sdjuvg.natappfree.cc/wxApp`,
                 changeOrigin: true,
