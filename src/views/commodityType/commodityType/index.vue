@@ -25,7 +25,7 @@
                     <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
                 </template>
             </el-table-column>
-            <el-table-column label="抽中倍数" align="center" prop="multiple" />
+            <!-- <el-table-column label="抽中倍数" align="center" prop="multiple" /> -->
             <el-table-column label="创建时间" align="center" prop="createTime" width="180">
                 <template slot-scope="scope">
                     <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -55,9 +55,9 @@
                         <el-radio v-for="dict in dict.type.sys_normal_disable" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="抽中倍数" prop="multiple">
+                <!-- <el-form-item label="抽中倍数" prop="multiple">
                     <el-input v-model="form.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="form.multiple = form.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -111,9 +111,9 @@ export default {
                 status: [
                     { required: true, message: "商品状态不能为空", trigger: "blur" }
                 ],
-                multiple: [
-                    { required: true, message: "请选择抽奖倍数", trigger: "blur" }
-                ],
+                // multiple: [
+                //     { required: true, message: "请选择抽奖倍数", trigger: "blur" }
+                // ],
             },
             // 商品分类树选项
             commodityCateOptions: [],
@@ -148,7 +148,7 @@ export default {
                 dictValue: void 0,
                 dictSort: 1,
                 status: "0",
-                multiple: void 0,
+                // multiple: void 0,
             };
             this.resetForm("form");
         },

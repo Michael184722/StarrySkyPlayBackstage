@@ -139,6 +139,7 @@
                             <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
                         </el-table-column>
                         <el-table-column label="商品参考价" prop="referencePrice" align="center" />
+                        <el-table-column label="商品倍数" prop="multiple" align="center" v-if="form.suitType == 4" />
                         <el-table-column label="商品概率" prop="reference" align="center" />
                         <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
                             <template slot-scope="scope">
@@ -211,6 +212,9 @@
                 <el-form-item label="参考价" prop="referencePrice">
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
                 </el-form-item>
+                <el-form-item label="抽中倍数" prop="multiple" v-if="form.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
+                    <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
+                </el-form-item>
                 <el-form-item label="抽中概率" prop="reference">
                     <el-input v-model="commodityForm.reference" type="number" max="100" placeholder="请输入抽中概率" @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
                         <template slot="append">%</template>
@@ -282,10 +286,14 @@
                         <div>参考价：{{ item.referencePrice }} 元</div>
                     </div>
                     <div class="sm-list-item-text">
-                        <div>等级：{{ item.typeName }}</div>
+                        <div>倍数：{{ item.multiple }}</div>
                         <div>概率：{{ item.reference ? item.reference + "%" : "" }}</div>
                     </div>
-                    <div class="sm-list-item-text">{{ item.remark }}</div>
+                    <div class="sm-list-item-text">
+                        <div>等级：{{ item.typeName }}</div>
+                    </div>
+                    <div class="sm-list-item-text">备注：{{ item.remark }}广东分行i的方便火锅i积分兑换港币梵蒂冈 </div>
+
                     <div class="sm-list-item-salesType" v-if="item.isSale == 1">售卖</div>
                     <div class="sm-list-item-salesType" v-if="item.isSend == 1">赠送</div>
 
@@ -355,6 +363,9 @@
                 </el-form-item>
                 <el-form-item label="商品数量" prop="num" v-if="lookInfo.suitType != 4" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
                     <el-input v-model="boxProductForm.num" type="number" placeholder="请输入商品数量" />
+                </el-form-item>
+                <el-form-item label="抽中倍数" prop="multiple" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
+                    <el-input v-model="boxProductForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="boxProductForm.multiple = boxProductForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>
                 <el-form-item label="参考价" prop="referencePrice">
                     <el-input v-model="boxProductForm.referencePrice" type="number" placeholder="请输入商品参考价" />
@@ -611,6 +622,7 @@ export default {
                 num: null,
                 commodityId: null,
                 referencePrice: null,
+                multiple: null,
                 reference: null,
                 remark: null,
                 isSale: null,
@@ -775,6 +787,7 @@ export default {
                         isSend: this.boxProductForm.isSend,
                         num: this.boxProductForm.num,
                         price: this.queryProducts(this.boxProductForm.commodityId, 'price'),
+                        multiple: this.boxProductForm.multiple,
                         reference: this.boxProductForm.reference,
                         referencePrice: this.boxProductForm.referencePrice,
                         remark: this.boxProductForm.remark,
@@ -782,7 +795,7 @@ export default {
                         totalNum: this.lookInfo.suitType != 4 ? this.boxProductForm.num : this.boxProductForm.totalNum,
                         typeName: this.queryProducts(this.boxProductForm.commodityId, 'levelName'),
                     };
-                    if (this.editIndex) {
+                    if (this.editIndex || this.editIndex == 0) {
                         // 修改
                         this.boxInfo.commodityList = this.boxInfo.commodityList.map((item, index) => {
                             if (index == this.editIndex) item = { ...obj };
@@ -868,6 +881,7 @@ export default {
             this.commodityForm = {
                 commodityId: null,
                 referencePrice: null,
+                multiple: null,
                 reference: null,
                 remark: null,
                 num: null,
@@ -1044,7 +1058,6 @@ export default {
                     display: flex;
                     font-size: 12px;
                     padding: 5px 10px;
-                    align-items: center;
                     box-sizing: border-box;
                     justify-content: space-between;
                 }

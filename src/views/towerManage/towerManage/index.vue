@@ -103,6 +103,7 @@
                             <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
                         </el-table-column>
                         <el-table-column label="商品参考价" prop="referencePrice" align="center" />
+                        <el-table-column label="抽中倍数" prop="multiple" align="center" />
                         <el-table-column label="商品概率" prop="reference" align="center" />
                         <el-table-column label="类型" prop="type" align="center">
                             <template slot-scope="scope">
@@ -147,6 +148,9 @@
                 </el-form-item>
                 <el-form-item label="参考价" prop="referencePrice">
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
+                </el-form-item>
+                <el-form-item label="抽中倍数" prop="multiple">
+                    <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>
                 <el-form-item label="抽中概率" prop="reference">
                     <el-input v-model="commodityForm.reference" type="number" placeholder="请输入抽中概率" @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
@@ -239,6 +243,7 @@ export default {
             commodityRules: {
                 commodityId: [{ required: true, message: "请选择商品", trigger: "change" }],
                 referencePrice: [{ required: true, message: "请输入参考价", trigger: "blur" }],
+                multiple: [{ required: true, message: '请输入抽中倍数', trigger: 'blur' }],
                 reference: [{ required: true, message: "请输入抽中概率", trigger: "blur" }],
             },
             goodsOptions: [],
@@ -412,6 +417,7 @@ export default {
             this.commodityForm = {
                 commodityId: null,
                 referencePrice: null,
+                multiple: null,
                 reference: null,
                 remark: null,
                 type: '4'
