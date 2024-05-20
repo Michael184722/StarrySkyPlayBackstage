@@ -16,6 +16,7 @@ import { download } from '@/utils/request'
 
 import './assets/icons' // icon
 import './permission' // permission control
+import 'element-ui/lib/theme-chalk/index.css';
 import { getDicts } from "@/api/system/dict/data";
 import { getConfigKey } from "@/api/system/config";
 import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, handleTree } from "@/utils/ruoyi";
@@ -73,14 +74,26 @@ DictData.install()
  */
 
 Vue.use(Element, {
-  size: Cookies.get('size') || 'medium' // set element-ui default size
+    size: Cookies.get('size') || 'medium' // set element-ui default size
 })
-
+Vue.use({
+    install(Vue) {
+        Vue.component('ElDialog', {
+            extends: Vue.component('ElDialog'), // 扩展原有组件
+            props: {
+                closeOnClickModal: {
+                    type: Boolean,
+                    default: false // 默认点击遮罩不关闭 Dialog
+                }
+            }
+        });
+    }
+});
 Vue.config.productionTip = false
 
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
 })

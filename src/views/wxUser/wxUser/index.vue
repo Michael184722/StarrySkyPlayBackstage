@@ -268,11 +268,11 @@
         <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1500px" append-to-body>
             <el-row>
                 <el-col :span="1.5"><el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable /></el-col>
-                <el-col :span="1.5" :offset="1"><el-button type="primary" @click="transactionRecords">搜索</el-button></el-col>
-                <el-col :span="1.5" :offset="1">
+                <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="transactionRecords">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ tranValidate.inMoney }}</div>
                 </el-col>
-                <el-col :span="1.5" :offset="1">
+                <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
                     <div style="height: 100%; display: flex;align-items: center;">支出：{{ tranValidate.payMoney }}</div>
                 </el-col>
             </el-row>
@@ -599,11 +599,11 @@ export default {
         // 交易记录
         transactionRecords() {
             this.queryTradeStatistics();
-            listTradeRecord({
+            listTradeRecord( this.addDateRange({
                 openId: this.tranValidate.row.openId,
                 pageNum: this.tranValidate.pageNum,
                 pageSize: this.tranValidate.pageSize,
-            }).then(res => {
+            }, this.tranValidate.datetimerange )).then(res => {
                 this.tranValidate.list = res.rows;
                 this.tranValidate.total = res.total;
                 this.tranValidate.type = true;
@@ -619,11 +619,11 @@ export default {
         // 积分记录
         integralRecord() {
             this.queryTradeRecordStatistics();
-            listIntegralRecord({
+            listIntegralRecord(this.addDateRange({
                 openId: this.integValidate.row.openId,
                 pageNum: this.integValidate.pageNum,
                 pageSize: this.integValidate.pageSize,
-            }).then(res => {
+            }, this.integValidate.datetimerange)).then(res => {
                 this.integValidate.list = res.rows;
                 this.integValidate.total = res.total;
                 this.integValidate.type = true;

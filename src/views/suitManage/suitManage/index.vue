@@ -196,7 +196,7 @@
         <el-dialog :title="prTitle" :visible.sync="openGoods" width="800px" append-to-body>
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
-                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;">
+                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(true)">
                         <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
@@ -351,7 +351,7 @@
         <el-dialog title="新增商品" :visible.sync="openGoodType" width="1200px" append-to-body class="suitManage">
             <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
                 <el-form-item label="商品名称" prop="commodityId">
-                    <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;">
+                    <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(false)">
                         <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
@@ -539,6 +539,10 @@ export default {
         /** 计算百分值 */
         getPercent(val) {
             return val / 100;
+        },
+        commodityChange(type) {
+            type && (this.commodityForm.referencePrice = this.queryProducts(this.commodityForm.commodityId, 'price'));
+            !type && (this.boxProductForm.referencePrice = this.queryProducts(this.boxProductForm.commodityId, 'price'));
         },
         /** 查询抽赏套管理列表 */
         getList() {
