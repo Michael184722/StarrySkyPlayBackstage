@@ -76,7 +76,7 @@
                     <el-switch v-model="scope.row.delFlag" active-value="2" inactive-value="0" @change="switchChange($event, scope.row, 'delFlag')" />
                 </template>
             </el-table-column>
-            <el-table-column label="回收账号" align="center" prop="delFlag" width="150">
+            <el-table-column label="回收账号" align="center" prop="isInner" width="150">
                 <template slot-scope="scope">
                     <el-switch v-model="scope.row.isInner" active-value="1" inactive-value="0" @change="switchChange($event, scope.row, 'isInner')" />
                 </template>
