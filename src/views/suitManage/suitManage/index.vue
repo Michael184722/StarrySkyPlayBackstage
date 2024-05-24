@@ -294,8 +294,9 @@
                     </div>
                     <div class="sm-list-item-text">备注：{{ item.remark }}广东分行i的方便火锅i积分兑换港币梵蒂冈 </div>
 
-                    <div class="sm-list-item-salesType" v-if="item.isSale == 1">售卖</div>
-                    <div class="sm-list-item-salesType" v-if="item.isSend == 1">赠送</div>
+                    <div class="sm-list-item-salesType"  v-if="lookInfo.suitType == 4 && item.isDouble == 1">双倍赠送</div>
+                    <div class="sm-list-item-salesType" v-else-if="item.isSend == 1">赠送</div>
+                    <div class="sm-list-item-salesType" v-else-if="item.isSale == 1">售卖</div>
 
                     <div class="sm-list-item-type" v-if="lookInfo.suitType != 4">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
                     <div class="sm-list-item-tips" v-if="lookInfo.suitType != 4 && item.num == 0">已售完</div>

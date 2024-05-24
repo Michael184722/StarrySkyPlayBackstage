@@ -39,6 +39,7 @@
                     {{ scope.row.type == 1 ? '微信号' : scope.row.type == 2 ? '微信群号' : '' }}
                 </template>
             </el-table-column>
+            <el-table-column label="备注" align="center" prop="remark"></el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
