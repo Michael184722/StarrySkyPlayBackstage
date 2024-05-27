@@ -82,11 +82,13 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="500">
+            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="600">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="lookUseInfo(scope.row)" v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; tranValidate.datetimerange = []; transactionRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">交易记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="purchValidate.row = scope.row; purchValidate.pageNum = 1; purchValidate.datetimerange = []; purchaseRecords()"
+                        v-hasPermi="['wxUser:wxUser:query']">购买记录</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="integValidate.row = scope.row; integValidate.pageNum = 1; integValidate.datetimerange = []; integralRecord()"
                         v-hasPermi="['wxUser:wxUser:query']">积分记录</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()"
@@ -267,7 +269,8 @@
         <!-- 交易记录 -->
         <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1500px" append-to-body>
             <el-row>
-                <el-col :span="1.5"><el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable /></el-col>
+                <el-col :span="1.5"><el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" clearable /></el-col>
                 <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="transactionRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ tranValidate.inMoney }}</div>
@@ -306,7 +309,28 @@
                     </template>
                 </el-table-column>
                 <!-- 交易商品名称 -->
-                <el-table-column label="交易商品名称" align="center" prop="commodityName" />
+                <el-table-column label="交易商品名称" align="center" prop="commodityName">
+                    <template slot-scope="scope">
+                        <el-popover placement="right" trigger="click">
+                            <el-table v-if="scope.row.commodityList.length" :data="scope.row.commodityList">
+                                <el-table-column width="200" property="commodityName" label="商品名称"></el-table-column>
+                                <el-table-column width="200" label="商品等级" align="center" property="levelName" />
+                                <el-table-column width="200" label="中奖数量" align="center" property="totalNum" />
+                                <el-table-column width="200" label="中奖总价" align="center" property="totalPrice">
+                                    <template slot-scope="scope">
+                                        {{ Number(scope.row.totalPrice) }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column width="200" label="商品图片" align="center" property="faceImg">
+                                    <template slot-scope="scope">
+                                        <ImagePreview :src="scope.row.faceImg" width="50px" height="50px" />
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <el-button slot="reference" type="primary" size="mini">查看</el-button>
+                        </el-popover>
+                    </template>
+                </el-table-column>
                 <!-- 交易人昵称/被交易人 -->
                 <el-table-column label="交易人昵称/被交易人" align="center" prop="nickName">
                     <template slot-scope="scope">
@@ -324,10 +348,93 @@
             </el-table>
             <pagination v-show="tranValidate.total > 0" :total="tranValidate.total" :page.sync="tranValidate.pageNum" :limit.sync="tranValidate.pageSize" @pagination="transactionRecords" />
         </el-dialog>
+        <!-- 交易记录 -->
+        <el-dialog title="购买记录" :visible.sync="purchValidate.type" v-if="purchValidate.type" width="1500px" append-to-body>
+            <el-row>
+                <el-col :span="1.5"><el-date-picker v-model="purchValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" clearable /></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="purchaseRecords">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
+                    <div style="height: 100%; display: flex;align-items: center;">收入：{{ purchValidate.inMoney }}</div>
+                </el-col>
+                <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
+                    <div style="height: 100%; display: flex;align-items: center;">支出：{{ purchValidate.payMoney }}</div>
+                </el-col>
+            </el-row>
+            <el-table :data="purchValidate.list" max-height="650" style="margin-top: 30px;">
+                <!-- 序号 -->
+                <el-table-column label="序号" type="index" align="center" width="55" />
+                <!-- 交易场所 -->
+                <el-table-column label="交易场所" align="center" prop="floor">
+                    <template slot-scope="scope">
+                        <!-- 1-商城、2-全局套，3-打拳套，4-无限池，5-攀塔，9-交易区 -->
+                        <el-tag v-if="scope.row.floor == 1">商城</el-tag>
+                        <el-tag v-if="scope.row.floor == 2">全局套</el-tag>
+                        <el-tag v-if="scope.row.floor == 3">打拳套</el-tag>
+                        <el-tag v-if="scope.row.floor == 4">无限池</el-tag>
+                        <el-tag v-if="scope.row.floor == 5">攀塔</el-tag>
+                        <el-tag v-if="scope.row.floor == 9">交易区</el-tag>
+                    </template>
+                </el-table-column>
+                <!-- 交易方式 -->
+                <el-table-column label="交易方式" align="center" prop="tradeType">
+                    <template slot-scope="scope">
+                        {{ scope.row.type == 1 ? "微信支付" : scope.row.type == 2 ? "余额支付" : "" }}
+                    </template>
+                </el-table-column>
+                <!-- 交易金额 -->
+                <el-table-column label="交易金额" align="center" prop="money" />
+                <!-- 支出/收入 -->
+                <el-table-column label="支出/收入" align="center" prop="payType">
+                    <template slot-scope="scope">
+                        <el-tag>{{ scope.row.payType }}：{{ scope.row.money }}</el-tag>
+                    </template>
+                </el-table-column>
+                <!-- 交易商品名称 -->
+                <el-table-column label="交易商品名称" align="center" prop="commodityName">
+                    <template slot-scope="scope">
+                        <el-popover placement="right" trigger="click">
+                            <el-table v-if="scope.row.commodityList.length" :data="scope.row.commodityList">
+                                <el-table-column width="200" property="commodityName" label="商品名称"></el-table-column>
+                                <el-table-column width="200" label="商品等级" align="center" property="levelName" />
+                                <el-table-column width="200" label="中奖数量" align="center" property="totalNum" />
+                                <el-table-column width="200" label="中奖总价" align="center" property="totalPrice">
+                                    <template slot-scope="scope">
+                                        {{ Number(scope.row.totalPrice) }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column width="200" label="商品图片" align="center" property="faceImg">
+                                    <template slot-scope="scope">
+                                        <ImagePreview :src="scope.row.faceImg" width="50px" height="50px" />
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <el-button slot="reference" type="primary" size="mini">查看</el-button>
+                        </el-popover>
+                    </template>
+                </el-table-column>
+                <!-- 交易人昵称/被交易人 -->
+                <el-table-column label="交易人昵称/被交易人" align="center" prop="nickName">
+                    <template slot-scope="scope">
+                        {{ scope.row.nickName ? scope.row.nickName : "平台" }}
+                    </template>
+                </el-table-column>
+                <!-- 头像 -->
+                <el-table-column label="头像" align="center" prop="wxAvatar">
+                    <template slot-scope="scope">
+                        <ImagePreview :src="scope.row.wxAvatar" :width="50" :height="50" />
+                    </template>
+                </el-table-column>
+                <!-- 交易时间 -->
+                <el-table-column label="交易时间" align="center" prop="createTime" />
+            </el-table>
+            <pagination v-show="purchValidate.total > 0" :total="purchValidate.total" :page.sync="purchValidate.pageNum" :limit.sync="purchValidate.pageSize" @pagination="purchaseRecords" />
+        </el-dialog>
         <!-- 积分记录 -->
         <el-dialog title="积分记录" :visible.sync="integValidate.type" v-if="integValidate.type" width="1500px" append-to-body>
             <el-row>
-                <el-col :span="1.5"><el-date-picker v-model="integValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable /></el-col>
+                <el-col :span="1.5"><el-date-picker v-model="integValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" clearable /></el-col>
                 <el-col :span="1.5" :offset="1"><el-button type="primary" @click="integralRecord">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ integValidate.inIntegral }}</div>
@@ -415,7 +522,7 @@
 
 <script>
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listIntegralRecord, listSendRecord, listTradeStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -490,6 +597,17 @@ export default {
             baTotal: 0,
 
             tranValidate: {
+                pageNum: 1,
+                pageSize: 10,
+                total: 0,
+                list: [],
+                row: {},
+                type: false,
+                datetimerange: [],
+                inMoney: 0,
+                payMoney: 0,
+            },
+            purchValidate: {
                 pageNum: 1,
                 pageSize: 10,
                 total: 0,
@@ -599,14 +717,27 @@ export default {
         // 交易记录
         transactionRecords() {
             this.queryTradeStatistics();
-            listTradeRecord( this.addDateRange({
+            listTradeRecord(this.addDateRange({
                 openId: this.tranValidate.row.openId,
                 pageNum: this.tranValidate.pageNum,
                 pageSize: this.tranValidate.pageSize,
-            }, this.tranValidate.datetimerange )).then(res => {
+            }, this.tranValidate.datetimerange)).then(res => {
                 this.tranValidate.list = res.rows;
                 this.tranValidate.total = res.total;
                 this.tranValidate.type = true;
+            });
+        },
+        // 购买记录
+        purchaseRecords() {
+            // purchValidate
+            listPresent(this.addDateRange({
+                openId: this.purchValidate.row.openId,
+                pageNum: this.purchValidate.pageNum,
+                pageSize: this.purchValidate.pageSize,
+            }, this.purchValidate.datetimerange)).then(res => {
+                this.purchValidate.list = res.rows;
+                this.purchValidate.total = res.total;
+                this.purchValidate.type = true;
             });
         },
         // 查询交易统计

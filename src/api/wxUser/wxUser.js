@@ -36,6 +36,15 @@ export function listTradeRecord(query) {
     })
 }
 
+// 查询抽赏
+export function listPresent(query) {
+    return request({
+        url: '/tradeRecord/tradeRecord/lotteryRecordList',
+        method: 'get',
+        params: query
+    })
+}
+
 // 查询交易统计
 export function listTradeStatistics(query) {
     return request({
