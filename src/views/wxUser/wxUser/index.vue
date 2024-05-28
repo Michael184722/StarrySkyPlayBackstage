@@ -522,7 +522,7 @@
 
 <script>
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -727,9 +727,16 @@ export default {
                 this.tranValidate.type = true;
             });
         },
+        // 查询交易统计
+        queryTradeStatistics() {
+            listTradeStatistics(this.addDateRange({ openId: this.tranValidate.row.openId }, this.tranValidate.datetimerange)).then(res => {
+                this.tranValidate.inMoney = res.data.inMoney;
+                this.tranValidate.payMoney = res.data.payMoney;
+            });
+        },
         // 购买记录
         purchaseRecords() {
-            // purchValidate
+            this.queryPresentStatistics();
             listPresent(this.addDateRange({
                 openId: this.purchValidate.row.openId,
                 pageNum: this.purchValidate.pageNum,
@@ -740,11 +747,11 @@ export default {
                 this.purchValidate.type = true;
             });
         },
-        // 查询交易统计
-        queryTradeStatistics() {
-            listTradeStatistics(this.addDateRange({ openId: this.tranValidate.row.openId }, this.tranValidate.datetimerange)).then(res => {
-                this.tranValidate.inMoney = res.data.inMoney;
-                this.tranValidate.payMoney = res.data.payMoney;
+        // 查询购买记录统计
+        queryPresentStatistics() {
+            listPresentStatistics(this.addDateRange({ openId: this.purchValidate.row.openId }, this.purchValidate.datetimerange)).then(res => {
+                this.purchValidate.inMoney = res.data.inMoney;
+                this.purchValidate.payMoney = res.data.payMoney;
             });
         },
         // 积分记录

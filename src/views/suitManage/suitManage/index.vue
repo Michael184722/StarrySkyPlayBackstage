@@ -542,8 +542,8 @@ export default {
             return val / 100;
         },
         commodityChange(type) {
-            type && (this.commodityForm.referencePrice = this.queryProducts(this.commodityForm.commodityId, 'price'));
-            !type && (this.boxProductForm.referencePrice = this.queryProducts(this.boxProductForm.commodityId, 'price'));
+            type && (this.commodityForm.referencePrice =  this.form.suitType == 3 ? this.form.integral : this.form.price);
+            !type && (this.boxProductForm.referencePrice = this.lookInfo.suitType == 3 ? this.lookInfo.integral : this.lookInfo.price);
         },
         /** 查询抽赏套管理列表 */
         getList() {

@@ -19,7 +19,12 @@
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="类型名称" align="center" prop="dictLabel" />
             <el-table-column label="类型等级" align="center" prop="dictValue" />
-            <el-table-column label="排序" align="center" prop="dictSort" />
+            <el-table-column label="排序" align="center" prop="remark" />
+            <el-table-column label="是否排行" align="center" prop="dictSort">
+                <template slot-scope="scope">
+                    <el-switch v-model="scope.row.dictSort" :active-value="1" :inactive-value="2" @change="handleStatusChange(scope.row)"></el-switch>
+                </template>
+            </el-table-column>
             <el-table-column label="状态" align="center" prop="status">
                 <template slot-scope="scope">
                     <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status" />
@@ -47,8 +52,12 @@
                 <el-form-item label="类型等级" prop="dictValue">
                     <el-input v-model="form.dictValue" type="number" placeholder="请输入类型等级" />
                 </el-form-item>
-                <el-form-item label="显示排序" prop="dictSort">
-                    <el-input-number v-model="form.dictSort" controls-position="right" :min="0" />
+                <el-form-item label="显示排序" prop="remark">
+                    <el-input-number v-model="form.remark" controls-position="right" :min="0" />
+                </el-form-item>
+                <el-form-item label="是否排行" prop="dictSort">
+                    <!-- <el-input-number v-model="form.dictSort" controls-position="right" :min="0" /> -->
+                    <el-switch v-model="form.dictSort" :active-value="1" :inactive-value="2" active-text="是" inactive-text="否"></el-switch>
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
                     <el-radio-group v-model="form.status">
@@ -105,8 +114,11 @@ export default {
                 dictValue: [
                     { required: true, message: "商品等级不能为空", trigger: "blur" }
                 ],
-                dictSort: [
+                remark: [
                     { required: true, message: "排序不能为空", trigger: "blur" }
+                ],
+                dictSort: [
+                    { required: true, message: "请选择是否排行", trigger: "change" }
                 ],
                 status: [
                     { required: true, message: "商品状态不能为空", trigger: "blur" }
@@ -146,8 +158,9 @@ export default {
                 dictType: 'level',
                 dictLabel: void 0,
                 dictValue: void 0,
-                dictSort: 1,
+                dictSort: 2,
                 status: "0",
+                remark: 1,
                 // multiple: void 0,
             };
             this.resetForm("form");
@@ -174,8 +187,15 @@ export default {
             const dictCode = row.dictCode || this.ids
             getData(dictCode).then(response => {
                 this.form = response.data;
+                console.log(this.form);
                 this.open = true;
                 this.title = "修改类型";
+            });
+        },
+        handleStatusChange(row) {
+            updateData(row).then(response => {
+                this.$modal.msgSuccess("修改成功");
+                this.getList();
             });
         },
         /** 提交按钮 */

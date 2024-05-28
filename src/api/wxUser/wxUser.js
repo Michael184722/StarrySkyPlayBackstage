@@ -54,6 +54,15 @@ export function listTradeStatistics(query) {
     })
 }
 
+// 查询交易统计
+export function listPresentStatistics(query) {
+    return request({
+        url: '/tradeRecord/tradeRecord/lotteryStatis',
+        method: 'get',
+        params: query
+    })
+}
+
 // 查询积分记录统计
 export function listIntegralRecordStatistics(query) {
     return request({
