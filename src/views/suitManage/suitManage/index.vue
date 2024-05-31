@@ -676,7 +676,7 @@ export default {
                     id: this.lookInfo.id,
                     wxSuitCommodityList: [],
                 };
-                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t, lotteryNum: 0 })));
+                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t })));
                 updateSuitManageEditBox(obj).then(res => {
                     this.$modal.msgSuccess("修改成功");
                     this.openInfo = false;
