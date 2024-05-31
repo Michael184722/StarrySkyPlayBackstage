@@ -676,7 +676,7 @@ export default {
                     id: this.lookInfo.id,
                     wxSuitCommodityList: [],
                 };
-                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t, totalNum: 0, lotteryNum: 0 })));
+                this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t, lotteryNum: 0 })));
                 updateSuitManageEditBox(obj).then(res => {
                     this.$modal.msgSuccess("修改成功");
                     this.openInfo = false;
@@ -705,7 +705,6 @@ export default {
         },
         // 查看大图ImagePreview
         lookImage(val, index) {
-            console.log(val, index, this.$refs[val + index]);
             this.$refs[val + index][0].$refs.elImage.clickHandler();
         },
         // 修改盒子商品
@@ -764,11 +763,10 @@ export default {
         },
         // 箱子删除
         deleteBox(row, index) {
-            this.$modal.confirm('当前删不进行提交也会删除箱子，请再次确认是否删除？').then(() => {
+            this.$modal.confirm('当前删除不进行提交也会删除箱子，请再次确认是否删除？').then(() => {
                 return !row.type && delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: index + 1 });
             }).then(() => {
                 this.lookInfo.mapList.splice(index, 1);
-                console.log(this.lookInfo.mapList);
                 this.$modal.msgSuccess("删除成功");
             });
         },
