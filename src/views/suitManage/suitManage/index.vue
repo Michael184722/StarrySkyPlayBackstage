@@ -167,13 +167,13 @@
                         </template>
                         <el-table-column label="是否售卖" prop="isSale" align="center">
                             <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4"
+                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 4"
                                     @change="sellChange($event, scope.row)" />
                             </template>
                         </el-table-column>
                         <el-table-column label="是否赠送" prop="isSend" align="center">
                             <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 3 || form.suitType == 4 || scope.row.isDouble == 1"
+                                <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 4 || scope.row.isDouble == 1"
                                     @change="giftsChange($event, scope.row)" />
                             </template>
                         </el-table-column>
@@ -378,7 +378,7 @@
                 </el-form-item>
                 <!-- 是否售卖 -->
                 <el-form-item label="是否售卖" prop="isSale" :rules="[{ required: true, message: '请选择是否售卖', trigger: 'change' }]">
-                    <el-radio-group v-model="boxProductForm.isSale" style="margin-top: 10px" :disabled="lookInfo.suitType == 3 || lookInfo.suitType == 4"
+                    <el-radio-group v-model="boxProductForm.isSale" style="margin-top: 10px" :disabled="lookInfo.suitType == 4"
                         @input="boxProductForm.isSale == '1' ? boxProductForm.isSend = '0' : boxProductForm.isSend = '1'">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
@@ -386,7 +386,7 @@
                 </el-form-item>
                 <!-- 是否赠送 -->
                 <el-form-item label="是否赠送" prop="isSend" :rules="[{ required: true, message: '请选择是否赠送', trigger: 'change' }]" v-if="lookInfo.suitType != 4">
-                    <el-radio-group v-model="boxProductForm.isSend" style="margin-top: 10px" :disabled="lookInfo.suitType == 3 || lookInfo.suitType == 4"
+                    <el-radio-group v-model="boxProductForm.isSend" style="margin-top: 10px" :disabled="lookInfo.suitType == 4"
                         @input="boxProductForm.isSend == '1' ? boxProductForm.isSale = '0' : boxProductForm.isSale = '1'">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>

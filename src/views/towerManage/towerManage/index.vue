@@ -136,7 +136,7 @@
         <el-dialog :title="prTitle" :visible.sync="openGoods" width="800px" append-to-body>
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
-                    <el-select v-model="commodityForm.commodityId" placeholder="请选择商品名称" style="width: 100%;">
+                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;">
                         <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
