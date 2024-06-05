@@ -235,9 +235,22 @@
                 </el-table-column>
             </el-table>
         </el-dialog>
-        <el-dialog title="赠送商品" :visible.sync="giveType" v-if="giveType" width="1500px" append-to-body>
+        <el-dialog title="赠送" :visible.sync="giveType" v-if="giveType" width="1500px" append-to-body>
             <el-form ref="give" :model="give" :rules="giveRules" label-width="80px">
-                <el-form-item label="赠送商品" prop="commodityId">
+                <!-- 福袋和商品切换 -->
+                  <el-form-item label="赠送类型" prop="type">
+                    <el-radio-group v-model="give.type">
+                        <el-radio :label="1">福袋</el-radio>
+                        <el-radio :label="2">商品</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <!-- 选择福袋 -->
+                  <el-form-item label="选择福袋" prop="bagId" v-if="give.type == 1" :rules="[{ required: true, message: '请选择福袋', trigger: 'change' }]">
+                    <el-select v-model="give.bagId" filterable placeholder="请选择福袋" style="width: 100%">
+                        <el-option v-for="(item, index) in bagList" :key="index" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="赠送商品" prop="commodityId" v-if="give.type == 2" :rules="[{ required: true, message: '请选择赠送商品', trigger: 'change' }]">
                     <el-select v-model="give.commodityId" filterable placeholder="请选择赠送商品" style="width: 100%">
                         <el-option v-for="(item, index) in commodityList" :key="index" :label="item.commodityName" :value="item.id"></el-option>
                     </el-select>
@@ -521,6 +534,8 @@
 </template>
 
 <script>
+import { listBag } from "@/api/bag/bag";
+import { addBagRecord } from "@/api/bagRecord/bagRecord";
 import { listCommodity } from "@/api/commodity/commodity";
 import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
 
@@ -584,9 +599,7 @@ export default {
                 row: {},
             },
             give: {},
-            giveRules: {
-                commodityId: [{ required: true, message: "请选择赠送商品", trigger: "change" }],
-            },
+            giveRules: {},
             balanceQuery: {
                 openId: null,
                 pageNum: 1,
@@ -637,6 +650,7 @@ export default {
                 row: {},
                 type: false,
             },
+            bagList: [],
         };
     },
     created() {
@@ -813,6 +827,8 @@ export default {
         },
         giftReset() {
             this.give = {
+                type: 2,
+                bagId: null,
                 openId: null,
                 commodityId: null,
             };
@@ -822,6 +838,10 @@ export default {
             this.giftReset();
             this.getGivenGoods();
             this.giveVal.row = row;
+            listBag().then(res => {
+                console.log(res, "LLKKK");
+                this.bagList = res.rows;
+            })
             listCommodity().then(res => {
                 this.give.openId = row.openId;
                 this.commodityList = res.rows;
@@ -854,13 +874,21 @@ export default {
         submitGive() {
             this.$refs["give"].validate(valid => {
                 if (valid) {
-                    giveGoods(this.give).then(res => {
-                        if (res.code == 200) {
+                    if(this.give.type == 1) {
+                        addBagRecord({ openId: this.give.openId, bagId: this.give.bagId }).then(res => {
                             this.$modal.msgSuccess("赠送成功");
                             this.giveType = false;
                             this.getList();
-                        }
-                    })
+                        });
+                    } else {
+                        giveGoods({ openId: this.give.openId, commodityId: this.give.commodityId }).then(res => {
+                            if (res.code == 200) {
+                                this.$modal.msgSuccess("赠送成功");
+                                this.giveType = false;
+                                this.getList();
+                            }
+                        });
+                    }
                 }
             })
         },
