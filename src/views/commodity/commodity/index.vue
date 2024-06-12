@@ -38,6 +38,12 @@
             <el-table-column label="商品数量" align="center" prop="num" />
             <el-table-column label="创建时间" align="center" prop="createTime" />
             <el-table-column label="更新时间" align="center" prop="updateTime" />
+            <!-- 上下架 -->
+            <el-table-column label="上下架" align="center" prop="status">
+                <template slot-scope="scope">
+                    <el-switch v-model="scope.row.status" active-value="1" inactive-value="0" @change="handleStatusChange(scope.row)"></el-switch>
+                </template>
+            </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['commodity:commodity:edit']">修改</el-button>
@@ -225,6 +231,16 @@ export default {
                 };
                 this.open = true;
                 this.title = "修改商城商品管理";
+            });
+        },
+        handleStatusChange(row) {
+            console.log(row.status, ":::");
+            let text = row.status === "1" ? "上架" : "下架";
+            updateCommodity({id: row.id, status: row.status}).then(() => {
+                this.$modal.msgSuccess(text + "成功");
+                this.getList();
+            }).catch(function() {
+                this.getList();
             });
         },
         /** 提交按钮 */

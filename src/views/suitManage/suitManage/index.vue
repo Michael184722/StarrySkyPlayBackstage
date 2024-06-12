@@ -662,7 +662,7 @@ export default {
                 if (this.lookInfo.mapList && this.lookInfo.mapList.length) {
                     obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
                     obj.commodityList.forEach(item => {
-                        arr.push({ ...item, id: null, boxIndex: (item.boxIndex + 1) });
+                        arr.push({ ...item, id: null, num: item.totalNum, boxIndex: (item.boxIndex + 1) });
                     });
                 } else this.lookInfo.mapList = [];
                 obj.commodityList = arr;
