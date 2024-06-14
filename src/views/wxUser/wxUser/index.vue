@@ -238,14 +238,14 @@
         <el-dialog title="赠送" :visible.sync="giveType" v-if="giveType" width="1500px" append-to-body>
             <el-form ref="give" :model="give" :rules="giveRules" label-width="80px">
                 <!-- 福袋和商品切换 -->
-                  <el-form-item label="赠送类型" prop="type">
+                <el-form-item label="赠送类型" prop="type">
                     <el-radio-group v-model="give.type">
                         <el-radio :label="1">福袋</el-radio>
                         <el-radio :label="2">商品</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <!-- 选择福袋 -->
-                  <el-form-item label="选择福袋" prop="bagId" v-if="give.type == 1" :rules="[{ required: true, message: '请选择福袋', trigger: 'change' }]">
+                <el-form-item label="选择福袋" prop="bagId" v-if="give.type == 1" :rules="[{ required: true, message: '请选择福袋', trigger: 'change' }]">
                     <el-select v-model="give.bagId" filterable placeholder="请选择福袋" style="width: 100%">
                         <el-option v-for="(item, index) in bagList" :key="index" :label="item.name" :value="item.id"></el-option>
                     </el-select>
@@ -364,8 +364,14 @@
         <!-- 交易记录 -->
         <el-dialog title="购买记录" :visible.sync="purchValidate.type" v-if="purchValidate.type" width="1500px" append-to-body>
             <el-row>
-                <el-col :span="1.5"><el-date-picker v-model="purchValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
-                        end-placeholder="结束日期" clearable /></el-col>
+                <el-col :span="2.5">
+                    <el-select v-model="purchValidate.state" placeholder="请选择交易类型" clearable>
+                        <el-option v-for="item in [{ value: 1, label: '平台'}, { value: 2, label: '非平台'}]" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-date-picker v-model="purchValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable />
+                </el-col>
                 <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="purchaseRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ purchValidate.inMoney }}</div>
@@ -627,6 +633,7 @@ export default {
                 list: [],
                 row: {},
                 type: false,
+                state: null,
                 datetimerange: [],
                 inMoney: 0,
                 payMoney: 0,
@@ -752,6 +759,7 @@ export default {
         purchaseRecords() {
             this.queryPresentStatistics();
             listPresent(this.addDateRange({
+                state: this.purchValidate.state,
                 openId: this.purchValidate.row.openId,
                 pageNum: this.purchValidate.pageNum,
                 pageSize: this.purchValidate.pageSize,
@@ -874,7 +882,7 @@ export default {
         submitGive() {
             this.$refs["give"].validate(valid => {
                 if (valid) {
-                    if(this.give.type == 1) {
+                    if (this.give.type == 1) {
                         addBagRecord({ openId: this.give.openId, bagId: this.give.bagId }).then(res => {
                             this.$modal.msgSuccess("赠送成功");
                             this.giveType = false;
