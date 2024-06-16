@@ -624,7 +624,7 @@ export default {
         },
         resetGoods() {
             this.boxProductForm = {
-                num: null,
+                num: 0,
                 commodityId: null,
                 referencePrice: null,
                 multiple: null,
