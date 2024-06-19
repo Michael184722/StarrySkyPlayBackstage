@@ -292,7 +292,7 @@
                     <div class="sm-list-item-text">
                         <div>等级：{{ item.typeName }}</div>
                     </div>
-                    <div class="sm-list-item-text">备注：{{ item.remark }}广东分行i的方便火锅i积分兑换港币梵蒂冈 </div>
+                    <div class="sm-list-item-text">备注：{{ item.remark }} </div>
 
                     <div class="sm-list-item-salesType"  v-if="lookInfo.suitType == 4 && item.isDouble == 1">双倍赠送</div>
                     <div class="sm-list-item-salesType" v-else-if="item.isSend == 1">赠送</div>
@@ -528,7 +528,7 @@ export default {
                 this.form.wxSuitCommodityList.forEach(item => {
                     let num = this.queryProducts(item.commodityId, "price");
                     let price = num ? Number(Number(num).toFixed(2)) : 0;
-                    let reference = item.reference ? Number(this.getPercent(Number(Number(item.reference).toFixed(2))).toFixed(2)) : 0;
+                    let reference = item.reference ? Number(this.getPercent(Number(Number(item.reference)))) : 0;
                     obj.exVal += Number(Number(price * reference).toFixed(2));
                 });
                 obj.profitAndLoss = Number(this.form.price) - obj.exVal;
