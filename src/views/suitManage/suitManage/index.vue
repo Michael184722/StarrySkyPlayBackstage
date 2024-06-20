@@ -262,7 +262,7 @@
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="lookInfo.faceImg" @click="lookImage('ImageFace', 1)"></i>
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editClick(item, index)"></i>
-                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" @click="deleteBox(item, index)"></i>
+                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" v-if="item.commodityList[0] && !item.commodityList[0].id" @click="deleteBox(item, index)"></i>
                     </div>
                 </div>
             </div>
