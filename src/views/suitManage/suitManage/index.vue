@@ -257,7 +257,8 @@
             <div class="sm-list" v-if="lookInfo.mapList">
                 <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index">
                     <ImagePreview ref="ImageFace1" :src="lookInfo.faceImg" width="160px" height="150px" />
-                    <div style="margin: 10px 0">箱子&nbsp;-&nbsp;{{ index + 1 }}</div>
+                    <div style="margin: 10px 0" v-if="item.commodityList[0]">箱子&nbsp;-&nbsp;{{ item.commodityList[0].boxIndex }}</div>
+                    <div style="margin: 10px 0" v-else>空箱子</div>
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="lookInfo.faceImg" @click="lookImage('ImageFace', 1)"></i>
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editClick(item, index)"></i>
@@ -726,6 +727,7 @@ export default {
         },
         // 箱子修改
         editClick(row, index) {
+            console.log(row, "AAAA");
             this.boxIndex = (index + 1);
             this.boxInfo = { ...row };
             this.rankValstate.pageNum = 1;
@@ -763,8 +765,13 @@ export default {
         },
         // 箱子删除
         deleteBox(row, index) {
+            console.log(row);
+            if(row.commodityList.length == 0) {
+                this.$modal.warning("该箱子没有商品，直接提交即可");
+                return;
+            };
             this.$modal.confirm('当前删除不进行提交也会删除箱子，请再次确认是否删除？').then(() => {
-                return !row.type && delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: index + 1 });
+                return !row.type && delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: row.commodityList[0].boxIndex });
             }).then(() => {
                 this.lookInfo.mapList.splice(index, 1);
                 this.$modal.msgSuccess("删除成功");
