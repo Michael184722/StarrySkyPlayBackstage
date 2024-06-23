@@ -668,6 +668,7 @@ export default {
                 } else this.lookInfo.mapList = [];
                 obj.commodityList = arr;
                 this.lookInfo.mapList.push({ ...obj, type: true });
+                console.log(this.lookInfo,  "新增箱子");
             });
         },
         // 编辑盒子商品信息进行提交
@@ -677,7 +678,10 @@ export default {
                     id: this.lookInfo.id,
                     wxSuitCommodityList: [],
                 };
+                console.log(this.lookInfo.mapList, "提交信息");
                 this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t })));
+                console.log(obj, "提交数据");
+                // return;
                 updateSuitManageEditBox(obj).then(res => {
                     this.$modal.msgSuccess("修改成功");
                     this.openInfo = false;

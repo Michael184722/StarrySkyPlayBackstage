@@ -90,6 +90,15 @@ export function listSendRecord(query) {
     })
 }
 
+// 查询背包数据
+export function listUserPackage(query) {
+    return request({
+        url: '/wx/module/getUserPackageList',
+        method: 'get',
+        params: query
+    })
+}
+
 // 查询小程序用户信息详细
 export function getWxUser(openId) {
     return request({

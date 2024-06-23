@@ -40,14 +40,14 @@
         </el-row>
 
         <el-table v-loading="loading" :data="wxUserList">
-            <el-table-column label="序号" type="index" width="55" align="center" fixed="left" />
-            <el-table-column label="ID" align="center" prop="userId" width="150" fixed="left" />
-            <el-table-column label="头像" align="center" prop="wxAvatar" fixed="left">
+            <el-table-column label="序号" type="index" width="55" align="center" />
+            <el-table-column label="ID" align="center" prop="userId" width="150" />
+            <el-table-column label="头像" align="center" prop="wxAvatar">
                 <template slot-scope="scope">
                     <ImagePreview :src="scope.row.wxAvatar" :width="50" :height="50" />
                 </template>
             </el-table-column>
-            <el-table-column label="昵称" align="center" prop="nickName" width="200" fixed="left" />
+            <el-table-column label="昵称" align="center" prop="nickName" width="200" />
             <el-table-column label="性别" align="center" prop="sex" width="80">
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.sex == 1">男</el-tag>
@@ -82,17 +82,20 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="600">
+            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="620" fixed="right">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="lookUseInfo(scope.row)" v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; tranValidate.datetimerange = []; transactionRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">交易记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="purchValidate.row = scope.row; purchValidate.pageNum = 1; purchValidate.datetimerange = []; purchaseRecords()"
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="purchValidate.row = scope.row; purchValidate.pageNum = 1; purchValidate.state = null; purchValidate.datetimerange = []; purchaseRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">购买记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="integValidate.row = scope.row; integValidate.pageNum = 1; integValidate.datetimerange = []; integralRecord()"
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="integValidate.row = scope.row; integValidate.pageNum = 1; integValidate.state = null; integValidate.datetimerange = []; integralRecord()"
                         v-hasPermi="['wxUser:wxUser:query']">积分记录</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">发货记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view"
+                        @click="packageValidate.row = scope.row; packageValidate.cmType = ''; packageValidate.orderType = 1; packageValidate.openOrFold = 2; packageValidate.pageNum = 1; getUserPackage()"
+                        v-hasPermi="['wxUser:wxUser:query']">背包</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">修改</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="handleGift(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">赠送</el-button>
                     <el-button size="mini" type="text" icon="el-icon-edit" @click="clearCase(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">清空箱子</el-button>
@@ -282,7 +285,13 @@
         <!-- 交易记录 -->
         <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1500px" append-to-body>
             <el-row>
-                <el-col :span="1.5"><el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                <el-col :span="2.5">
+                    <el-select v-model="tranValidate.state" placeholder="请选择交易类型" clearable>
+                        <el-option v-for="item in [{ value: 1, label: '平台' }, { value: 2, label: '非平台' }]" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
                         end-placeholder="结束日期" clearable /></el-col>
                 <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="transactionRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
@@ -366,11 +375,12 @@
             <el-row>
                 <el-col :span="2.5">
                     <el-select v-model="purchValidate.state" placeholder="请选择交易类型" clearable>
-                        <el-option v-for="item in [{ value: 1, label: '平台'}, { value: 2, label: '非平台'}]" :key="item.value" :label="item.label" :value="item.value" />
+                        <el-option v-for="item in [{ value: 1, label: '平台' }, { value: 2, label: '非平台' }]" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
-                    <el-date-picker v-model="purchValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" clearable />
+                    <el-date-picker v-model="purchValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                        clearable />
                 </el-col>
                 <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="purchaseRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
@@ -536,6 +546,47 @@
             </el-table>
             <pagination v-show="shipValidate.total > 0" :total="shipValidate.total" :page.sync="shipValidate.pageNum" :limit.sync="shipValidate.pageSize" @pagination="shippingRecords" />
         </el-dialog>
+        <!-- 背包 -->
+        <el-dialog title="背包" :visible.sync="packageValidate.type" v-if="packageValidate.type" width="1500px" append-to-body>
+            <el-row>
+                <el-col :span="1.5">
+                    <el-select v-model="packageValidate.cmType" clearable>
+                        <el-option label="全部" value=""></el-option>
+                        <el-option label="预售" value="1"></el-option>
+                        <el-option label="现货" value="2"></el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-select v-model="packageValidate.orderType" clearable>
+                        <el-option label="时间" :value="1"></el-option>
+                        <el-option label="价格" :value="2"></el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-select v-model="packageValidate.openOrFold" clearable>
+                        <el-option label="展开" :value="1"></el-option>
+                        <el-option label="折叠" :value="2"></el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" @click="getUserPackage">搜索</el-button></el-col>
+            </el-row>
+            <el-table :data="packageValidate.list" max-height="650">
+                <!-- 序号 -->
+                <el-table-column label="序号" type="index" align="center" width="55" />
+                <el-table-column label="商品名称" align="center" prop="commodityName" />
+                <!-- 商品图片 -->
+                 <el-table-column label="商品图片" align="center" prop="commodityImg">
+                    <template slot-scope="scope">
+                        <ImagePreview :src="scope.row.commodityImg" :width="50" :height="50" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="商品数量" align="center" prop="num" v-if="packageValidate.openOrFold == 2" />
+                <el-table-column label="商品总价" align="center" prop="price" />
+                <!-- 商品等级 -->
+                 <el-table-column label="商品等级" align="center" prop="levelName" />
+            </el-table>
+            <pagination v-if="packageValidate.openOrFold == 1" v-show="packageValidate.total > 0" :total="packageValidate.total" :page.sync="packageValidate.pageNum" :limit.sync="packageValidate.pageSize" @pagination="getUserPackage" />
+        </el-dialog>
     </div>
 </template>
 
@@ -543,7 +594,7 @@
 import { listBag } from "@/api/bag/bag";
 import { addBagRecord } from "@/api/bagRecord/bagRecord";
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -622,6 +673,7 @@ export default {
                 list: [],
                 row: {},
                 type: false,
+                state: null,
                 datetimerange: [],
                 inMoney: 0,
                 payMoney: 0,
@@ -658,6 +710,17 @@ export default {
                 type: false,
             },
             bagList: [],
+            packageValidate: {
+                pageNum: 1,
+                pageSize: 10,
+                cmType: '', // 1-预售 2-现货
+                orderType: 1, // 1-时间 2-价格
+                openOrFold: 2, // 2-折叠 1-展开
+                total: 0,
+                list: [],
+                row: {},
+                type: false,
+            }
         };
     },
     created() {
@@ -738,11 +801,17 @@ export default {
         // 交易记录
         transactionRecords() {
             this.queryTradeStatistics();
-            listTradeRecord(this.addDateRange({
+            let obj = {
+                state: this.tranValidate.state,
                 openId: this.tranValidate.row.openId,
                 pageNum: this.tranValidate.pageNum,
                 pageSize: this.tranValidate.pageSize,
-            }, this.tranValidate.datetimerange)).then(res => {
+            };
+            if (this.tranValidate.datetimerange.length) {
+                obj.beginTime = this.tranValidate.datetimerange[0];
+                obj.endTime = this.tranValidate.datetimerange[1];
+            }
+            listTradeRecord(obj).then(res => {
                 this.tranValidate.list = res.rows;
                 this.tranValidate.total = res.total;
                 this.tranValidate.type = true;
@@ -758,12 +827,17 @@ export default {
         // 购买记录
         purchaseRecords() {
             this.queryPresentStatistics();
-            listPresent(this.addDateRange({
+            let obj = {
                 state: this.purchValidate.state,
                 openId: this.purchValidate.row.openId,
                 pageNum: this.purchValidate.pageNum,
                 pageSize: this.purchValidate.pageSize,
-            }, this.purchValidate.datetimerange)).then(res => {
+            };
+            if (this.purchValidate.datetimerange.length) {
+                obj.beginTime = this.purchValidate.datetimerange[0];
+                obj.endTime = this.purchValidate.datetimerange[1];
+            }
+            listPresent(obj).then(res => {
                 this.purchValidate.list = res.rows;
                 this.purchValidate.total = res.total;
                 this.purchValidate.type = true;
@@ -812,6 +886,24 @@ export default {
             getBalance(this.addDateRange(this.balanceQuery, this.baRange)).then(res => {
                 this.baList = res.rows;
                 this.baTotal = res.total;
+            });
+        },
+        // 查询背包
+        getUserPackage() {
+            let obj = {
+                openId: this.packageValidate.row.openId,
+                cmType: this.packageValidate.cmType,
+                orderType: this.packageValidate.orderType,
+                openOrFold: this.packageValidate.openOrFold,
+            };
+            if (this.packageValidate.openOrFold == 1) {
+                obj.pageNum = this.packageValidate.pageNum;
+                obj.pageSize = this.packageValidate.pageSize;
+            }
+            listUserPackage(obj).then(res => {
+                this.packageValidate.list = res.rows;
+                this.packageValidate.total = res.total;
+                this.packageValidate.type = true;
             });
         },
         /** 修改按钮操作 */

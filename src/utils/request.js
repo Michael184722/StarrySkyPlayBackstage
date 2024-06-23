@@ -7,7 +7,16 @@ import { tansParams, blobValidate } from "@/utils/ruoyi";
 import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
 
+let loadingTimer;
+let loadingInstance;
+let baseZIndex = 5000;
+let activeRequests = 0;
 let downloadLoadingInstance;
+
+// 创建一个函数来获取并更新 z-index
+function getNextZIndex() {
+    return baseZIndex++;  // 返回当前值后递增
+}
 // 是否显示重新登录
 export let isRelogin = { show: false };
 
@@ -65,14 +74,36 @@ service.interceptors.request.use(config => {
             }
         }
     };
+    if (!loadingInstance) {
+        loadingInstance = Loading.service({
+            lock: true,
+            text: '数据加载中，请稍等...',
+            spinner: 'el-icon-loading',
+            background: 'rgba(0, 0, 0, 0.7)',
+        });
+        // 确保实例已经挂载到 DOM
+        if (loadingInstance.$el) {
+            loadingInstance.$el.style.zIndex = getNextZIndex();
+        }
+    };
+    clearTimeout(loadingTimer);
+    activeRequests++;
     return config
 }, error => {
-    console.log(error)
     Promise.reject(error)
 })
 
 // 响应拦截器
 service.interceptors.response.use(res => {
+    activeRequests--;
+    if (activeRequests === 0) {
+        loadingTimer = setTimeout(() => {
+            if (loadingInstance) {
+                loadingInstance.close();
+                loadingInstance = null;
+            }
+        }, 500);
+    };
     // 未设置状态码则默认成功状态
     const code = res.data.code || 200;
     // 获取错误信息
@@ -108,7 +139,15 @@ service.interceptors.response.use(res => {
     }
 },
     error => {
-        console.log('err' + error)
+        activeRequests--;
+        if (activeRequests === 0) {
+            loadingTimer = setTimeout(() => {
+                if (loadingInstance) {
+                    loadingInstance.close();
+                    loadingInstance = null;
+                }
+            }, 500);
+        };
         let { message } = error;
         if (message == "Network Error") {
             message = "后端接口连接异常";
