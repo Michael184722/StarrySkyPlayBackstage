@@ -283,7 +283,7 @@
             <pagination v-show="giveVal.total > 0" :total="giveVal.total" :page.sync="giveVal.pageNum" :limit.sync="giveVal.pageSize" @pagination="getGivenGoods" />
         </el-dialog>
         <!-- 交易记录 -->
-        <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1500px" append-to-body>
+        <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1600px" append-to-body>
             <el-row>
                 <el-col :span="2.5">
                     <el-select v-model="tranValidate.state" placeholder="请选择交易类型" clearable>
@@ -330,6 +330,10 @@
                         <el-tag>{{ scope.row.payType }}：{{ scope.row.money }}</el-tag>
                     </template>
                 </el-table-column>
+                <!-- 支付前余额 -->
+                <el-table-column label="支付前余额" align="center" prop="oldMoney" />
+                <!-- 支付后余额 -->
+                <el-table-column label="支付后余额" align="center" prop="newMoney" />
                 <!-- 交易商品名称 -->
                 <el-table-column label="交易商品名称" align="center" prop="commodityName">
                     <template slot-scope="scope">
@@ -371,7 +375,7 @@
             <pagination v-show="tranValidate.total > 0" :total="tranValidate.total" :page.sync="tranValidate.pageNum" :limit.sync="tranValidate.pageSize" @pagination="transactionRecords" />
         </el-dialog>
         <!-- 交易记录 -->
-        <el-dialog title="购买记录" :visible.sync="purchValidate.type" v-if="purchValidate.type" width="1500px" append-to-body>
+        <el-dialog title="购买记录" :visible.sync="purchValidate.type" v-if="purchValidate.type" width="1600px" append-to-body>
             <el-row>
                 <el-col :span="2.5">
                     <el-select v-model="purchValidate.state" placeholder="请选择交易类型" clearable>
@@ -419,6 +423,10 @@
                         <el-tag>{{ scope.row.payType }}：{{ scope.row.money }}</el-tag>
                     </template>
                 </el-table-column>
+                <!-- 支付前余额 -->
+                <el-table-column label="支付前余额" align="center" prop="oldMoney" />
+                <!-- 支付后余额 -->
+                <el-table-column label="支付后余额" align="center" prop="newMoney" />
                 <!-- 交易商品名称 -->
                 <el-table-column label="交易商品名称" align="center" prop="commodityName">
                     <template slot-scope="scope">
@@ -495,6 +503,10 @@
                         <el-tag>{{ (scope.row.floor == 6 ? '支出：' : '收入：') + scope.row.integral }}</el-tag>
                     </template>
                 </el-table-column>
+                <!-- 交易前余额 -->
+                <el-table-column label="交易前余额" align="center" prop="oldMoney" />
+                <!-- 交易后余额 -->
+                <el-table-column label="交易后余额" align="center" prop="newMoney" />
                 <!-- 交易商品名称 -->
                 <el-table-column label="交易商品名称" align="center" prop="commodityName" />
                 <!-- 交易商品图片 -->

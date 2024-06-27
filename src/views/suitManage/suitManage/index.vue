@@ -262,6 +262,7 @@
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="lookInfo.faceImg" @click="lookImage('ImageFace', 1)"></i>
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editClick(item, index)"></i>
+                        <i class="el-icon-download" style="color: #E6A23C; font-size: 30px;" @click="updateClick(index)"></i>
                         <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" v-if="item.commodityList[0] && !item.commodityList[0].id" @click="deleteBox(item, index)"></i>
                     </div>
                 </div>
@@ -740,6 +741,12 @@ export default {
             this.getRecordList();
             this.boxType = true;
         },
+        updateClick(row, index) {
+            this.download('/suitManage/suitManage/exportSuitRecordList', {
+                boxIndex: index + 1,
+                suitId: this.lookInfo.id,
+            }, `${this.lookInfo.suitName + '套的第' + (index + 1) + '箱'}.xlsx`)
+        },
         // 查询排行列表
         getRankList() {
             let obj = {
@@ -1130,6 +1137,7 @@ export default {
                     justify-content: space-around;
 
                     >i {
+                        cursor: pointer;
                         transform: translateY(8em);
                     }
 
