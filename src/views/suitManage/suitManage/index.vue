@@ -665,7 +665,6 @@ export default {
                         });
                         return item;
                     });
-                    console.log(this.lookInfo, "this.lookInfo");
                     this.openInfo = true;
                 });
             });

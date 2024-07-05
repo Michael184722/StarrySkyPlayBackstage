@@ -990,7 +990,6 @@ export default {
             this.getGivenGoods();
             this.giveVal.row = row;
             listBag().then(res => {
-                console.log(res, "LLKKK");
                 this.bagList = res.rows;
             })
             listCommodity().then(res => {
