@@ -167,8 +167,7 @@
                         </template>
                         <el-table-column label="是否售卖" prop="isSale" align="center">
                             <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 4"
-                                    @change="sellChange($event, scope.row)" />
+                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 4" @change="sellChange($event, scope.row)" />
                             </template>
                         </el-table-column>
                         <el-table-column label="是否赠送" prop="isSend" align="center">
@@ -213,7 +212,8 @@
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
                 </el-form-item>
                 <el-form-item label="抽中倍数" prop="multiple" v-if="form.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
-                    <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
+                    <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10"
+                        @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>
                 <el-form-item label="抽中概率" prop="reference">
                     <el-input v-model="commodityForm.reference" type="number" max="100" placeholder="请输入抽中概率" @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
@@ -253,6 +253,8 @@
             <h3 style="margin-top: 35px; display: flex; align-items: center;">
                 <div>箱子列表（{{ lookInfo.mapList ? lookInfo.mapList.length : 0 }}个）</div>
                 <el-button type="primary" size="mini" style="margin-left: 20px;" @click="addNewBox">新增箱子</el-button>
+                <el-input v-model="setBoxNum" size="mini" type="number" placeholder="请输入新增数量" style="width: 200px; margin-left: 20px;" />
+                <el-button @click="deleAll" size="mini" type="danger" style="margin-left: 20px;">批量删除</el-button>
             </h3>
             <div class="sm-list" v-if="lookInfo.mapList">
                 <div class="sm-list-item" v-for="(item, index) in lookInfo.mapList" :key="index">
@@ -263,7 +265,8 @@
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="lookInfo.faceImg" @click="lookImage('ImageFace', 1)"></i>
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editClick(item, index)"></i>
                         <i class="el-icon-download" style="color: #E6A23C; font-size: 30px;" @click="updateClick(index)"></i>
-                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" v-if="item.commodityList[0] && !item.commodityList[0].id" @click="deleteBox(item, index)"></i>
+                        <i class="el-icon-delete" style="color: #F56C6C; font-size: 30px;" @click="deleteBox(item, index)"></i>
+                        <!-- v-if="item.commodityList[0] && !item.commodityList[0].id" -->
                     </div>
                 </div>
             </div>
@@ -296,7 +299,7 @@
                     </div>
                     <div class="sm-list-item-text">备注：{{ item.remark }} </div>
 
-                    <div class="sm-list-item-salesType"  v-if="lookInfo.suitType == 4 && item.isDouble == 1">双倍赠送</div>
+                    <div class="sm-list-item-salesType" v-if="lookInfo.suitType == 4 && item.isDouble == 1">双倍赠送</div>
                     <div class="sm-list-item-salesType" v-else-if="item.isSend == 1">赠送</div>
                     <div class="sm-list-item-salesType" v-else-if="item.isSale == 1">售卖</div>
 
@@ -368,7 +371,8 @@
                     <el-input v-model="boxProductForm.num" type="number" placeholder="请输入商品数量" />
                 </el-form-item>
                 <el-form-item label="抽中倍数" prop="multiple" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
-                    <el-input v-model="boxProductForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="boxProductForm.multiple = boxProductForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
+                    <el-input v-model="boxProductForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10"
+                        @input="boxProductForm.multiple = boxProductForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>
                 <el-form-item label="参考价" prop="referencePrice">
                     <el-input v-model="boxProductForm.referencePrice" type="number" placeholder="请输入商品参考价" />
@@ -515,6 +519,7 @@ export default {
                 total: 0,
                 list: [],
             },
+            setBoxNum: 1,
         };
     },
     created() {
@@ -544,7 +549,7 @@ export default {
             return val / 100;
         },
         commodityChange(type) {
-            type && (this.commodityForm.referencePrice =  this.form.suitType == 3 ? this.form.integral : this.form.price);
+            type && (this.commodityForm.referencePrice = this.form.suitType == 3 ? this.form.integral : this.form.price);
             !type && (this.boxProductForm.referencePrice = this.lookInfo.suitType == 3 ? this.lookInfo.integral : this.lookInfo.price);
         },
         /** 查询抽赏套管理列表 */
@@ -643,6 +648,7 @@ export default {
         queryLook(row) {
             this.reset();
             this.editRow = row;
+            this.setBoxNum = 1;
             const id = row.id || this.ids;
             this.getCommodityList();
             getSuitManage(id).then(response => {
@@ -651,7 +657,15 @@ export default {
                 };
                 this.form.drawNum = response.data.drawNum ? response.data.drawNum.split(',') : [];
                 getDetail(id).then(res => {
-                    this.lookInfo = { ...res.data };
+                    this.lookInfo = res.data;
+                    this.lookInfo.mapList.map(item => {
+                        item.commodityList.map(t => {
+                            t.oldBoxIndex = t.boxIndex;
+                            return t;
+                        });
+                        return item;
+                    });
+                    console.log(this.lookInfo, "this.lookInfo");
                     this.openInfo = true;
                 });
             });
@@ -659,17 +673,18 @@ export default {
         // 新增盒子
         addNewBox() {
             this.$modal.confirm('是否确认新增盒子？').then(() => {
-                let arr = [];
-                let obj = {};
-                if (this.lookInfo.mapList && this.lookInfo.mapList.length) {
-                    obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
-                    obj.commodityList.forEach(item => {
-                        arr.push({ ...item, id: null, num: item.totalNum, boxIndex: (item.boxIndex + 1) });
-                    });
-                } else this.lookInfo.mapList = [];
-                obj.commodityList = arr;
-                this.lookInfo.mapList.push({ ...obj, type: true });
-                console.log(this.lookInfo,  "新增箱子");
+                for (let i = 0; i < this.setBoxNum; i++) {
+                    let arr = [];
+                    let obj = {};
+                    if (this.lookInfo.mapList && this.lookInfo.mapList.length) {
+                        obj = { ...this.lookInfo.mapList[this.lookInfo.mapList.length - 1] };
+                        obj.commodityList.forEach(item => {
+                            arr.push({ ...item, id: null, num: item.totalNum, boxIndex: (item.boxIndex + 1) });
+                        });
+                    } else this.lookInfo.mapList = [];
+                    obj.commodityList = arr;
+                    this.lookInfo.mapList.push({ ...obj, type: true });
+                };
             });
         },
         // 编辑盒子商品信息进行提交
@@ -679,10 +694,7 @@ export default {
                     id: this.lookInfo.id,
                     wxSuitCommodityList: [],
                 };
-                console.log(this.lookInfo.mapList, "提交信息");
                 this.lookInfo.mapList.forEach(item => item.commodityList.forEach(t => obj.wxSuitCommodityList.push({ ...t })));
-                console.log(obj, "提交数据");
-                // return;
                 updateSuitManageEditBox(obj).then(res => {
                     this.$modal.msgSuccess("修改成功");
                     this.openInfo = false;
@@ -732,7 +744,6 @@ export default {
         },
         // 箱子修改
         editClick(row, index) {
-            console.log(row, "AAAA");
             this.boxIndex = (index + 1);
             this.boxInfo = { ...row };
             this.rankValstate.pageNum = 1;
@@ -776,17 +787,43 @@ export default {
         },
         // 箱子删除
         deleteBox(row, index) {
-            console.log(row);
-            if(row.commodityList.length == 0) {
+            if (row.commodityList.length == 0) {
                 this.$modal.warning("该箱子没有商品，直接提交即可");
                 return;
             };
-            this.$modal.confirm('当前删除不进行提交也会删除箱子，请再次确认是否删除？').then(() => {
-                return !row.type && delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: row.commodityList[0].boxIndex });
-            }).then(() => {
-                this.lookInfo.mapList.splice(index, 1);
-                this.$modal.msgSuccess("删除成功");
+            this.$modal.confirm('当前删除要进行提交，保证箱子下标紊乱，请再次确认是否删除？').then(() => {
+                if (!row.type) {
+                    delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: row.commodityList[0].oldBoxIndex }).then(res => {
+                        this.updateIndexBox(index);
+                    });
+                }
+            })
+        },
+        updateIndexBox(ind) {
+            this.lookInfo.mapList.map((item, index) => {
+                if (index > ind) {
+                    item.commodityList.map(t => {
+                        t.boxIndex = t.boxIndex - 1;
+                        return t;
+                    });
+                }
+                return item;
             });
+            this.lookInfo.mapList.splice(ind, 1);
+            this.$modal.msgSuccess("删除成功");
+        },
+        deleAll() {
+            this.$modal.confirm('是否确定批量删除，删除完成后，请进行提交？').then(() => {
+                this.setDelectAll();
+            })
+        },
+        setDelectAll() {
+            if(this.lookInfo.mapList.length != 1) {
+                delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: this.lookInfo.mapList[1].commodityList[0].oldBoxIndex }).then(res => {
+                    this.lookInfo.mapList.splice(1, 1);
+                    this.setDelectAll();
+                });
+            } else this.$modal.msgSuccess("删除成功");
         },
         // 关闭新增商品
         cancelBoxProductForm() {

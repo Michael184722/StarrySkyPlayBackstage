@@ -81,6 +81,15 @@ export function listIntegralRecord(query) {
     })
 }
 
+// 查询下级用户
+export function getNextUsers(query) {
+    return request({
+        url: '/wx/system/getUserShare',
+        method: 'get',
+        params: query
+    })
+}
+
 // 发货记录
 export function listSendRecord(query) {
     return request({

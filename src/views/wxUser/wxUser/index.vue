@@ -82,17 +82,21 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="620" fixed="right">
+            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="720" fixed="right">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="lookUseInfo(scope.row)" v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; tranValidate.datetimerange = []; transactionRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">交易记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="purchValidate.row = scope.row; purchValidate.pageNum = 1; purchValidate.state = null; purchValidate.datetimerange = []; purchaseRecords()"
+                    <el-button size="mini" type="text" icon="el-icon-view"
+                        @click="purchValidate.row = scope.row; purchValidate.pageNum = 1; purchValidate.state = null; purchValidate.datetimerange = []; purchaseRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">购买记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="integValidate.row = scope.row; integValidate.pageNum = 1; integValidate.state = null; integValidate.datetimerange = []; integralRecord()"
+                    <el-button size="mini" type="text" icon="el-icon-view"
+                        @click="integValidate.row = scope.row; integValidate.pageNum = 1; integValidate.state = null; integValidate.datetimerange = []; integralRecord()"
                         v-hasPermi="['wxUser:wxUser:query']">积分记录</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()"
                         v-hasPermi="['wxUser:wxUser:query']">发货记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="subUserValidate.row = scope.row; subUserValidate.pageNum = 1; subordinateUsers()"
+                        v-hasPermi="['wxUser:wxUser:query']">下级用户</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view"
                         @click="packageValidate.row = scope.row; packageValidate.cmType = ''; packageValidate.orderType = 1; packageValidate.openOrFold = 2; packageValidate.pageNum = 1; getUserPackage()"
                         v-hasPermi="['wxUser:wxUser:query']">背包</el-button>
@@ -291,8 +295,8 @@
                     </el-select>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
-                    <el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
-                        end-placeholder="结束日期" clearable /></el-col>
+                    <el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                        clearable /></el-col>
                 <el-col :span="1.5" :offset="1"><el-button type="primary" size="small" @click="transactionRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 6px;">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ tranValidate.inMoney }}</div>
@@ -587,7 +591,7 @@
                 <el-table-column label="序号" type="index" align="center" width="55" />
                 <el-table-column label="商品名称" align="center" prop="commodityName" />
                 <!-- 商品图片 -->
-                 <el-table-column label="商品图片" align="center" prop="commodityImg">
+                <el-table-column label="商品图片" align="center" prop="commodityImg">
                     <template slot-scope="scope">
                         <ImagePreview :src="scope.row.commodityImg" :width="50" :height="50" />
                     </template>
@@ -595,9 +599,24 @@
                 <el-table-column label="商品数量" align="center" prop="num" v-if="packageValidate.openOrFold == 2" />
                 <el-table-column label="商品总价" align="center" prop="price" />
                 <!-- 商品等级 -->
-                 <el-table-column label="商品等级" align="center" prop="levelName" />
+                <el-table-column label="商品等级" align="center" prop="levelName" />
             </el-table>
-            <pagination v-if="packageValidate.openOrFold == 1" v-show="packageValidate.total > 0" :total="packageValidate.total" :page.sync="packageValidate.pageNum" :limit.sync="packageValidate.pageSize" @pagination="getUserPackage" />
+            <pagination v-if="packageValidate.openOrFold == 1" v-show="packageValidate.total > 0" :total="packageValidate.total" :page.sync="packageValidate.pageNum"
+                :limit.sync="packageValidate.pageSize" @pagination="getUserPackage" />
+        </el-dialog>
+        <el-dialog title="发货记录" :visible.sync="subUserValidate.type" v-if="subUserValidate.type" width="1500px" append-to-body>
+            <el-table :data="subUserValidate.list" max-height="650">
+                <!-- 序号 -->
+                <el-table-column label="序号" type="index" align="center" width="55" />
+                <el-table-column label="头像" align="center">
+                    <template slot-scope="scope">
+                        <ImagePreview :src="scope.row.avatar" :width="50" :height="50" />
+                    </template>
+                </el-table-column>
+                <el-table-column label="昵称" align="center" prop="nickName" />
+                <el-table-column label="积分奖励" align="center" prop="integral" />
+            </el-table>
+            <pagination v-show="subUserValidate.total > 0" :total="subUserValidate.total" :page.sync="subUserValidate.pageNum" :limit.sync="subUserValidate.pageSize" @pagination="subordinateUsers" />
         </el-dialog>
     </div>
 </template>
@@ -606,7 +625,7 @@
 import { listBag } from "@/api/bag/bag";
 import { addBagRecord } from "@/api/bagRecord/bagRecord";
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage, getNextUsers } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -732,7 +751,15 @@ export default {
                 list: [],
                 row: {},
                 type: false,
-            }
+            },
+            subUserValidate: {
+                pageNum: 1,
+                pageSize: 10,
+                total: 0,
+                list: [],
+                row: {},
+                type: false,
+            },
         };
     },
     created() {
@@ -898,6 +925,18 @@ export default {
             getBalance(this.addDateRange(this.balanceQuery, this.baRange)).then(res => {
                 this.baList = res.rows;
                 this.baTotal = res.total;
+            });
+        },
+        // 查询下级用户
+        subordinateUsers() {
+            getNextUsers({
+                openId: this.subUserValidate.row.openId,
+                pageNum: this.subUserValidate.pageNum,
+                pageSize: this.subUserValidate.pageSize,
+            }).then(res => {
+                this.subUserValidate.list = res.rows;
+                this.subUserValidate.total = res.total;
+                this.subUserValidate.type = true;
             });
         },
         // 查询背包
