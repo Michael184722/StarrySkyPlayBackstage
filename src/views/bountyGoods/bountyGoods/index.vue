@@ -9,6 +9,13 @@
                     <el-option v-for="dict in dict.type.level" :key="dict.label" :label="dict.label" :value="dict.value" />
                 </el-select>
             </el-form-item>
+            <!-- 筛选预售和现货 -->
+            <el-form-item label="商品类型" prop="cmType">
+                <el-select v-model="queryParams.cmType" placeholder="请选择商品类型" clearable>
+                    <el-option label="预售" value="1" />
+                    <el-option label="现货" value="2" />
+                </el-select>
+            </el-form-item>
             <el-form-item label="更新时间">
                 <el-date-picker v-model="dateRange" type="daterange" value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
             </el-form-item>
@@ -31,6 +38,13 @@
             <el-table-column label="商品图片" align="center" prop="faceImg">
                 <template slot-scope="scope">
                     <imagePreview :src="scope.row.faceImg" :width="50" :height="50" />
+                </template>
+            </el-table-column>
+            <!-- 商品类型 -->
+            <el-table-column label="商品类型" align="center" prop="cmType">
+                <template slot-scope="scope">
+                    <span v-if="scope.row.cmType === '1'">预售</span>
+                    <span v-else-if="scope.row.cmType === '2'">现货</span>
                 </template>
             </el-table-column>
             <el-table-column label="价格(元)" align="center" prop="price" />
@@ -114,6 +128,8 @@ export default {
                 pageNum: 1,
                 pageSize: 10,
                 commodityName: null,
+                cmType: null,
+                level: null,
                 type: "2"
             },
             dateRange: [],

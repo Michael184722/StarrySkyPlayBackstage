@@ -1,20 +1,20 @@
 <template>
     <div class="app-container">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-            <el-form-item label="ID" prop="openId">
-                <el-input v-model="queryParams.openId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" />
+            <el-form-item label="ID" prop="userId">
+                <el-input v-model="queryParams.userId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item label="昵称" prop="nickName">
                 <el-input v-model="queryParams.nickName" placeholder="请输入昵称" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
-            <el-form-item label="商品名称" prop="commodityName">
+            <!-- <el-form-item label="商品名称" prop="commodityName">
                 <el-input v-model="queryParams.commodityName" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <el-form-item label="商品等级" prop="level">
                 <el-select v-model="queryParams.level" placeholder="请选择商品等级" clearable>
                     <el-option v-for="dict in dict.type.level" :key="dict.value" :label="dict.label" :value="dict.label" />
                 </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="类型" prop="status">
                 <el-select v-model="queryParams.status" placeholder="请选择类型" clearable>
                     <el-option label="已成交" value="1" />
@@ -112,7 +112,7 @@
         <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改交易区对话框 -->
-        <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+        <!-- <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
                 <el-form-item label="小程序用户id" prop="openId">
                     <el-input v-model="form.openId" placeholder="请输入小程序用户id" />
@@ -141,7 +141,7 @@
                 <el-button type="primary" @click="submitForm">确 定</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 
@@ -175,7 +175,7 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 10,
-                openId: null,
+                userId: null,
                 nickName: null,
                 commodityName: null,
                 level: null,

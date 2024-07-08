@@ -237,8 +237,16 @@
                 <!-- 充值时间 -->
                 <el-table-column label="充值时间" align="center" prop="createTime" />
                 <!-- 充值方式 -->
-                <el-table-column label="充值方式" align="center" prop="rechargeType">
-                    <template>微信</template>
+                <el-table-column label="充值方式" align="center" prop="type">
+                    <template slot-scope="scope">{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
+                </el-table-column>
+                <!-- 新余额 -->
+                <el-table-column label="新余额" align="center">
+                    <template slot-scope="scope">{{  scope.row.type == 1 ? '/' : scope.row.newMoney }}</template>
+                </el-table-column>
+                <!-- 旧余额 -->
+                <el-table-column label="旧余额" align="center">
+                    <template slot-scope="scope">{{  scope.row.type == 1 ? '/' : scope.row.oldMoney }}</template>
                 </el-table-column>
             </el-table>
         </el-dialog>

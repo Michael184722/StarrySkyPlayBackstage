@@ -54,7 +54,7 @@
         <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改福袋赠送记录对话框 -->
-        <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+        <!-- <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
                 <el-form-item label="小程序用户id" prop="openId">
                     <el-input v-model="form.openId" placeholder="请输入小程序用户id" />
@@ -76,7 +76,7 @@
                 <el-button type="primary" @click="submitForm">确 定</el-button>
                 <el-button @click="cancel">取 消</el-button>
             </div>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 

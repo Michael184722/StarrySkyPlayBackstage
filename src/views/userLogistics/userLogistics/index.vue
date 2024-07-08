@@ -1,8 +1,8 @@
 <template>
     <div class="app-container">
         <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="108px">
-            <el-form-item label="ID" prop="openId">
-                <el-input v-model="queryParams.openId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" />
+            <el-form-item label="ID" prop="userId">
+                <el-input v-model="queryParams.userId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" />
             </el-form-item>
             <!-- 昵称 -->
             <el-form-item label="昵称" prop="nickName">
@@ -123,7 +123,8 @@
             </el-table-column>
             <el-table-column label="操作" align="center" fixed="right" width="180">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" v-if="scope.row.status == 0" @click="handleUpdate(scope.row)" v-hasPermi="['userLogistics:userLogistics:edit']">审核</el-button>
+                    <el-button size="mini" type="text" v-if="scope.row.status != 0" @click="handleUpdate(scope.row, '修改')">修改</el-button>
+                    <el-button size="mini" type="text" v-if="scope.row.status == 0" @click="handleUpdate(scope.row, '审核')" v-hasPermi="['userLogistics:userLogistics:edit']">审核</el-button>
                     <el-tag v-if="scope.row.status == 1">已审核</el-tag>
                     <!-- <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['userLogistics:userLogistics:edit']">修改</el-button> -->
                     <!-- <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['userLogistics:userLogistics:remove']">删除</el-button> -->
@@ -180,7 +181,7 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 10,
-                openId: null,
+                userId: null,
                 logisticsNo: null,
                 logisticsCompany: null,
                 address: null,
@@ -258,11 +259,11 @@ export default {
             this.title = "添加物流信息";
         },
         /** 修改按钮操作 */
-        handleUpdate(row) {
+        handleUpdate(row, val) {
             this.reset();
             this.open = true;
             this.form.id = row.id;
-            this.title = "审核";
+            this.title = val;
             // const id = row.id || this.ids
             // getUserLogistics(id).then(response => {
             //     this.form = response.data;
