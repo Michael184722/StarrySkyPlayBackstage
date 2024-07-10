@@ -23,7 +23,7 @@
             </el-form-item>
             <el-form-item label="是否包邮" prop="isMail">
                 <el-select v-model="queryParams.isMail" placeholder="请选择是否包邮" clearable>
-                    <el-option v-for="dict in [{value: 0, label: '否'}, {value: 1, label: '是'}]" :key="dict.value" :label="dict.label" :value="dict.value" />
+                    <el-option v-for="dict in [{ value: 0, label: '否' }, { value: 1, label: '是' }]" :key="dict.value" :label="dict.label" :value="dict.value" />
                 </el-select>
             </el-form-item>
             <!-- 审核状态 -->
@@ -94,15 +94,15 @@
             <el-table-column label="物流公司" align="center" prop="logisticsCompany" width="200" />
             <el-table-column label="是否包邮" align="center" prop="isMail" width="200">
                 <template slot-scope="scope">
-                    <template v-for="(item, index) in [{value: 0, label: '否'}, {value: 1, label: '是'}]">
-                        <el-tag v-if="item.value === scope.row.isMail" :key="index" :type="item.value === 0 && 'danger'">{{item.label}}</el-tag>
+                    <template v-for="(item, index) in [{ value: 0, label: '否' }, { value: 1, label: '是' }]">
+                        <el-tag v-if="item.value === scope.row.isMail" :key="index" :type="item.value === 0 && 'danger'">{{ item.label }}</el-tag>
                     </template>
                 </template>
             </el-table-column>
             <el-table-column label="审核状态" align="center" prop="status" width="200">
                 <template slot-scope="scope">
-                    <template v-for="(item, index) in [{value: 0, label: '待审核'}, {value: 1, label: '审核通过'}, {value: 2, label: '审核不通过'}]">
-                        <el-tag v-if="item.value == scope.row.status" :key="index" :type="item.value === 2 ? 'danger' : item.value === 1 ? 'success' : ''">{{item.label}}</el-tag>
+                    <template v-for="(item, index) in [{ value: 0, label: '待审核' }, { value: 1, label: '审核通过' }, { value: 2, label: '审核不通过' }]">
+                        <el-tag v-if="item.value == scope.row.status" :key="index" :type="item.value === 2 ? 'danger' : item.value === 1 ? 'success' : ''">{{ item.label }}</el-tag>
                     </template>
                 </template>
             </el-table-column>
@@ -123,24 +123,30 @@
             </el-table-column>
             <el-table-column label="操作" align="center" fixed="right" width="180">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" v-if="scope.row.status != 0" @click="handleUpdate(scope.row, '修改')">修改</el-button>
+                    <el-button size="mini" type="text" v-if="scope.row.status != 0 && scope.row.status != 2" @click="handleUpdate(scope.row, '修改')">修改</el-button>
                     <el-button size="mini" type="text" v-if="scope.row.status == 0" @click="handleUpdate(scope.row, '审核')" v-hasPermi="['userLogistics:userLogistics:edit']">审核</el-button>
-                    <el-tag v-if="scope.row.status == 1">已审核</el-tag>
+                    <el-tag v-if="scope.row.status == 1" style="margin-left: 20px;">已审核</el-tag>
                     <!-- <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['userLogistics:userLogistics:edit']">修改</el-button> -->
                     <!-- <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['userLogistics:userLogistics:remove']">删除</el-button> -->
                 </template>
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改物流信息对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                <el-form-item label="物流单号" prop="logisticsNo">
+                <el-form-item label="审核状态" prop="status" :rules="[{ required: true, message: '请选择审核状态', trigger: 'change' }]">
+                    <el-radio-group v-model="form.status">
+                        <el-radio label="1">通过</el-radio>
+                        <el-radio label="2">驳回</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="物流单号" v-if="form.status == 1" prop="logisticsNo" :rules="[{ required: true, message: '请输入物流单号', trigger: 'blur' }]">
                     <el-input v-model="form.logisticsNo" placeholder="请输入物流单号" />
                 </el-form-item>
-                <el-form-item label="物流公司" prop="logisticsCompany">
+                <el-form-item label="物流公司" v-if="form.status == 1" prop="logisticsCompany" :rules="[{ required: true, message: '请输入物流公司', trigger: 'blur' }]">
                     <el-input v-model="form.logisticsCompany" placeholder="请输入物流公司" />
                 </el-form-item>
             </el-form>
@@ -153,7 +159,7 @@
 </template>
 
 <script>
-import { listUserLogistics, getUserLogistics, delUserLogistics, addUserLogistics, updateUserLogistics } from "@/api/userLogistics/userLogistics";
+import { listUserLogistics, getUserLogistics, delUserLogistics, addUserLogistics, updateUserLogistics, rejectUserLogistics } from "@/api/userLogistics/userLogistics";
 
 export default {
     name: "UserLogistics",
@@ -197,12 +203,12 @@ export default {
             form: {},
             // 表单校验
             rules: {
-                logisticsNo: [
-                    { required: true, message: "请输入物流单号", trigger: "blur" }
-                ],
-                logisticsCompany: [
-                    { required: true, message: "请输入物流公司", trigger: "blur" }
-                ],
+                // logisticsNo: [
+                //     { required: true, message: "请输入物流单号", trigger: "blur" }
+                // ],
+                // logisticsCompany: [
+                //     { required: true, message: "请输入物流公司", trigger: "blur" }
+                // ],
             },
             dateRange: [],
         };
@@ -230,6 +236,7 @@ export default {
             this.form = {
                 id: null,
                 status: "1",
+                packageIds: null,
                 logisticsNo: null,
                 logisticsCompany: null,
             };
@@ -263,6 +270,7 @@ export default {
             this.reset();
             this.open = true;
             this.form.id = row.id;
+            this.form.packageIds = row.packageIds;
             this.title = val;
             // const id = row.id || this.ids
             // getUserLogistics(id).then(response => {
@@ -276,11 +284,19 @@ export default {
             this.$refs["form"].validate(valid => {
                 if (valid) {
                     if (this.form.id != null) {
-                        updateUserLogistics(this.form).then(response => {
-                            this.$modal.msgSuccess("修改成功");
-                            this.open = false;
-                            this.getList();
-                        });
+                        if(this.form.status == "1") {
+                            updateUserLogistics(this.form).then(response => {
+                                this.$modal.msgSuccess("审核成功");
+                                this.open = false;
+                                this.getList();
+                            });
+                        } else {
+                            rejectUserLogistics(this.form).then(response => {
+                                this.$modal.msgSuccess("已驳回");
+                                this.open = false;
+                                this.getList();
+                            });
+                        }
                     } else {
                         addUserLogistics(this.form).then(response => {
                             this.$modal.msgSuccess("新增成功");

@@ -165,6 +165,12 @@
                                 </template>
                             </el-table-column>
                         </template>
+                        <el-table-column label="特效" align="center">
+                            <template slot-scope="scope">
+                                <el-switch v-model="scope.row.isSpecial" active-value="1" inactive-value="0" />
+                                <!-- @change="switchTypeChange($event, scope.row, 'isDouble')" -->
+                            </template>
+                        </el-table-column>
                         <el-table-column label="是否售卖" prop="isSale" align="center">
                             <template slot-scope="scope">
                                 <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 4" @change="sellChange($event, scope.row)" />
@@ -299,9 +305,9 @@
                     </div>
                     <div class="sm-list-item-text">备注：{{ item.remark }} </div>
 
-                    <div class="sm-list-item-salesType" v-if="lookInfo.suitType == 4 && item.isDouble == 1">双倍赠送</div>
-                    <div class="sm-list-item-salesType" v-else-if="item.isSend == 1">赠送</div>
-                    <div class="sm-list-item-salesType" v-else-if="item.isSale == 1">售卖</div>
+                    <div class="sm-list-item-salesType" v-if="lookInfo.suitType == 4 && item.isDouble == 1">双倍赠送<span v-if="item.isSpecial == 1"> / 特效</span></div>
+                    <div class="sm-list-item-salesType" v-else-if="item.isSend == 1">赠送<span v-if="item.isSpecial == 1"> / 特效</span></div>
+                    <div class="sm-list-item-salesType" v-else-if="item.isSale == 1">售卖<span v-if="item.isSpecial == 1"> / 特效</span></div>
 
                     <div class="sm-list-item-type" v-if="lookInfo.suitType != 4">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
                     <div class="sm-list-item-tips" v-if="lookInfo.suitType != 4 && item.num == 0">已售完</div>
@@ -401,6 +407,12 @@
                 <!-- 是否双倍赠送 -->
                 <el-form-item label="是否双倍赠送" prop="isDouble" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请选择是否双倍赠送', trigger: 'change' }]">
                     <el-radio-group v-model="boxProductForm.isDouble" style="margin-top: 10px">
+                        <el-radio label="1">是</el-radio>
+                        <el-radio label="0">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="是否开启特效" prop="isSpecial" :rules="[{ required: true, message: '请选择是否开启特效', trigger: 'change' }]">
+                    <el-radio-group v-model="boxProductForm.isSpecial" style="margin-top: 10px">
                         <el-radio label="1">是</el-radio>
                         <el-radio label="0">否</el-radio>
                     </el-radio-group>
@@ -641,6 +653,7 @@ export default {
                 isSend: null,
                 isDouble: null,
                 sendNum: null,
+                isSpecial: null,
             };
             this.resetForm("boxProductForm");
         },
@@ -715,6 +728,8 @@ export default {
             this.boxProductForm.isSale = "1";
             // 是否赠送
             this.boxProductForm.isSend = "0";
+            // 是否开启特效
+            this.boxProductForm.isSpecial = "0";
             // };
             if (this.lookInfo.suitType == 4) this.boxProductForm.isDouble = '0';
             this.editIndex = null;
@@ -817,7 +832,7 @@ export default {
             })
         },
         setDelectAll() {
-            if(this.lookInfo.mapList.length != 1) {
+            if (this.lookInfo.mapList.length != 1) {
                 delSuitManageBox({ suitId: this.lookInfo.id, boxIndex: this.lookInfo.mapList[1].commodityList[0].oldBoxIndex }).then(res => {
                     this.lookInfo.mapList.splice(1, 1);
                     this.setDelectAll();
@@ -842,6 +857,7 @@ export default {
                         isDouble: this.boxProductForm.isDouble,
                         isSale: this.boxProductForm.isSale,
                         isSend: this.boxProductForm.isSend,
+                        isSpecial: this.boxProductForm.isSpecial,
                         num: this.boxProductForm.num,
                         price: this.queryProducts(this.boxProductForm.commodityId, 'price'),
                         multiple: this.boxProductForm.multiple,
@@ -995,6 +1011,7 @@ export default {
                         this.form.wxSuitCommodityList =
                             this.form.wxSuitCommodityList.map(item => item.commodityId === this.editId ? { ...this.commodityForm } : item);
                         this.openGoods = false;
+                        console.log(this.form.wxSuitCommodityList, "this.form.wxSuitCommodityList");
                     } else {
                         if (this.form.wxSuitCommodityList.find(item => item.commodityId === this.commodityForm.commodityId)) {
                             this.$message.error("商品已存在，请勿重复添加！");
@@ -1006,6 +1023,7 @@ export default {
                             isSend: "0",
                             isSale: "0",
                             isDouble: "0",
+                            isSpecial: "0"
                         };
                         if (this.form.suitType == 1 || this.form.suitType == 2 || this.form.suitType == 4) {
                             obj.isSale = "1";
@@ -1014,6 +1032,7 @@ export default {
                         this.form.suitType == 4 ? obj.sendNum = 0 : "";
                         this.form.wxSuitCommodityList.push(obj);
                         this.openGoods = false;
+                        console.log(this.form.wxSuitCommodityList, "this.form.wxSuitCommodityList");
                     };
                 }
             });

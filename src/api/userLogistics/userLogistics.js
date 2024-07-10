@@ -35,6 +35,15 @@ export function updateUserLogistics(data) {
   })
 }
 
+// 驳回物流信息
+export function rejectUserLogistics(data) {
+    return request({
+    url: '/userLogistics/userLogistics/approve',
+    method: 'post',
+    data,
+  })
+}
+
 // 删除物流信息
 export function delUserLogistics(id) {
   return request({
