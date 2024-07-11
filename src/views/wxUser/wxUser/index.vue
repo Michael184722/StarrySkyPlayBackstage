@@ -633,7 +633,7 @@
 import { listBag } from "@/api/bag/bag";
 import { addBagRecord } from "@/api/bagRecord/bagRecord";
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage, getNextUsers } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, updateWxUserDate, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage, getNextUsers } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -1055,7 +1055,7 @@ export default {
             this.$refs["form"].validate(valid => {
                 if (valid) {
                     if (this.form.openId != null) {
-                        updateWxUser(this.form).then(response => {
+                        updateWxUserDate(this.form).then(response => {
                             this.$modal.msgSuccess("修改成功");
                             this.open = false;
                             this.getList();

@@ -135,15 +135,15 @@ export function giveGoods(data) {
 }
 
 // 修改小程序用户信息
-// export function updateWxUser(data) {
-//     return request({
-//         url: '/wxUser/wxUser',
-//         method: 'put',
-//         data: data
-//     })
-// }
-
 export function updateWxUser(data) {
+    return request({
+        url: '/wxUser/wxUser',
+        method: 'put',
+        data: data
+    })
+}
+
+export function updateWxUserDate(data) {
     return request({
         url: '/wxUser/wxUser/updateUserBalance',
         method: 'post',
