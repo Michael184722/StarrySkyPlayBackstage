@@ -185,6 +185,7 @@
                     <div class="form-box-con-item">流水金额：{{ info.water }}</div>
                     <div class="form-box-con-item">是否参与流水排行：{{ info.isWarter == 1 ? '是' : '否' }}</div>
                     <div class="form-box-con-item">创建时间：{{ info.createTime }}</div>
+                    <div class="form-box-con-item">距离升级还差：{{ (info.endMoney - info.totalMoney) || 0 }} 星币</div>
                 </div>
             </div>
             <div class="form-title">
@@ -243,13 +244,16 @@
                 <el-table-column label="充值方式" align="center" prop="type">
                     <template slot-scope="scope">{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
                 </el-table-column>
+                <el-table-column label="支付状态" align="center" prop="type">
+                    <template slot-scope="scope">{{ scope.row.status == 1 ? "成功支付" : scope.row.status == 0 ? "取消支付" : "/" }}</template>
+                </el-table-column>
                 <!-- 新余额 -->
                 <el-table-column label="新余额" align="center">
-                    <template slot-scope="scope">{{  scope.row.type == 1 ? '/' : scope.row.newMoney }}</template>
+                    <template slot-scope="scope">{{ scope.row.newMoney }}</template>
                 </el-table-column>
                 <!-- 旧余额 -->
                 <el-table-column label="旧余额" align="center">
-                    <template slot-scope="scope">{{  scope.row.type == 1 ? '/' : scope.row.oldMoney }}</template>
+                    <template slot-scope="scope">{{ scope.row.oldMoney }}</template>
                 </el-table-column>
             </el-table>
         </el-dialog>
