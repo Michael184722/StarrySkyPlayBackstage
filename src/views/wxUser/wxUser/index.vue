@@ -36,6 +36,9 @@
             <el-col :span="1.5">
                 <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" v-hasPermi="['wxUser:wxUser:export']">导出</el-button>
             </el-col>
+            <el-col :span="1.5">
+                <el-button type="danger" plain size="mini" @click="removeDate" v-hasPermi="['wxUser:wxUser:export']">全部流水-删除</el-button>
+            </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -350,7 +353,7 @@
                 <el-table-column label="交易商品名称" align="center" prop="commodityName">
                     <template slot-scope="scope">
                         <el-popover placement="right" trigger="click">
-                            <el-table v-if="scope.row.commodityList.length" :data="scope.row.commodityList">
+                            <el-table v-if="scope.row.commodityList && scope.row.commodityList.length" :data="scope.row.commodityList">
                                 <el-table-column width="200" property="commodityName" label="商品名称"></el-table-column>
                                 <el-table-column width="200" label="商品等级" align="center" property="levelName" />
                                 <el-table-column width="200" label="中奖数量" align="center" property="totalNum" />
@@ -443,7 +446,7 @@
                 <el-table-column label="交易商品名称" align="center" prop="commodityName">
                     <template slot-scope="scope">
                         <el-popover placement="right" trigger="click">
-                            <el-table v-if="scope.row.commodityList.length" :data="scope.row.commodityList">
+                            <el-table v-if="scope.row.commodityList && scope.row.commodityList.length" :data="scope.row.commodityList">
                                 <el-table-column width="200" property="commodityName" label="商品名称"></el-table-column>
                                 <el-table-column width="200" label="商品等级" align="center" property="levelName" />
                                 <el-table-column width="200" label="中奖数量" align="center" property="totalNum" />
@@ -633,7 +636,7 @@
 import { listBag } from "@/api/bag/bag";
 import { addBagRecord } from "@/api/bagRecord/bagRecord";
 import { listCommodity } from "@/api/commodity/commodity";
-import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, updateWxUserDate, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage, getNextUsers } from "@/api/wxUser/wxUser";
+import { listWxUser, getWxUser, delWxUser, addWxUser, updateWxUser, updateWxUserDate, giveGoods, getBalance, delCase, listGivenGoods, listTradeRecord, listPresent, listIntegralRecord, listSendRecord, listTradeStatistics, listPresentStatistics, listIntegralRecordStatistics, listUserPackage, getNextUsers, clearTheFlowingWater } from "@/api/wxUser/wxUser";
 
 export default {
     name: "WxUser",
@@ -885,6 +888,7 @@ export default {
                 obj.endTime = this.purchValidate.datetimerange[1];
             }
             listPresent(obj).then(res => {
+                console.log(res, "MMMM");
                 this.purchValidate.list = res.rows;
                 this.purchValidate.total = res.total;
                 this.purchValidate.type = true;
@@ -1085,6 +1089,15 @@ export default {
             this.download('wxUser/wxUser/export', {
                 ...this.queryParams
             }, `wxUser_${new Date().getTime()}.xlsx`)
+        },
+        // 删除所有流水记录
+        removeDate() {
+            this.$modal.confirm('是否确认已经导出数据，再清除流水记录？').then(() => {
+                return clearTheFlowingWater();
+            }).then(() => {
+                this.getList();
+                this.$modal.msgSuccess("清除成功");
+            }).catch(() => { });
         }
     }
 };

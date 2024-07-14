@@ -159,6 +159,13 @@ export function delWxUser(openId) {
     })
 }
 
+export function clearTheFlowingWater() {
+    return request({
+        url: '/wxUser/wxUser/cleanWater',
+        method: 'get'
+    })
+}
+
 
 export function delCase(openId) {
     return request({

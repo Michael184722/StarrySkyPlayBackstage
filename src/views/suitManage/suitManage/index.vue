@@ -323,7 +323,7 @@
             </div>
             <el-divider content-position="center">箱子抽赏信息</el-divider>
             <h3 style="margin-top: 35px">中赏排行</h3>
-            <el-table :data="rankValstate.list">
+            <el-table :data="rankValstate.list" border>
                 <el-table-column label="排名" align="center" prop="rank" />
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
@@ -341,7 +341,18 @@
             </div>
 
             <h3 style="margin-top: 35px">中赏记录</h3>
-            <el-table :data="recordValstate.list">
+            <el-row>
+                <el-col :span="1.5">
+                    <el-input type="text" v-model="nickName" placeholder="请输入昵称" clearable />
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-input type="text" v-model="commodityName" placeholder="请输入商品名称" clearable />
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-button type="primary" @click="recordValstate.pageNum = 1; getRecordList()">搜索</el-button>
+                </el-col>
+            </el-row>
+            <el-table :data="recordValstate.list" border style="margin-top: 10px;">
                 <el-table-column label="序号" type="index" align="center" />
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
@@ -532,6 +543,8 @@ export default {
                 list: [],
             },
             setBoxNum: 1,
+            nickName: null,
+            commodityName: null,
         };
     },
     created() {
@@ -762,6 +775,8 @@ export default {
             this.boxInfo = { ...row };
             this.rankValstate.pageNum = 1;
             this.recordValstate.pageNum = 1;
+            this.nickName = null;
+            this.commodityName = null;
             this.getRankList();
             this.getRecordList();
             this.boxType = true;
@@ -789,6 +804,8 @@ export default {
         // 查询中赏记录
         getRecordList() {
             let obj = {
+                nickName: this.nickName,
+                commodityName: this.commodityName,
                 pageNum: this.recordValstate.pageNum,
                 pageSize: this.recordValstate.pageSize,
                 suitId: this.lookInfo.id,
