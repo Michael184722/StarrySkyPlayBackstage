@@ -9,6 +9,7 @@
       :pager-count="pagerCount"
       :total="total"
       v-bind="$attrs"
+      :small="small"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -59,7 +60,11 @@ export default {
     hidden: {
       type: Boolean,
       default: false
-    }
+    },
+    small: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {

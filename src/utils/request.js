@@ -35,6 +35,8 @@ service.interceptors.request.use(config => {
     const isToken = (config.headers || {}).isToken === false
     // 是否需要防止数据重复提交
     const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
+    // 是否需要加载loading
+    const isLoad = (config.headers || {}).load === false
     if (getToken() && !isToken) {
         config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
     }
@@ -74,7 +76,7 @@ service.interceptors.request.use(config => {
             }
         }
     };
-    if (!loadingInstance) {
+    if (!loadingInstance && !isLoad) {
         loadingInstance = Loading.service({
             lock: true,
             text: '数据加载中，请稍等...',
@@ -84,6 +86,12 @@ service.interceptors.request.use(config => {
         // 确保实例已经挂载到 DOM
         if (loadingInstance.$el) {
             loadingInstance.$el.style.zIndex = getNextZIndex();
+        }
+    };
+    if (isLoad) {
+        if (loadingInstance) {
+            loadingInstance.close();
+            loadingInstance = null;
         }
     };
     clearTimeout(loadingTimer);

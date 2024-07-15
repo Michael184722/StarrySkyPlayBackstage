@@ -1,10 +1,13 @@
 import request from '@/utils/request'
 
 // 查询小程序用户信息列表
-export function listWxUser(query) {
+export function listWxUser(query, type = true) {
     return request({
         url: '/wxUser/wxUser/list',
         method: 'get',
+        headers: {
+            load: type
+        },
         params: query
     })
 }
@@ -100,11 +103,14 @@ export function listSendRecord(query) {
 }
 
 // 查询背包数据
-export function listUserPackage(query) {
+export function listUserPackage(query, type = true) {
     return request({
         url: '/wx/module/getUserPackageList',
         method: 'get',
-        params: query
+        headers: {
+            load: type
+        },
+        params: query,
     })
 }
 
