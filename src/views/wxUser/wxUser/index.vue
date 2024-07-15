@@ -46,7 +46,7 @@
                 <el-button type="text" @click="copyText(totalScore)">总积分：{{ totalScore }}</el-button>
             </el-col>
             <el-col :span="1.5" :offset="1">
-                <el-button type="text" @click="copyText(totalBalBack)" :loading="totalBalBackLoad">背包总余额：{{ totalBalBack }} 元</el-button>
+                <el-button type="text" @click="copyText(totalBalBack)">背包总余额：{{ totalBalBack }} 元</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -923,7 +923,6 @@ export default {
             totalScore: 0,
             // 背包总余额
             totalBalBack: 0,
-            totalBalBackLoad: false,
             giveImg: null,
         };
     },
@@ -968,9 +967,8 @@ export default {
                 this.totalScore = 0;
                 this.totalBalance = 0;
                 this.totalBalBack = 0;
-                this.totalBalBackLoad = true;
                 response.rows.map((item, index) => {
-                    if (item.isInner != 1) {
+                    if (item.isInner != 1 && item.isWarter != 0) {
                         const a = new Big(this.totalScore);
                         const b = new Big(this.totalBalance);
                         const c = new Big(Number(item.integral));
@@ -992,8 +990,7 @@ export default {
                     const c = new Big(Number(item.price));
                     this.totalBalBack = Number(a.plus(Number(b.times(c).toString())).toString());
                 });
-                if (type) this.totalBalBackLoad = false;
-            }).catch(() => this.totalBalBackLoad = false);
+            })
         },
         // 取消按钮
         cancel() {
