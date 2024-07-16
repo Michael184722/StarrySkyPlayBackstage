@@ -2,13 +2,16 @@
     <div class="app-container">
         <el-form :model="queryParams" ref="queryForm" size="mini" :inline="true" v-show="showSearch" label-width="68px">
             <el-form-item label="ID" prop="userId">
-                <el-input v-model="queryParams.userId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery" style="width: 150px" />
+                <el-input v-model="queryParams.userId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery"
+                    style="width: 150px" />
             </el-form-item>
             <el-form-item label="昵称" prop="nickName">
-                <el-input v-model="queryParams.nickName" placeholder="请输入昵称" clearable @keyup.enter.native="handleQuery" style="width: 150px" />
+                <el-input v-model="queryParams.nickName" placeholder="请输入昵称" clearable @keyup.enter.native="handleQuery"
+                    style="width: 150px" />
             </el-form-item>
             <el-form-item label="手机号" prop="phone">
-                <el-input v-model="queryParams.phone" placeholder="请输入手机号" clearable @keyup.enter.native="handleQuery" style="width: 140px" />
+                <el-input v-model="queryParams.phone" placeholder="请输入手机号" clearable @keyup.enter.native="handleQuery"
+                    style="width: 140px" />
             </el-form-item>
             <el-form-item label="流水排序" prop="water">
                 <el-select v-model="water" placeholder="请选择流水排序" clearable style="width: 130px">
@@ -23,7 +26,8 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="创建日期" prop="daterange">
-                <el-date-picker clearable v-model="daterange" value-format="yyyy-MM-dd" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 220px" />
+                <el-date-picker clearable v-model="daterange" value-format="yyyy-MM-dd" type="daterange"
+                    range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 220px" />
             </el-form-item>
 
             <el-form-item>
@@ -34,10 +38,12 @@
 
         <el-row :gutter="10" class="mb8">
             <el-col :span="1.5">
-                <el-button size="mini" type="warning" plain icon="el-icon-download" @click="handleExport" v-hasPermi="['wxUser:wxUser:export']">导出</el-button>
+                <el-button size="mini" type="warning" plain icon="el-icon-download" @click="handleExport"
+                    v-hasPermi="['wxUser:wxUser:export']">导出</el-button>
             </el-col>
             <el-col :span="1.5">
-                <el-button size="mini" type="danger" plain @click="removeDate" v-hasPermi="['wxUser:wxUser:export']">全部流水-删除</el-button>
+                <el-button size="mini" type="danger" plain @click="removeDate"
+                    v-hasPermi="['wxUser:wxUser:export']">全部流水-删除</el-button>
             </el-col>
             <el-col :span="1.5" :offset="1">
                 <el-button type="text" @click="copyText(totalBalance)">总余额：{{ totalBalance }} 元</el-button>
@@ -88,31 +94,37 @@
             <el-table-column label="创建时间" align="center" prop="createTime" width="140" />
             <el-table-column label="流水排行" align="center" prop="isWarter" width="75" fixed="right">
                 <template slot-scope="scope">
-                    <el-switch v-model="scope.row.isWarter" active-value="1" inactive-value="0" @change="switchChange($event, scope.row, 'isWarter')" />
+                    <el-switch v-model="scope.row.isWarter" active-value="1" inactive-value="0"
+                        @change="switchChange($event, scope.row, 'isWarter')" />
                 </template>
             </el-table-column>
             <el-table-column label="封号" align="center" prop="delFlag" width="75" fixed="right">
                 <template slot-scope="scope">
-                    <el-switch v-model="scope.row.delFlag" active-value="2" inactive-value="0" @change="switchChange($event, scope.row, 'delFlag')" />
+                    <el-switch v-model="scope.row.delFlag" active-value="2" inactive-value="0"
+                        @change="switchChange($event, scope.row, 'delFlag')" />
                 </template>
             </el-table-column>
             <el-table-column label="回收账号" align="center" prop="isInner" width="80" fixed="right">
                 <template slot-scope="scope">
-                    <el-switch v-model="scope.row.isInner" active-value="1" inactive-value="0" @change="switchChange($event, scope.row, 'isInner')" />
+                    <el-switch v-model="scope.row.isInner" active-value="1" inactive-value="0"
+                        @change="switchChange($event, scope.row, 'isInner')" />
                 </template>
             </el-table-column>
 
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="160" fixed="right">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="lookUseInfo(scope.row)" v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
-                    <el-button size="mini" type="text" @click="handleUpdate(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">修改</el-button>
+                    <el-button size="mini" type="text" @click="lookUseInfo(scope.row)"
+                        v-hasPermi="['wxUser:wxUser:query']">查看</el-button>
+                    <el-button size="mini" type="text" @click="handleUpdate(scope.row)"
+                        v-hasPermi="['wxUser:wxUser:edit']">修改</el-button>
                     <el-dropdown>
                         <el-button size="mini" type="text">
                             更多菜单<i class="el-icon-arrow-down el-icon--right"></i>
                         </el-button>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item>
-                                <el-button size="mini" type="text" @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; tranValidate.datetimerange = []; transactionRecords()"
+                                <el-button size="mini" type="text"
+                                    @click="tranValidate.row = scope.row; tranValidate.pageNum = 1; tranValidate.datetimerange = []; transactionRecords()"
                                     v-hasPermi="['wxUser:wxUser:query']">交易记录</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
@@ -126,11 +138,13 @@
                                     v-hasPermi="['wxUser:wxUser:query']">积分记录</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
-                                <el-button size="mini" type="text" @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()"
+                                <el-button size="mini" type="text"
+                                    @click="shipValidate.row = scope.row; shipValidate.pageNum = 1; shippingRecords()"
                                     v-hasPermi="['wxUser:wxUser:query']">发货记录</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
-                                <el-button size="mini" type="text" @click="subUserValidate.row = scope.row; subUserValidate.pageNum = 1; subordinateUsers()"
+                                <el-button size="mini" type="text"
+                                    @click="subUserValidate.row = scope.row; subUserValidate.pageNum = 1; subordinateUsers()"
                                     v-hasPermi="['wxUser:wxUser:query']">下级用户</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
@@ -139,10 +153,12 @@
                                     v-hasPermi="['wxUser:wxUser:query']">用户背包</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
-                                <el-button size="mini" type="text" @click="handleGift(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">福利赠送</el-button>
+                                <el-button size="mini" type="text" @click="handleGift(scope.row)"
+                                    v-hasPermi="['wxUser:wxUser:edit']">福利赠送</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
-                                <el-button size="mini" type="text" @click="clearCase(scope.row)" v-hasPermi="['wxUser:wxUser:edit']">清空箱子</el-button>
+                                <el-button size="mini" type="text" @click="clearCase(scope.row)"
+                                    v-hasPermi="['wxUser:wxUser:edit']">清空箱子</el-button>
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -150,7 +166,8 @@
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total > 0" :total="total" small :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" small :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改小程序用户信息对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -330,7 +347,8 @@
                 <el-row>
                     <el-col :span="1.5">存储余额</el-col>
                     <el-col :span="1.5" :offset="1">
-                        <el-date-picker v-model="baRange" size="mini" type="daterange" value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
+                        <el-date-picker v-model="baRange" size="mini" type="daterange" value-format="yyyy-MM-dd"
+                            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
                     </el-col>
                     <el-col :span="1.5" :offset="1">
                         <el-button type="primary" size="mini" @click="kookBalance">查询</el-button>
@@ -355,7 +373,8 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <pagination v-show="baTotal > 0" small :total="baTotal" :page.sync="balanceQuery.pageNum" :limit.sync="balanceQuery.pageSize" @pagination="kookBalance" />
+            <pagination v-show="baTotal > 0" small :total="baTotal" :page.sync="balanceQuery.pageNum"
+                :limit.sync="balanceQuery.pageSize" @pagination="kookBalance" />
 
             <div class="form-title">收货地址</div>
             <el-table :data="info.wxUserAddresses" max-height="500" border size="mini">
@@ -371,7 +390,32 @@
                 <el-table-column label="详细地址" align="center" prop="address" />
             </el-table>
             <div class="form-title">充值记录</div>
-            <el-table :data="info.wxUserRecharges" max-height="500" border size="mini">
+            <el-row>
+                <el-col :span="1.5">
+                    <el-select v-model="rechargeRecord.type" placeholder="请选择支付方式" size="mini" style="width: 130px;">
+                        <el-option label="微信" value="1"></el-option>
+                        <el-option label="平台" value="2"></el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-select v-model="rechargeRecord.status" placeholder="请选择支付状态" size="mini" style="width: 135px;">
+                        <el-option label="成功支付" value="1"></el-option>
+                        <el-option label="取消支付" value="0"></el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-date-picker v-model="rechargeRecord.createTime" type="datetimerange"
+                        value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" size="mini" style="width: 280px;" />
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-button type="primary" @click="rechClickQuery" size="mini">查询</el-button>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <div style="line-height: 25px;">总充值金额：{{ totalValue }} 元</div>
+                </el-col>
+            </el-row>
+            <el-table :data="rechargeRecord.list" max-height="500" border size="mini" style="margin-top: 20px;">
                 <!-- 序号 -->
                 <el-table-column label="序号" type="index" align="center" width="55" />
                 <!-- 充值金额 -->
@@ -380,10 +424,11 @@
                 <el-table-column label="充值时间" align="center" prop="createTime" />
                 <!-- 充值方式 -->
                 <el-table-column label="充值方式" align="center" prop="type">
-                    <template slot-scope="scope">{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
+                    <template slot-scope="scope">{{ scope.row.type }}-{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
                 </el-table-column>
                 <el-table-column label="支付状态" align="center" prop="type">
-                    <template slot-scope="scope">{{ scope.row.status == 1 ? "成功支付" : scope.row.status == 0 ? "取消支付" : "/" }}</template>
+                    <template slot-scope="scope">{{ scope.row.status == 1 ? "成功支付" : scope.row.status == 0 ? "取消支付" :
+                        "/" }}</template>
                 </el-table-column>
                 <!-- 新余额 -->
                 <el-table-column label="新余额" align="center">
@@ -405,14 +450,19 @@
                     </el-radio-group>
                 </el-form-item>
                 <!-- 选择福袋 -->
-                <el-form-item label="选择福袋" prop="bagId" v-if="give.type == 1" :rules="[{ required: true, message: '请选择福袋', trigger: 'change' }]">
+                <el-form-item label="选择福袋" prop="bagId" v-if="give.type == 1"
+                    :rules="[{ required: true, message: '请选择福袋', trigger: 'change' }]">
                     <el-select v-model="give.bagId" filterable placeholder="请选择福袋" style="width: 100%">
-                        <el-option v-for="(item, index) in bagList" :key="index" :label="item.name" :value="item.id"></el-option>
+                        <el-option v-for="(item, index) in bagList" :key="index" :label="item.name"
+                            :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="赠送商品" prop="commodityId" v-if="give.type == 2" :rules="[{ required: true, message: '请选择赠送商品', trigger: 'change' }]">
-                    <el-select v-model="give.commodityId" filterable placeholder="请选择赠送商品" style="width: 100%" @change="giveChange(give.commodityId)">
-                        <el-option v-for="(item, index) in commodityList" :key="index" :label="item.commodityName" :value="item.id"></el-option>
+                <el-form-item label="赠送商品" prop="commodityId" v-if="give.type == 2"
+                    :rules="[{ required: true, message: '请选择赠送商品', trigger: 'change' }]">
+                    <el-select v-model="give.commodityId" filterable placeholder="请选择赠送商品" style="width: 100%"
+                        @change="giveChange(give.commodityId)">
+                        <el-option v-for="(item, index) in commodityList" :key="index" :label="item.commodityName"
+                            :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品图片" v-if="give.type == 2">
@@ -440,20 +490,25 @@
                 <!-- 赠送时间 -->
                 <el-table-column label="赠送时间" prop="createTime" align="center" />
             </el-table>
-            <pagination v-show="giveVal.total > 0" small :total="giveVal.total" :page.sync="giveVal.pageNum" :limit.sync="giveVal.pageSize" @pagination="getGivenGoods" />
+            <pagination v-show="giveVal.total > 0" small :total="giveVal.total" :page.sync="giveVal.pageNum"
+                :limit.sync="giveVal.pageSize" @pagination="getGivenGoods" />
         </el-dialog>
         <!-- 交易记录 -->
-        <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1150px" append-to-body>
+        <el-dialog title="交易记录" :visible.sync="tranValidate.type" v-if="tranValidate.type" width="1150px"
+            append-to-body>
             <el-row>
                 <el-col :span="2.5">
                     <el-select v-model="tranValidate.state" placeholder="请选择交易类型" clearable size="mini">
-                        <el-option v-for="item in [{ value: 1, label: '平台' }, { value: 2, label: '非平台' }]" :key="item.value" :label="item.label" :value="item.value" />
+                        <el-option v-for="item in [{ value: 1, label: '平台' }, { value: 2, label: '非平台' }]"
+                            :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
-                    <el-date-picker v-model="tranValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
-                        clearable size="mini" /></el-col>
-                <el-col :span="1.5" :offset="1"><el-button type="primary" size="mini" @click="transactionRecords">搜索</el-button></el-col>
+                    <el-date-picker v-model="tranValidate.datetimerange" type="datetimerange"
+                        value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" clearable size="mini" /></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" size="mini"
+                        @click="transactionRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 4px;">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ tranValidate.inMoney }}</div>
                 </el-col>
@@ -498,8 +553,10 @@
                 <el-table-column label="交易商品名称" align="center" prop="commodityName" width="100">
                     <template slot-scope="scope">
                         <el-popover placement="right" trigger="click">
-                            <el-table v-if="scope.row.commodityList && scope.row.commodityList.length" :data="scope.row.commodityList" border size="mini">
-                                <el-table-column width="200" property="commodityName" label="商品名称" show-overflow-tooltip />
+                            <el-table v-if="scope.row.commodityList && scope.row.commodityList.length"
+                                :data="scope.row.commodityList" border size="mini">
+                                <el-table-column width="200" property="commodityName" label="商品名称"
+                                    show-overflow-tooltip />
                                 <el-table-column width="100" label="商品等级" align="center" property="levelName" />
                                 <el-table-column width="100" label="中奖数量" align="center" property="totalNum" />
                                 <el-table-column width="100" label="中奖总价" align="center" property="totalPrice">
@@ -532,21 +589,27 @@
                 <!-- 交易时间 -->
                 <el-table-column label="交易时间" align="center" prop="createTime" width="150" />
             </el-table>
-            <pagination v-show="tranValidate.total > 0" small :total="tranValidate.total" :page.sync="tranValidate.pageNum" :limit.sync="tranValidate.pageSize" @pagination="transactionRecords" />
+            <pagination v-show="tranValidate.total > 0" small :total="tranValidate.total"
+                :page.sync="tranValidate.pageNum" :limit.sync="tranValidate.pageSize"
+                @pagination="transactionRecords" />
         </el-dialog>
         <!-- 交易记录 -->
-        <el-dialog title="购买记录" :visible.sync="purchValidate.type" v-if="purchValidate.type" width="1200px" append-to-body>
+        <el-dialog title="购买记录" :visible.sync="purchValidate.type" v-if="purchValidate.type" width="1200px"
+            append-to-body>
             <el-row>
                 <el-col :span="2.5">
                     <el-select v-model="purchValidate.state" placeholder="请选择交易类型" clearable size="mini">
-                        <el-option v-for="item in [{ value: 1, label: '平台' }, { value: 2, label: '非平台' }]" :key="item.value" :label="item.label" :value="item.value" />
+                        <el-option v-for="item in [{ value: 1, label: '平台' }, { value: 2, label: '非平台' }]"
+                            :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
-                    <el-date-picker v-model="purchValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
-                        clearable size="mini" />
+                    <el-date-picker v-model="purchValidate.datetimerange" type="datetimerange"
+                        value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期" clearable size="mini" />
                 </el-col>
-                <el-col :span="1.5" :offset="1"><el-button type="primary" size="mini" @click="purchaseRecords">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" size="mini"
+                        @click="purchaseRecords">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1" style="margin-top: 3px;">
                     <div style="height: 100%; display: flex;align-items: center;">收入：{{ purchValidate.inMoney }}</div>
                 </el-col>
@@ -591,8 +654,10 @@
                 <el-table-column label="交易商品名称" align="center" prop="commodityName">
                     <template slot-scope="scope">
                         <el-popover placement="right" trigger="click">
-                            <el-table v-if="scope.row.commodityList && scope.row.commodityList.length" :data="scope.row.commodityList" border size="mini">
-                                <el-table-column width="200" property="commodityName" label="商品名称" show-overflow-tooltip />
+                            <el-table v-if="scope.row.commodityList && scope.row.commodityList.length"
+                                :data="scope.row.commodityList" border size="mini">
+                                <el-table-column width="200" property="commodityName" label="商品名称"
+                                    show-overflow-tooltip />
                                 <el-table-column label="商品等级" align="center" property="levelName" />
                                 <el-table-column label="中奖数量" align="center" property="totalNum" />
                                 <el-table-column label="中奖总价" align="center" property="totalPrice">
@@ -625,19 +690,25 @@
                 <!-- 交易时间 -->
                 <el-table-column label="交易时间" align="center" prop="createTime" width="150" />
             </el-table>
-            <pagination v-show="purchValidate.total > 0" small :total="purchValidate.total" :page.sync="purchValidate.pageNum" :limit.sync="purchValidate.pageSize" @pagination="purchaseRecords" />
+            <pagination v-show="purchValidate.total > 0" small :total="purchValidate.total"
+                :page.sync="purchValidate.pageNum" :limit.sync="purchValidate.pageSize" @pagination="purchaseRecords" />
         </el-dialog>
         <!-- 积分记录 -->
-        <el-dialog title="积分记录" :visible.sync="integValidate.type" v-if="integValidate.type" width="1150px" append-to-body>
+        <el-dialog title="积分记录" :visible.sync="integValidate.type" v-if="integValidate.type" width="1150px"
+            append-to-body>
             <el-row>
-                <el-col :span="1.5"><el-date-picker v-model="integValidate.datetimerange" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
+                <el-col :span="1.5"><el-date-picker v-model="integValidate.datetimerange" type="datetimerange"
+                        value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
                         end-placeholder="结束日期" clearable size="mini" /></el-col>
-                <el-col :span="1.5" :offset="1"><el-button type="primary" size="mini" @click="integralRecord">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" size="mini"
+                        @click="integralRecord">搜索</el-button></el-col>
                 <el-col :span="1.5" :offset="1">
-                    <div style="height: 100%; display: flex;align-items: center;">收入：{{ integValidate.inIntegral }}</div>
+                    <div style="height: 100%; display: flex;align-items: center;">收入：{{ integValidate.inIntegral }}
+                    </div>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
-                    <div style="height: 100%; display: flex;align-items: center;">支出：{{ integValidate.payIntegral }}</div>
+                    <div style="height: 100%; display: flex;align-items: center;">支出：{{ integValidate.payIntegral }}
+                    </div>
                 </el-col>
             </el-row>
             <el-table :data="integValidate.list" style="margin-top: 30px;" border size="mini">
@@ -678,18 +749,23 @@
                 <!-- 交易时间 -->
                 <el-table-column label="交易时间" align="center" prop="createTime" width="150" />
             </el-table>
-            <pagination v-show="integValidate.total > 0" small :total="integValidate.total" :page.sync="integValidate.pageNum" :limit.sync="integValidate.pageSize" @pagination="integralRecord" />
+            <pagination v-show="integValidate.total > 0" small :total="integValidate.total"
+                :page.sync="integValidate.pageNum" :limit.sync="integValidate.pageSize" @pagination="integralRecord" />
         </el-dialog>
         <!-- 发货记录 -->
-        <el-dialog title="发货记录" :visible.sync="shipValidate.type" v-if="shipValidate.type" width="1220px" append-to-body>
+        <el-dialog title="发货记录" :visible.sync="shipValidate.type" v-if="shipValidate.type" width="1220px"
+            append-to-body>
             <el-table :data="shipValidate.list" max-height="650" border size="mini">
                 <!-- 序号 -->
                 <el-table-column label="序号" type="index" align="center" width="55" />
                 <el-table-column label="商品名称" align="center" prop="commodityName">
                     <template slot-scope="scope">
                         <el-popover placement="right" trigger="click">
-                            <el-table v-if="scope.row.commodityName" :data="scope.row.commodityName.split(',').map(item => { return { commodityName: item } })" border size="mini">
-                                <el-table-column width="400" property="commodityName" align="center" label="商品名称"></el-table-column>
+                            <el-table v-if="scope.row.commodityName"
+                                :data="scope.row.commodityName.split(',').map(item => { return { commodityName: item } })"
+                                border size="mini">
+                                <el-table-column width="400" property="commodityName" align="center"
+                                    label="商品名称"></el-table-column>
                             </el-table>
                             <el-button slot="reference" type="primary" size="mini">查看</el-button>
                         </el-popover>
@@ -698,7 +774,8 @@
                 <el-table-column label="商品数量" align="center" prop="num" />
                 <el-table-column label="商品总价" align="center" prop="totalMoney" />
                 <el-table-column label="物流单号" align="center" prop="logisticsNo" />
-                <el-table-column label="物流公司" align="center" prop="logisticsCompany" show-overflow-tooltip width="150" />
+                <el-table-column label="物流公司" align="center" prop="logisticsCompany" show-overflow-tooltip
+                    width="150" />
                 <el-table-column label="收货人姓名" align="center" prop="name" width="90" />
                 <el-table-column label="收获人手机号" align="center" prop="phone" width="100" />
                 <el-table-column label="收货人地区" align="center" prop="region" show-overflow-tooltip width="150" />
@@ -710,16 +787,21 @@
                 </el-table-column>
                 <el-table-column label="状态" align="center" prop="status">
                     <template slot-scope="scope">
-                        <template v-for="(item, index) in [{ value: 0, label: '待审核' }, { value: 1, label: '审核通过' }, { value: 2, label: '审核不通过' }]">
-                            <el-tag v-if="item.value == scope.row.status" :key="index" :type="item.value === 2 ? 'danger' : item.value === 1 ? 'success' : ''">{{ item.label }}</el-tag>
+                        <template
+                            v-for="(item, index) in [{ value: 0, label: '待审核' }, { value: 1, label: '审核通过' }, { value: 2, label: '审核不通过' }]">
+                            <el-tag v-if="item.value == scope.row.status" :key="index"
+                                :type="item.value === 2 ? 'danger' : item.value === 1 ? 'success' : ''">{{ item.label
+                                }}</el-tag>
                         </template>
                     </template>
                 </el-table-column>
             </el-table>
-            <pagination v-show="shipValidate.total > 0" small :total="shipValidate.total" :page.sync="shipValidate.pageNum" :limit.sync="shipValidate.pageSize" @pagination="shippingRecords" />
+            <pagination v-show="shipValidate.total > 0" small :total="shipValidate.total"
+                :page.sync="shipValidate.pageNum" :limit.sync="shipValidate.pageSize" @pagination="shippingRecords" />
         </el-dialog>
         <!-- 背包 -->
-        <el-dialog title="背包" :visible.sync="packageValidate.type" v-if="packageValidate.type" width="850px" append-to-body>
+        <el-dialog title="背包" :visible.sync="packageValidate.type" v-if="packageValidate.type" width="850px"
+            append-to-body>
             <el-row>
                 <el-col :span="1.5">
                     <el-select v-model="packageValidate.cmType" clearable size="mini">
@@ -740,7 +822,8 @@
                         <el-option label="折叠" :value="2"></el-option>
                     </el-select>
                 </el-col>
-                <el-col :span="1.5" :offset="1"><el-button type="primary" @click="getUserPackage" size="mini">搜索</el-button></el-col>
+                <el-col :span="1.5" :offset="1"><el-button type="primary" @click="getUserPackage"
+                        size="mini">搜索</el-button></el-col>
             </el-row>
             <el-table :data="packageValidate.list" max-height="650" style="margin-top: 20px;" border size="mini">
                 <!-- 序号 -->
@@ -757,10 +840,12 @@
                 <!-- 商品等级 -->
                 <el-table-column label="商品等级" align="center" prop="levelName" />
             </el-table>
-            <pagination v-if="packageValidate.openOrFold == 1" small v-show="packageValidate.total > 0" :total="packageValidate.total" :page.sync="packageValidate.pageNum"
+            <pagination v-if="packageValidate.openOrFold == 1" small v-show="packageValidate.total > 0"
+                :total="packageValidate.total" :page.sync="packageValidate.pageNum"
                 :limit.sync="packageValidate.pageSize" @pagination="getUserPackage" />
         </el-dialog>
-        <el-dialog title="下级用户" :visible.sync="subUserValidate.type" v-if="subUserValidate.type" width="600px" append-to-body>
+        <el-dialog title="下级用户" :visible.sync="subUserValidate.type" v-if="subUserValidate.type" width="600px"
+            append-to-body>
             <el-table :data="subUserValidate.list" max-height="650" border size="mini">
                 <!-- 序号 -->
                 <el-table-column label="序号" type="index" align="center" width="55" />
@@ -772,7 +857,9 @@
                 <el-table-column label="昵称" align="center" prop="nickName" />
                 <el-table-column label="积分奖励" align="center" prop="integral" />
             </el-table>
-            <pagination v-show="subUserValidate.total > 0" small :total="subUserValidate.total" :page.sync="subUserValidate.pageNum" :limit.sync="subUserValidate.pageSize" @pagination="subordinateUsers" />
+            <pagination v-show="subUserValidate.total > 0" small :total="subUserValidate.total"
+                :page.sync="subUserValidate.pageNum" :limit.sync="subUserValidate.pageSize"
+                @pagination="subordinateUsers" />
         </el-dialog>
     </div>
 </template>
@@ -924,12 +1011,80 @@ export default {
             // 背包总余额
             totalBalBack: 0,
             giveImg: null,
+            // 查询充值记录条件
+            rechargeRecord: {
+                type: null,
+                status: null,
+                createTime: [],
+                list: []
+            }
         };
     },
     created() {
         this.getList();
     },
+    computed: {
+        totalValue() {
+            let val = 0;
+            if(this.rechargeRecord.list && this.rechargeRecord.list.length) {
+                this.rechargeRecord.list.forEach(item => {
+                    val += Number(item.money);
+                });
+            };
+            return val;
+        }
+    },
     methods: {
+        // 查询充值记录
+        rechClickQuery() {
+            let arr = [];
+            if (this.rechargeRecord.createTime == null) this.rechargeRecord.createTime = [];
+            this.info.wxUserRecharges.forEach(item => {
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length == 0) {
+                    arr.push(item);
+                };
+                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length == 0) {
+                    if (item.type == this.rechargeRecord.type) arr.push(item);
+                };
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.createTime.length == 0) {
+                    if (item.status == this.rechargeRecord.status) arr.push(item);
+                };
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length) {
+                    let a = new Date(item.createTime).getTime();
+                    let b = new Date(this.rechargeRecord.createTime[0]).getTime();
+                    let c = new Date(this.rechargeRecord.createTime[1]).getTime();
+                    if (a >= b && a <= c) arr.push(item);
+                };
+                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.createTime.length == 0) {
+                    if (item.type == this.rechargeRecord.type && item.status == this.rechargeRecord.status) arr.push(item);
+                };
+                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length) {
+                    if (item.type == this.rechargeRecord.type) {
+                        let a = new Date(item.createTime).getTime();
+                        let b = new Date(this.rechargeRecord.createTime[0]).getTime();
+                        let c = new Date(this.rechargeRecord.createTime[1]).getTime();
+                        if (a >= b && a <= c) arr.push(item);
+                    }
+                };
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.createTime.length) {
+                    if (item.status == this.rechargeRecord.status) {
+                        let a = new Date(item.createTime).getTime();
+                        let b = new Date(this.rechargeRecord.createTime[0]).getTime();
+                        let c = new Date(this.rechargeRecord.createTime[1]).getTime();
+                        if (a >= b && a <= c) arr.push(item);
+                    }
+                };
+                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.createTime.length) {
+                    if (item.type == this.rechargeRecord.type && item.status == this.rechargeRecord.status) {
+                        let a = new Date(item.createTime).getTime();
+                        let b = new Date(this.rechargeRecord.createTime[0]).getTime();
+                        let c = new Date(this.rechargeRecord.createTime[1]).getTime();
+                        if (a >= b && a <= c) arr.push(item);
+                    }
+                };
+            });
+            this.rechargeRecord.list = [...arr];
+        },
         copyText(textToCopy) {
             const textArea = document.createElement('textarea');
             textArea.value = textToCopy;
@@ -945,9 +1100,8 @@ export default {
         },
         giveChange(id) {
             id ? this.commodityList.forEach(item => {
-                if(item.id == id) this.giveImg = item.faceImg;
+                if (item.id == id) this.giveImg = item.faceImg;
             }) : this.giveImg = null;
-            console.log(id, this.giveImg, "AA",this.commodityList);
         },
         /** 查询小程序用户信息列表 */
         getList() {
@@ -1046,9 +1200,14 @@ export default {
                 pageSize: 10,
             };
             this.baRange = [];
+            this.rechargeRecord.list = [];
+            this.rechargeRecord.type = null;
+            this.rechargeRecord.status = null;
+            this.rechargeRecord.createTime = [];
             this.kookBalance();
             getWxUser(row.openId).then(response => {
                 this.info = response.data;
+                this.rechargeRecord.list = response.data.wxUserRecharges;
                 this.openUseInfo = true;
             });
         },
