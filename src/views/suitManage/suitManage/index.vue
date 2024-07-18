@@ -9,6 +9,12 @@
                     <el-option v-for="(dict, key, index) in suitTypeData" :key="index" :label="dict" :value="key" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="上/下架" prop="status">
+                <el-select v-model="queryParams.status" placeholder="请选择上/下架" clearable>
+                    <el-option label="上架" value="1" />
+                    <el-option label="下架" value="0" />
+                </el-select>
+            </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
                 <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -202,7 +208,7 @@
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(true)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName" :value="dict.id"></el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
@@ -375,7 +381,7 @@
             <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(false)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName" :value="dict.id"></el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
@@ -482,6 +488,7 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 10,
+                status: null,
                 suitName: null,
                 suitType: null,
             },

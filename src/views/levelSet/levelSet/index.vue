@@ -58,7 +58,7 @@
                 </el-form-item>
                 <el-form-item label="赠送商品">
                     <el-select v-model="form.commodityId" placeholder="请选择" filterable style="width: 100%;" clearable>
-                        <el-option v-for="item in [{ commodityName: '不赠送', id: 0 }, ...commodityList]" :key="item.id" :label="item.commodityName" :value="item.id"></el-option>
+                        <el-option v-for="item in [{ commodityName: '不赠送', id: 0 }, ...commodityList]" :key="item.id" :label="item.commodityName + item.price ? '(' + item.price + '元)' : ''" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">

@@ -3,7 +3,7 @@
 		<el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
 			label-width="68px">
 			<el-form-item label="商品名称" prop="commodityName">
-				<el-input v-model="queryParams.commodityName" placeholder="请输入商品id" clearable
+				<el-input v-model="queryParams.commodityName" placeholder="请输入商品名称" clearable
 					@keyup.enter.native="handleQuery" />
 			</el-form-item>
 			<el-form-item label="购买时间">
