@@ -1332,9 +1332,10 @@ export default {
             this.resetForm("give");
         },
         handleGift(row) {
+            this.giveVal.row = row;
+            this.giveVal.pageNum = 1;
             this.giftReset();
             this.getGivenGoods();
-            this.giveVal.row = row;
             listBag().then(res => {
                 this.bagList = res.rows;
             })
