@@ -149,6 +149,14 @@ export function updateWxUser(data) {
     })
 }
 
+export function resetUser(data) {
+    return request({
+        url: '/userPackage/userPackage',
+        method: 'put',
+        data: data
+    })
+}
+
 export function updateWxUserDate(data) {
     return request({
         url: '/wxUser/wxUser/updateUserBalance',

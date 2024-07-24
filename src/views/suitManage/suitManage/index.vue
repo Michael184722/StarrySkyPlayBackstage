@@ -31,11 +31,11 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="suitManageList">
+        <el-table v-loading="loading" :data="suitManageList" border size="mini">
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="套封面" align="center" prop="faceImg">
                 <template slot-scope="scope">
-                    <ImagePreview :src="scope.row.faceImg" :width="50" :height="50" />
+                    <ImagePreview :src="scope.row.faceImg" :width="35" :height="35" />
                 </template>
             </el-table-column>
             <el-table-column label="套名称" align="center" prop="suitName" />

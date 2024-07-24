@@ -26,7 +26,7 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="towerManageList">
+        <el-table v-loading="loading" :data="towerManageList" border size="mini">
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="层数" align="center" prop="layers" />
             <el-table-column label="单价" align="center" prop="price" />
@@ -38,7 +38,7 @@
             </el-table-column>
             <el-table-column label="升级物品图片" align="center" prop="upCommodityImg">
                 <template slot-scope="scope">
-                    <image-preview v-if="scope.row.upCommodityImg" :src="scope.row.upCommodityImg" :width="50" :height="50" />
+                    <image-preview v-if="scope.row.upCommodityImg" :src="scope.row.upCommodityImg" :width="35" :height="35" />
                     <span v-else>无</span>
                 </template>
             </el-table-column>
@@ -54,7 +54,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+            <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view" @click="handleUpdate(scope.row, true)" v-hasPermi="['towerManage:towerManage:query']">查看</el-button>
                     <el-button size="mini" type="text" icon="el-icon-view" @click="towerRecord.row = scope.row; towerRecord.pageNum = 1; queryUpdate()" v-hasPermi="['towerManage:towerManage:query']">中赏记录</el-button>
@@ -201,6 +201,12 @@ import { listTowerManage, getTowerManage, delTowerManage, addTowerManage, update
 
 export default {
     name: "TowerManage",
+    props: {
+        id: {
+            type: String,
+            default: null
+        },
+    },
     data() {
         return {
             // 遮罩层
@@ -267,6 +273,7 @@ export default {
         /** 查询攀塔信息列表 */
         getList() {
             this.loading = true;
+            this.queryParams.towerSuitId = this.id;
             listTowerManage(this.queryParams).then(response => {
                 this.towerManageList = response.rows;
                 this.total = response.total;
@@ -322,6 +329,7 @@ export default {
         queryUpdate() {
             this.towerRecord.loading = true;
             listTowerRecord({
+                towerSuitId: this.id,
                 pageNum: this.towerRecord.pageNum,
                 pageSize: this.towerRecord.pageSize,
                 layers: this.towerRecord.row.layers
@@ -338,14 +346,16 @@ export default {
         submitForm() {
             this.$refs["form"].validate(valid => {
                 if (valid) {
-                    if (this.form.id != null) {
-                        updateTowerManage(this.form).then(response => {
+                    let obj = { ...this.form };
+                    if (obj.id != null) {
+                        updateTowerManage(obj).then(response => {
                             this.$modal.msgSuccess("修改成功");
                             this.open = false;
                             this.getList();
                         });
                     } else {
-                        addTowerManage(this.form).then(response => {
+                        obj.towerSuitId = this.id;
+                        addTowerManage(obj).then(response => {
                             this.$modal.msgSuccess("新增成功");
                             this.open = false;
                             this.getList();
