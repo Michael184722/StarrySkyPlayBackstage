@@ -330,7 +330,12 @@
             <el-divider content-position="center">箱子抽赏信息</el-divider>
             <h3 style="margin-top: 35px">中赏排行</h3>
             <el-table :data="rankValstate.list" border>
-                <el-table-column label="排名" align="center" prop="rank" />
+                <el-table-column label="ID" align="center" prop="userId" />
+                <el-table-column label="排名" align="center">
+                    <template slot-scope="scope">
+                        {{ scope.$index + 1 }}
+                    </template>
+                </el-table-column>
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
                         <ImagePreview :src="scope.row.wxAvatar" width="50px" height="50px" />
@@ -360,6 +365,7 @@
             </el-row>
             <el-table :data="recordValstate.list" border style="margin-top: 10px;">
                 <el-table-column label="序号" type="index" align="center" />
+                <el-table-column label="ID" align="center" prop="userId" />
                 <el-table-column label="头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
                         <ImagePreview :src="scope.row.wxAvatar" width="50px" height="50px" />

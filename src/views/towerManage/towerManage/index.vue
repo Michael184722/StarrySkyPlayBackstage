@@ -68,11 +68,11 @@
 
         <!-- 添加或修改攀塔信息对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="1400px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                <el-form-item label="层数" :prop="!editType ? 'layers' : ''">
+            <el-form v-if="open" ref="form" :model="form" :rules="rules" label-width="80px">
+                <el-form-item label="层数" prop="layers">
                     <el-input v-model="form.layers" type="number" placeholder="请输入层数" :disabled="editType" />
                 </el-form-item>
-                <el-form-item label="单价" :prop="!editType ? 'price' : ''">
+                <el-form-item label="单价" prop="price">
                     <el-input v-model="form.price" type="number" placeholder="请输入单价" :disabled="editType" />
                 </el-form-item>
                 <!-- 封面图 -->
@@ -85,7 +85,7 @@
                         <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxSuitCommodity">添加</el-button>
                     </el-col>
                 </el-row>
-                <el-form-item :prop="!editType ? 'wxTowerCommodityList' : ''" label=" " label-width="10px">
+                <el-form-item prop="wxTowerCommodityList" label=" " label-width="10px">
                     <el-table :data="form.wxTowerCommodityList" ref="wxSuitCommodity">
                         <el-table-column label="序号" align="center" type="index" width="50" />
                         <el-table-column label="商品名称" prop="commodityName" align="center">
@@ -203,8 +203,8 @@ export default {
     name: "TowerManage",
     props: {
         id: {
-            type: String,
-            default: null
+            type: Number || String,
+            default: ''
         },
     },
     data() {
@@ -310,6 +310,7 @@ export default {
         handleAdd() {
             this.reset();
             this.open = true;
+            this.editType = false;
             this.getCommodityList();
             this.title = "添加攀塔信息";
         },

@@ -44,7 +44,7 @@
 			<el-table-column label="套名称" align="center" prop="name" />
 			<el-table-column label="单抽价格" align="center" prop="price" />
 			<el-table-column label="查看等级" align="center" prop="levelId" />
-			<el-table-column label="限制数量" align="center" prop="lotteryNum" />
+			<!-- <el-table-column label="限制数量" align="center" prop="lotteryNum" /> -->
 
 			<el-table-column label="上下架状态" align="center" prop="status">
 				<template slot-scope="scope">
@@ -87,9 +87,9 @@
 							:value="item.id" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="抽奖次数" prop="lotteryNum">
+				<!-- <el-form-item label="抽奖次数" prop="lotteryNum">
 					<el-input v-model="form.lotteryNum" type="number" placeholder="请输入抽奖次数" />
-				</el-form-item>
+				</el-form-item> -->
 				<el-form-item label="上架时间" prop="upTime">
 					<el-date-picker clearable v-model="form.upTime" type="date" value-format="yyyy-MM-dd"
 						placeholder="请选择上架时间" style="width: 100%;" />
@@ -158,7 +158,7 @@ export default {
 				name: [{ required: true, message: "请输入", trigger: 'blur' }],
 				price: [{ required: true, message: "请输入", trigger: 'blur' }],
 				levelId: [{ required: true, message: "请输入", trigger: 'blur' }],
-				lotteryNum: [{ required: true, message: "请输入", trigger: 'blur' }],
+				// lotteryNum: [{ required: true, message: "请输入", trigger: 'blur' }],
 				faceImg: [{ required: true, message: "请输入", trigger: 'blur' }],
 			},
 			levelOptions: [],
@@ -195,7 +195,7 @@ export default {
 				price: null,
 				levelId: null,
 				faceImg: null,
-				lotteryNum: null,
+				lotteryNum: 0,
 			};
 			this.resetForm("form");
 		},
@@ -224,7 +224,9 @@ export default {
 		/** 塔信息 */
 		towerInformation(row) {
 			this.towerInfo = row;
-			this.towerInfoType = true;
+			this.$nextTick(() => {
+				this.towerInfoType = true;
+			});
 		},
 		/** 修改按钮操作 */
 		handleUpdate(row) {

@@ -1,26 +1,38 @@
 <template>
     <div class="app-container">
-        <el-form :model="queryParams" ref="queryForm" size="mini" :inline="true" v-show="showSearch" label-width="68px">
+        <el-form :model="queryParams" ref="queryForm" size="mini" :inline="true" v-show="showSearch" label-width="88px">
             <el-form-item label="ID" prop="userId">
                 <el-input v-model="queryParams.userId" placeholder="请输入ID" clearable @keyup.enter.native="handleQuery"
-                    style="width: 150px" />
+                    style="width: 200px" />
             </el-form-item>
             <el-form-item label="昵称" prop="nickName">
                 <el-input v-model="queryParams.nickName" placeholder="请输入昵称" clearable @keyup.enter.native="handleQuery"
-                    style="width: 150px" />
+                    style="width: 200px" />
             </el-form-item>
             <el-form-item label="手机号" prop="phone">
                 <el-input v-model="queryParams.phone" placeholder="请输入手机号" clearable @keyup.enter.native="handleQuery"
-                    style="width: 140px" />
+                    style="width: 200px" />
             </el-form-item>
             <el-form-item label="流水排序" prop="water">
-                <el-select v-model="water" placeholder="请选择流水排序" clearable style="width: 130px">
+                <el-select v-model="water" placeholder="请选择流水排序" clearable style="width: 200px">
                     <el-option label="升序" value="1" />
                     <el-option label="降序" value="0" />
                 </el-select>
             </el-form-item>
             <el-form-item label="余额排序" prop="balance">
-                <el-select v-model="balance" placeholder="请选择余额排序" clearable style="width: 130px">
+                <el-select v-model="balance" placeholder="请选择余额排序" clearable style="width: 200px">
+                    <el-option label="升序" value="1" />
+                    <el-option label="降序" value="0" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="积分排序" prop="integral">
+                <el-select v-model="integral" placeholder="请选择积分排序" clearable style="width: 200px">
+                    <el-option label="升序" value="1" />
+                    <el-option label="降序" value="0" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="背包总余额排序" prop="totalPrice" label-width="120px">
+                <el-select v-model="totalPrice" placeholder="请选择背包总余额排序" clearable style="width: 200px">
                     <el-option label="升序" value="1" />
                     <el-option label="降序" value="0" />
                 </el-select>
@@ -88,6 +100,7 @@
             <el-table-column label="余额" align="center" prop="balance" width="80" />
             <el-table-column label="流水金额" align="center" prop="water" width="100" />
             <el-table-column label="积分余额" align="center" prop="integral" width="100" />
+            <el-table-column label="背包总余额" align="center" prop="totalPrice" width="100" />
             <el-table-column label="等级" align="center" prop="levelName" width="80" />
             <el-table-column label="双倍次数" align="center" prop="doubleNum" width="80" />
             <el-table-column label="攀塔层数" align="center" prop="towerLayer" width="80" />
@@ -972,6 +985,8 @@ export default {
             },
             water: null,
             balance: null,
+            integral: null,
+            totalPrice: null,
             daterange: [],
             openUseInfo: false,
             info: {},
@@ -1164,6 +1179,8 @@ export default {
             this.loading = true;
             this.water && (this.queryParams.params.water = this.water);
             this.balance && (this.queryParams.params.balance = this.balance);
+            this.integral && (this.queryParams.params.integral = this.integral);
+            this.totalPrice && (this.queryParams.params.totalPrice = this.totalPrice);
             listWxUser(this.addDateRange(this.queryParams, this.daterange)).then(response => {
                 this.wxUserList = response.rows;
                 this.total = response.total;
@@ -1181,27 +1198,30 @@ export default {
                     if (item.isInner != 1 && item.isWarter != 0) {
                         const a = new Big(this.totalScore);
                         const b = new Big(this.totalBalance);
-                        const c = new Big(Number(item.integral));
-                        const d = new Big(Number(item.balance));
-                        this.totalScore = Number(a.plus(c).toString());
-                        this.totalBalance = Number(b.plus(d).toString());
-                        this.getBagList(item.openId, index == response.rows.length - 1);
+                        const c = new Big(this.totalBalBack);
+                        const d = new Big(Number(item.integral));
+                        const e = new Big(Number(item.balance));
+                        const f = new Big(Number(item.totalPrice));
+                        this.totalScore = Number(a.plus(d).toString());
+                        this.totalBalance = Number(b.plus(e).toString());
+                        this.totalBalBack = Number(c.plus(f).toString());
+                        // this.getBagList(item.openId, index == response.rows.length - 1);
                     }
                     return item;
                 });
             });
         },
         // 查询背包所有数据
-        getBagList(openId, type) {
-            listUserPackage({ cmType: '', orderType: 1, openOrFold: 2, openId }, false).then(response => {
-                response.rows.forEach(item => {
-                    const a = new Big(this.totalBalBack);
-                    const b = new Big(Number(item.num));
-                    const c = new Big(Number(item.price));
-                    this.totalBalBack = Number(a.plus(Number(b.times(c).toString())).toString());
-                });
-            })
-        },
+        // getBagList(openId, type) {
+        //     listUserPackage({ cmType: '', orderType: 1, openOrFold: 2, openId }, false).then(response => {
+        //         response.rows.forEach(item => {
+        //             const a = new Big(this.totalBalBack);
+        //             const b = new Big(Number(item.num));
+        //             const c = new Big(Number(item.price));
+        //             this.totalBalBack = Number(a.plus(Number(b.times(c).toString())).toString());
+        //         });
+        //     })
+        // },
         // 取消按钮
         cancel() {
             this.open = false;
@@ -1233,6 +1253,10 @@ export default {
         },
         /** 重置按钮操作 */
         resetQuery() {
+            this.water = null;
+            this.balance = null;
+            this.integral = null;
+            this.totalPrice = null;
             this.resetForm("queryForm");
             this.handleQuery();
         },
