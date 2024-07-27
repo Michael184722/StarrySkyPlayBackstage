@@ -971,12 +971,18 @@ export default {
                 sex: null,
                 birth: null,
                 idNo: null,
-                balance: null,
-                integral: null,
+                // balance: null,
+                // integral: null,
                 historyIntegral: null,
-                water: null,
+                // water: null,
                 isWarter: null,
                 userId: null,
+                params: {
+                    water: null,
+                    balance: null,
+                    integral: null,
+                    totalPrice: null,
+                }
             },
             // 表单参数
             form: {},
@@ -1177,10 +1183,26 @@ export default {
         /** 查询小程序用户信息列表 */
         getList() {
             this.loading = true;
-            this.water && (this.queryParams.params.water = this.water);
-            this.balance && (this.queryParams.params.balance = this.balance);
-            this.integral && (this.queryParams.params.integral = this.integral);
-            this.totalPrice && (this.queryParams.params.totalPrice = this.totalPrice);
+            if(this.water) {
+                this.queryParams.params.water = this.water;
+            } else {
+                this.queryParams.params.water = null;
+            };
+            if(this.balance) {
+                this.queryParams.params.balance = this.balance;
+            } else {
+                this.queryParams.params.balance = null;
+            };
+            if(this.integral) {
+                this.queryParams.params.integral = this.integral;
+            } else {
+                this.queryParams.params.integral = null;
+            };
+            if(this.totalPrice) {
+                this.queryParams.params.totalPrice = this.totalPrice;
+            } else {
+                this.queryParams.params.totalPrice = null;
+            };
             listWxUser(this.addDateRange(this.queryParams, this.daterange)).then(response => {
                 this.wxUserList = response.rows;
                 this.total = response.total;

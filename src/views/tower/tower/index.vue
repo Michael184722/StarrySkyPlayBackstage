@@ -104,7 +104,7 @@
 			</div>
 		</el-dialog>
 
-		<el-dialog title="塔信息" :visible.sync="towerInfoType" width="1300px" append-to-body>
+		<el-dialog title="塔信息" :visible.sync="towerInfoType" width="900px" append-to-body>
 			<dl-tow v-if="towerInfoType" :id="towerInfo.id"></dl-tow>
 		</el-dialog>
 		<!-- <el-col>

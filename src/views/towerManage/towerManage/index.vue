@@ -31,7 +31,7 @@
             <el-table-column label="层数" align="center" prop="layers" />
             <el-table-column label="单价" align="center" prop="price" />
 
-            <el-table-column label="升级物品名称" align="center" prop="upCommodityName">
+            <!-- <el-table-column label="升级物品名称" align="center" prop="upCommodityName">
                 <template slot-scope="scope">
                     {{ scope.row.upCommodityName || "无" }}
                 </template>
@@ -52,7 +52,7 @@
                     <image-preview v-if="scope.row.downCommodityImg" :src="scope.row.downCommodityImg" :width="50" :height="50" />
                     <span v-else>无</span>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
 
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
                 <template slot-scope="scope">
@@ -109,8 +109,10 @@
                             <template slot-scope="scope">
                                 <el-form-item :prop="'wxTowerCommodityList.' + scope.$index + '.type'" :rules="{ required: true, message: '选择商品类型', trigger: 'blur' }">
                                     <el-select v-model="scope.row.type" placeholder="请选择类型" clearable :disabled="editType">
-                                        <el-option label="升级物品" value="1" :disabled="disabledChange(1)" />
-                                        <el-option label="降级类型" value="2" :disabled="disabledChange(2)" />
+                                        <el-option label="升级物品" value="1" />
+                                        <!-- :disabled="disabledChange(1)" -->
+                                        <!-- :disabled="disabledChange(2)" -->
+                                        <el-option label="降级类型" value="2" />
                                         <el-option label="赠送物品" value="3" />
                                         <el-option label="售卖物品" value="4" />
                                     </el-select>
