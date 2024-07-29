@@ -25,6 +25,12 @@
                     <el-option label="降序" value="0" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="等级排序" prop="level">
+                <el-select v-model="level" placeholder="请选择等级排序" clearable style="width: 200px">
+                    <el-option label="升序" value="1" />
+                    <el-option label="降序" value="0" />
+                </el-select>
+            </el-form-item>
             <el-form-item label="积分排序" prop="integral">
                 <el-select v-model="integral" placeholder="请选择积分排序" clearable style="width: 200px">
                     <el-option label="升序" value="1" />
@@ -979,6 +985,7 @@ export default {
                 userId: null,
                 params: {
                     water: null,
+                    level: null,
                     balance: null,
                     integral: null,
                     totalPrice: null,
@@ -990,6 +997,7 @@ export default {
             rules: {
             },
             water: null,
+            level: null,
             balance: null,
             integral: null,
             totalPrice: null,
@@ -1188,6 +1196,11 @@ export default {
             } else {
                 this.queryParams.params.water = null;
             };
+            if(this.level) {
+                this.queryParams.params.level = this.level;
+            } else {
+                this.queryParams.params.level = null;
+            };
             if(this.balance) {
                 this.queryParams.params.balance = this.balance;
             } else {
@@ -1276,6 +1289,7 @@ export default {
         /** 重置按钮操作 */
         resetQuery() {
             this.water = null;
+            this.level = null;
             this.balance = null;
             this.integral = null;
             this.totalPrice = null;

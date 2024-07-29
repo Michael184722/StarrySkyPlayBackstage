@@ -32,12 +32,12 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="commodityList">
+        <el-table v-loading="loading" :data="commodityList" border size="mini">
             <el-table-column label="序号" align="center" type="index" width="55" />
             <el-table-column label="商品名称" align="center" prop="commodityName" />
             <el-table-column label="商品图片" align="center" prop="faceImg">
                 <template slot-scope="scope">
-                    <imagePreview :src="scope.row.faceImg" :width="50" :height="50" />
+                    <imagePreview :src="scope.row.faceImg" :width="35" :height="35" />
                 </template>
             </el-table-column>
             <!-- 商品类型 -->

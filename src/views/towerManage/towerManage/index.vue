@@ -112,9 +112,10 @@
                                         <el-option label="升级物品" value="1" />
                                         <!-- :disabled="disabledChange(1)" -->
                                         <!-- :disabled="disabledChange(2)" -->
-                                        <el-option label="降级类型" value="2" />
+                                        <el-option label="降级物品" value="2" />
                                         <el-option label="赠送物品" value="3" />
                                         <el-option label="售卖物品" value="4" />
+                                        <el-option label="降一级物品" value="5" :disabled="form.layers == 1" />
                                     </el-select>
                                 </el-form-item>
                             </template>
@@ -138,7 +139,7 @@
         <el-dialog :title="prTitle" :visible.sync="openGoods" width="800px" append-to-body>
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
-                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;">
+                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange">
                         <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
@@ -173,19 +174,20 @@
             </div>
         </el-dialog>
         <!-- 中奖记录 -->
-        <el-dialog title="中奖记录" :visible.sync="towerRecord.open" width="1500px" append-to-body>
-            <el-table v-loading="towerRecord.loading" :data="towerRecord.list">
+        <el-dialog title="中奖记录" :visible.sync="towerRecord.open" width="1200px" append-to-body>
+            <el-table v-loading="towerRecord.loading" :data="towerRecord.list" border size="mini">
                 <el-table-column label="序号" align="center" type="index" />
+                <el-table-column label="ID" align="center" prop="userId" />
                 <el-table-column label="用户昵称" align="center" prop="nickName" />
                 <el-table-column label="用户头像" align="center" prop="wxAvatar">
                     <template slot-scope="scope">
-                        <ImagePreview :src="scope.row.wxAvatar" :width="50" :height="50" />
+                        <ImagePreview :src="scope.row.wxAvatar" :width="35" :height="35" />
                     </template>
                 </el-table-column>
-                <el-table-column label="商品名称" align="center" prop="commodityName" />
+                <el-table-column label="商品名称" align="center" prop="commodityName" show-overflow-tooltip />
                 <el-table-column label="商品图片" align="center" prop="commodityImg">
                     <template slot-scope="scope">
-                        <ImagePreview :src="scope.row.commodityImg" :width="50" :height="50" />
+                        <ImagePreview :src="scope.row.commodityImg" :width="35" :height="35" />
                     </template>
                 </el-table-column>
                 <el-table-column label="商品等级" align="center" prop="level" />
@@ -272,6 +274,9 @@ export default {
         this.getList();
     },
     methods: {
+        commodityChange() {
+            this.commodityForm.referencePrice = this.queryProducts(this.commodityForm.commodityId, 'price');
+        },
         /** 查询攀塔信息列表 */
         getList() {
             this.loading = true;

@@ -34,7 +34,7 @@
             </el-form-item>
             <!-- 申请时间 -->
             <el-form-item label="申请时间">
-                <el-date-picker v-model="dateRange" type="daterange" value-format="yyyy-MM-dd" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
+                <el-date-picker v-model="dateRange" type="datetimerange" value-format="yyyy-MM-dd HH-mm-ss" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 350px" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -58,12 +58,12 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="userLogisticsList">
+        <el-table v-loading="loading" :data="userLogisticsList" border size="mini">
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="ID" align="center" prop="userId" width="200" />
             <el-table-column label="头像" align="center" prop="avatar">
                 <template slot-scope="scope">
-                    <ImagePreview :src="scope.row.avatar" width="50px" height="50px" />
+                    <ImagePreview :src="scope.row.avatar" width="35px" height="35px" />
                 </template>
             </el-table-column>
             <el-table-column label="昵称" align="center" prop="nickName" width="200" />
@@ -71,7 +71,7 @@
             <el-table-column label="商品" align="center" prop="commodityName">
                 <template slot-scope="scope">
                     <el-popover placement="right" trigger="click">
-                        <el-table v-if="scope.row.userPackageList" :data="scope.row.userPackageList">
+                        <el-table v-if="scope.row.userPackageList" :data="scope.row.userPackageList" border size="mini">
                             <el-table-column width="200" align="center" property="commodityName" label="商品名称"></el-table-column>
                             <el-table-column width="100" align="center" property="num" label="商品数量"></el-table-column>
                             <!-- 图片 -->
@@ -112,13 +112,13 @@
             <el-table-column label="收货人地址" align="center" prop="address" width="400" />
             <el-table-column label="申请时间" align="center" prop="createTime" width="180">
                 <template slot-scope="scope">
-                    <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+                    <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
                 </template>
             </el-table-column>
             <!-- 处理时间 -->
             <el-table-column label="处理时间" align="center" prop="updateTime" width="180">
                 <template slot-scope="scope">
-                    <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+                    <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center" fixed="right" width="180">
