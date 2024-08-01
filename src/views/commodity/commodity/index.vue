@@ -27,17 +27,17 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="commodityList">
+        <el-table v-loading="loading" :data="commodityList" border size="mini">
             <el-table-column label="序号" align="center" type="index" width="55" />
             <el-table-column label="商品名称" align="center" prop="commodityName" />
             <el-table-column label="封面图片" align="center" prop="faceImg">
                 <template slot-scope="scope">
-                    <imagePreview :src="scope.row.faceImg" :width="50" :height="50" />
+                    <imagePreview :src="scope.row.faceImg" :width="35" :height="35" />
                 </template>
             </el-table-column>
             <el-table-column label="商品图片" align="center" prop="img">
                 <template slot-scope="scope">
-                    <imagePreview :src="scope.row.img" :width="50" :height="50" />
+                    <imagePreview :src="scope.row.img" :width="35" :height="35" />
                 </template>
             </el-table-column>
             <!-- 商品类型 -->
@@ -50,6 +50,9 @@
             <el-table-column label="价格(元)" align="center" prop="price" />
             <el-table-column label="限购数量" align="center" prop="quota" />
             <el-table-column label="商品数量" align="center" prop="num" />
+            <el-table-column label="查看等级" align="center" prop="levelDownName">
+                <template slot-scope="scope">{{ scope.row.levelDownName }}~{{ scope.row.levelUpName }}</template>
+            </el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" />
             <el-table-column label="更新时间" align="center" prop="updateTime" />
             <!-- 上下架 -->
@@ -70,7 +73,7 @@
 
         <!-- 添加或修改商城商品管理对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+            <el-form ref="form" :model="form" :rules="rules" label-width="110px" size="mini">
                 <el-form-item label="商品名称" prop="commodityName">
                     <el-input v-model="form.commodityName" placeholder="请输入商品名称" />
                 </el-form-item>
@@ -90,7 +93,12 @@
                         <el-option v-for="(item, index) in [{ label: '预售', value: '1' }, { label: '现货', value: '2' }]" :key="index" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="查看等级" prop="levelId">
+                <el-form-item label="查看等级上限" prop="levelUpId">
+                    <el-select v-model="form.levelUpId" placeholder="请选择查看等级" style="width: 100%;">
+                        <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="查看等级下限" prop="levelId">
                     <el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;">
                         <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
                     </el-select>
@@ -167,8 +175,11 @@ export default {
                 cmType: [
                     { required: true, message: "请选择预售或现货", trigger: "change" }
                 ],
+                levelUpId: [
+                    { required: true, message: "请选择查看等级上限", trigger: "change" }
+                ],
                 levelId: [
-                    { required: true, message: "请选择查看等级", trigger: "change" }
+                    { required: true, message: "请选择查看等级下限", trigger: "change" }
                 ],
                 faceImg: [
                     { required: true, message: "请上传商品封面图片", trigger: "change" }
@@ -209,6 +220,7 @@ export default {
                 price: null,
                 quota: null,
                 num: null,
+                levelUpId: null,
                 levelId: null,
                 faceImg: null,
                 img: null,

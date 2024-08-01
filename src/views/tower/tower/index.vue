@@ -43,7 +43,9 @@
 			</el-table-column>
 			<el-table-column label="套名称" align="center" prop="name" />
 			<el-table-column label="单抽价格" align="center" prop="price" />
-			<el-table-column label="查看等级" align="center" prop="levelId" />
+			<el-table-column label="查看等级" align="center" prop="levelName">
+                <template slot-scope="scope">{{ scope.row.levelUpName }}~{{ scope.row.levelName }}</template>
+            </el-table-column>
 			<!-- <el-table-column label="限制数量" align="center" prop="lotteryNum" /> -->
 
 			<el-table-column label="上下架状态" align="center" prop="status">
@@ -74,14 +76,20 @@
 
 		<!-- 添加或修改攀塔套管理对话框 -->
 		<el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-			<el-form ref="form" :model="form" :rules="rules" label-width="80px">
+			<el-form ref="form" :model="form" :rules="rules" label-width="110px">
 				<el-form-item label="套名称" prop="name">
 					<el-input v-model="form.name" placeholder="请输入套名称" />
 				</el-form-item>
 				<el-form-item label="单抽价格" prop="price">
 					<el-input v-model="form.price" placeholder="请输入单抽价格" />
 				</el-form-item>
-				<el-form-item label="查看等级" prop="levelId">
+				<el-form-item label="查看等级上限" prop="levelUpId">
+					<el-select v-model="form.levelUpId" placeholder="请选择查看等级" style="width: 100%;">
+						<el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level"
+							:value="item.id" />
+					</el-select>
+				</el-form-item>
+				<el-form-item label="查看等级下限" prop="levelId">
 					<el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;">
 						<el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level"
 							:value="item.id" />
@@ -157,7 +165,8 @@ export default {
 			rules: {
 				name: [{ required: true, message: "请输入", trigger: 'blur' }],
 				price: [{ required: true, message: "请输入", trigger: 'blur' }],
-				levelId: [{ required: true, message: "请输入", trigger: 'blur' }],
+				levelUpId: [{ required: true, message: "请选择", trigger: 'change' }],
+				levelId: [{ required: true, message: "请选择", trigger: 'change' }],
 				// lotteryNum: [{ required: true, message: "请输入", trigger: 'blur' }],
 				faceImg: [{ required: true, message: "请输入", trigger: 'blur' }],
 			},
@@ -194,6 +203,7 @@ export default {
 				name: null,
 				price: null,
 				levelId: null,
+				levelUpId: null,
 				faceImg: null,
 				lotteryNum: 0,
 			};

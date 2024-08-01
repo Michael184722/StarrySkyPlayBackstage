@@ -50,7 +50,9 @@
             </el-table-column>
             <el-table-column label="箱子数量" align="center" prop="boxNum" />
             <el-table-column label="箱子剩余数量" align="center" prop="surNum" />
-            <el-table-column label="查看等级" align="center" prop="levelName" />
+            <el-table-column label="查看等级" align="center" prop="levelName">
+                <template slot-scope="scope">{{ scope.row.levelName }}~{{ scope.row.levelUpName }}</template>
+            </el-table-column>
             <el-table-column label="上下架状态" align="center" prop="status">
                 <template slot-scope="scope">
                     <el-switch v-model="scope.row.status" active-value="1" inactive-value="0" @change="switchChange($event, scope.row)" />
@@ -70,7 +72,7 @@
 
         <!-- 添加或修改抽赏套管理对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="1600px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+            <el-form ref="form" :model="form" :rules="rules" label-width="110px">
                 <el-form-item label="套名称" prop="suitName">
                     <el-input v-model="form.suitName" placeholder="请输入套名称" />
                 </el-form-item>
@@ -92,7 +94,12 @@
                 <el-form-item label="箱子数量" prop="boxNum" v-if="form.suitType != 4" :rules="[{ required: true, message: '请输入箱子数量', trigger: 'blur' }]">
                     <el-input v-model="form.boxNum" type="number" placeholder="请输入盒子数量" :disabled="editType" />
                 </el-form-item>
-                <el-form-item label="查看等级" prop="levelId">
+                <el-form-item label="查看等级上限" prop="levelUpId">
+                    <el-select v-model="form.levelUpId" placeholder="请选择查看等级" style="width: 100%;">
+                        <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="查看等级下限" prop="levelId">
                     <el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;">
                         <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
                     </el-select>
@@ -504,7 +511,8 @@ export default {
             rules: {
                 suitName: [{ required: true, message: "请输入套名称", trigger: "blur" }],
                 suitType: [{ required: true, message: "请选择套类型", trigger: "change" }],
-                levelId: [{ required: true, message: "请输入查看等级", trigger: "blur" }],
+                levelUpId: [{ required: true, message: "请选择查看等级上限", trigger: "change" }],
+                levelId: [{ required: true, message: "请选择查看等级下限", trigger: "change" }],
                 lotteryNum: [{ required: true, message: "请输入抽奖次数", trigger: "blur" }],
                 status: [{ required: true, message: "请选择上/下架", trigger: "change" }],
                 faceImg: [{ required: true, message: "请上传封面图片", trigger: "change" }],
@@ -616,6 +624,7 @@ export default {
                 price: null,
                 integral: null,
                 boxNum: null,
+                levelUpId: null,
                 levelId: null,
                 status: "0",
                 upTime: null,

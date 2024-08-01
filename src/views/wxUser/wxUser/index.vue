@@ -411,13 +411,13 @@
             <div class="form-title">充值记录</div>
             <el-row>
                 <el-col :span="1.5">
-                    <el-select v-model="rechargeRecord.type" placeholder="请选择支付方式" size="mini" style="width: 130px;">
+                    <el-select v-model="rechargeRecord.type" placeholder="请选择支付方式" size="mini" clearable style="width: 130px;">
                         <el-option label="微信" value="1"></el-option>
                         <el-option label="平台" value="2"></el-option>
                     </el-select>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
-                    <el-select v-model="rechargeRecord.status" placeholder="请选择支付状态" size="mini" style="width: 135px;">
+                    <el-select v-model="rechargeRecord.status" placeholder="请选择支付状态" size="mini" clearable style="width: 135px;">
                         <el-option label="成功支付" value="1"></el-option>
                         <el-option label="取消支付" value="0"></el-option>
                     </el-select>
