@@ -900,6 +900,7 @@
             <el-table :data="subUserValidate.list" max-height="650" border size="mini">
                 <!-- 序号 -->
                 <el-table-column label="序号" type="index" align="center" width="55" />
+                <el-table-column label="ID" align="center" prop="userId" />
                 <el-table-column label="头像" align="center">
                     <template slot-scope="scope">
                         <ImagePreview :src="scope.row.avatar" :width="35" :height="35" />
