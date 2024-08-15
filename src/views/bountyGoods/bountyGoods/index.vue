@@ -16,6 +16,12 @@
                     <el-option label="现货" value="2" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="金额排序" prop="price">
+                <el-select v-model="price" placeholder="请选择排序" clearable>
+                    <el-option label="正序" value="0" />
+                    <el-option label="倒序" value="1" />
+                </el-select>
+            </el-form-item>
             <el-form-item label="更新时间">
                 <el-date-picker v-model="dateRange" type="daterange" value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
             </el-form-item>
@@ -130,8 +136,12 @@ export default {
                 commodityName: null,
                 cmType: null,
                 level: null,
-                type: "2"
+                type: "2",
+                params: {
+                    price: null
+                }
             },
+            price: null,
             dateRange: [],
             // 表单参数
             form: {},
@@ -162,6 +172,11 @@ export default {
         /** 查询商城商品管理列表 */
         getList() {
             this.loading = true;
+            if(this.price) {
+                this.queryParams.params.price = this.price;
+            } else {
+                this.queryParams.params.price && (this.queryParams.params.price = null);
+            }
             listCommodity(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
                 this.commodityList = response.rows;
                 this.total = response.total;
@@ -194,7 +209,9 @@ export default {
         },
         /** 重置按钮操作 */
         resetQuery() {
+            this.price = null;
             this.dateRange = [];
+            this.queryParams.params.price && (this.queryParams.params.price = null);
             this.resetForm("queryForm");
             this.handleQuery();
         },
