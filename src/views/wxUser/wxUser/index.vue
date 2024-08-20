@@ -443,7 +443,7 @@
                 <el-table-column label="充值时间" align="center" prop="createTime" />
                 <!-- 充值方式 -->
                 <el-table-column label="充值方式" align="center" prop="type">
-                    <template slot-scope="scope">{{ scope.row.type }}-{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
+                    <template slot-scope="scope">{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
                 </el-table-column>
                 <el-table-column label="支付状态" align="center" prop="type">
                     <template slot-scope="scope">{{ scope.row.status == 1 ? "成功支付" : scope.row.status == 0 ? "取消支付" :
@@ -1124,6 +1124,9 @@ export default {
         // 查询充值记录
         rechClickQuery() {
             let arr = [];
+            console.log(this.rechargeRecord.type == "", "PPP");
+            if(this.rechargeRecord.type == "") this.rechargeRecord.type = null;
+            if(this.rechargeRecord.status == '') this.rechargeRecord.status = null;
             if (this.rechargeRecord.createTime == null) this.rechargeRecord.createTime = [];
             this.info.wxUserRecharges.forEach(item => {
                 if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length == 0) {
