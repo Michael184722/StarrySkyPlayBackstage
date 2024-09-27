@@ -12,7 +12,8 @@
 
         <el-row :gutter="10" class="mb8">
             <el-col :span="1.5">
-                <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['towerManage:towerManage:add']">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+                    v-hasPermi="['towerManage:towerManage:add']">新增</el-button>
             </el-col>
             <!-- <el-col :span="1.5">
                 <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate" v-hasPermi="['towerManage:towerManage:edit']">修改</el-button>
@@ -21,7 +22,8 @@
                 <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['towerManage:towerManage:remove']">删除</el-button>
             </el-col> -->
             <el-col :span="1.5">
-                <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" v-hasPermi="['towerManage:towerManage:export']">导出</el-button>
+                <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport"
+                    v-hasPermi="['towerManage:towerManage:export']">导出</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -35,36 +37,42 @@
                 <template slot-scope="scope">
                     {{ scope.row.upCommodityName || "无" }}
                 </template>
-            </el-table-column>
-            <el-table-column label="升级物品图片" align="center" prop="upCommodityImg">
-                <template slot-scope="scope">
+</el-table-column>
+<el-table-column label="升级物品图片" align="center" prop="upCommodityImg">
+    <template slot-scope="scope">
                     <image-preview v-if="scope.row.upCommodityImg" :src="scope.row.upCommodityImg" :width="35" :height="35" />
                     <span v-else>无</span>
                 </template>
-            </el-table-column>
-            <el-table-column label="降级物品名称" align="center" prop="downCommodityName">
-                <template slot-scope="scope">
+</el-table-column>
+<el-table-column label="降级物品名称" align="center" prop="downCommodityName">
+    <template slot-scope="scope">
                     {{ scope.row.downCommodityName || "无" }}
                 </template>
-            </el-table-column>
-            <el-table-column label="降级物品图片" align="center" prop="downCommodityImg">
-                <template slot-scope="scope">
+</el-table-column>
+<el-table-column label="降级物品图片" align="center" prop="downCommodityImg">
+    <template slot-scope="scope">
                     <image-preview v-if="scope.row.downCommodityImg" :src="scope.row.downCommodityImg" :width="50" :height="50" />
                     <span v-else>无</span>
                 </template>
-            </el-table-column> -->
+</el-table-column> -->
 
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="handleUpdate(scope.row, true)" v-hasPermi="['towerManage:towerManage:query']">查看</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-view" @click="towerRecord.row = scope.row; towerRecord.pageNum = 1; queryUpdate()" v-hasPermi="['towerManage:towerManage:query']">中赏记录</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row, false)" v-hasPermi="['towerManage:towerManage:edit']">修改</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['towerManage:towerManage:remove']">删除</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view" @click="handleUpdate(scope.row, true)"
+                        v-hasPermi="['towerManage:towerManage:query']">查看</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-view"
+                        @click="towerRecord.row = scope.row; towerRecord.pageNum = 1; queryUpdate()"
+                        v-hasPermi="['towerManage:towerManage:query']">中赏记录</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row, false)"
+                        v-hasPermi="['towerManage:towerManage:edit']">修改</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                        v-hasPermi="['towerManage:towerManage:remove']">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改攀塔信息对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="1400px" append-to-body>
@@ -82,22 +90,26 @@
                 <el-divider content-position="center">攀塔商品信息信息</el-divider>
                 <el-row :gutter="10" class="mb8" v-if="!editType">
                     <el-col :span="1.5">
-                        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxSuitCommodity">添加</el-button>
+                        <el-button type="primary" icon="el-icon-plus" size="mini"
+                            @click="handleAddWxSuitCommodity">添加</el-button>
                     </el-col>
                 </el-row>
                 <el-form-item prop="wxTowerCommodityList" label=" " label-width="10px">
                     <el-table :data="form.wxTowerCommodityList" ref="wxSuitCommodity">
                         <el-table-column label="序号" align="center" type="index" width="50" />
                         <el-table-column label="商品名称" prop="commodityName" align="center">
-                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "commodityName") }}</template>
+                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "commodityName")
+                                }}</template>
                         </el-table-column>
                         <el-table-column label="商品图片" prop="img" align="center">
                             <template slot-scope="scope">
-                                <ImagePreview :src="queryProducts(scope.row.commodityId, 'faceImg')" :width="50" :height="50" />
+                                <ImagePreview :src="queryProducts(scope.row.commodityId, 'faceImg')" :width="50"
+                                    :height="50" />
                             </template>
                         </el-table-column>
                         <el-table-column label="商品等级" prop="levelName" align="center">
-                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "levelName") }}</template>
+                            <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "levelName")
+                                }}</template>
                         </el-table-column>
                         <el-table-column label="商品原价" prop="price" align="center">
                             <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
@@ -107,8 +119,10 @@
                         <el-table-column label="商品概率" prop="reference" align="center" />
                         <el-table-column label="类型" prop="type" align="center">
                             <template slot-scope="scope">
-                                <el-form-item :prop="'wxTowerCommodityList.' + scope.$index + '.type'" :rules="{ required: true, message: '选择商品类型', trigger: 'blur' }">
-                                    <el-select v-model="scope.row.type" placeholder="请选择类型" clearable :disabled="editType">
+                                <el-form-item :prop="'wxTowerCommodityList.' + scope.$index + '.type'"
+                                    :rules="{ required: true, message: '选择商品类型', trigger: 'blur' }">
+                                    <el-select v-model="scope.row.type" placeholder="请选择类型" clearable
+                                        :disabled="editType">
                                         <el-option label="升级物品" value="1" />
                                         <!-- :disabled="disabledChange(1)" -->
                                         <!-- :disabled="disabledChange(2)" -->
@@ -123,8 +137,10 @@
                         <el-table-column label="备注" prop="remark" align="center" />
                         <el-table-column label="操作" align="center" v-if="!editType">
                             <template slot-scope="scope">
-                                <el-button size="mini" type="text" icon="el-icon-edit" @click="commodityUpdate(scope.row)">修改</el-button>
-                                <el-button size="mini" type="text" icon="el-icon-delete" @click="commodityDelete(scope.row)">删除</el-button>
+                                <el-button size="mini" type="text" icon="el-icon-edit"
+                                    @click="commodityUpdate(scope.row)">修改</el-button>
+                                <el-button size="mini" type="text" icon="el-icon-delete"
+                                    @click="commodityDelete(scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -139,12 +155,15 @@
         <el-dialog :title="prTitle" :visible.sync="openGoods" width="800px" append-to-body>
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
-                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
+                    <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;"
+                        @change="commodityChange">
+                        <el-option v-for="dict in goodsOptions" :key="dict.id"
+                            :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
-                    <el-input :value="queryProducts(commodityForm.commodityId, 'levelName')" placeholder="请选择商品" disabled />
+                    <el-input :value="queryProducts(commodityForm.commodityId, 'levelName')" placeholder="请选择商品"
+                        disabled />
                 </el-form-item>
                 <el-form-item label="商品单价">
                     <el-input :value="queryProducts(commodityForm.commodityId, 'price')" placeholder="请选择商品" disabled />
@@ -153,10 +172,12 @@
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
                 </el-form-item>
                 <el-form-item label="抽中倍数" prop="multiple">
-                    <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10" @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
+                    <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10"
+                        @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>
                 <el-form-item label="抽中概率" prop="reference">
-                    <el-input v-model="commodityForm.reference" type="number" placeholder="请输入抽中概率" @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
+                    <el-input v-model="commodityForm.reference" type="number" placeholder="请输入抽中概率"
+                        @input="(val) => { commodityForm.reference = val <= 100 ? val : 100 }">
                         <template slot="append">%</template>
                     </el-input>
                 </el-form-item>
@@ -165,7 +186,8 @@
                 </el-form-item>
                 <!-- 商品图片-->
                 <el-form-item label="商品图片">
-                    <ImagePreview :src="queryProducts(commodityForm.commodityId, 'faceImg')" width="300px" :height="commodityForm.commodityId ? '' : '200px'" />
+                    <ImagePreview :src="queryProducts(commodityForm.commodityId, 'faceImg')" width="300px"
+                        :height="commodityForm.commodityId ? '' : '200px'" />
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -175,7 +197,22 @@
         </el-dialog>
         <!-- 中奖记录 -->
         <el-dialog title="中奖记录" :visible.sync="towerRecord.open" width="1200px" append-to-body>
-            <el-table v-loading="towerRecord.loading" :data="towerRecord.list" border size="mini">
+
+            <el-row>
+                <el-col :span="1.5">
+                    <el-input v-model="towerRecord.userId" placeholder="请输入用户ID" clearable size="mini"
+                        style="width: 200px" @keyup.enter.native="towerRecord.pageNum = 1; queryUpdate()" />
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-input v-model="towerRecord.commodityName" placeholder="请输入商品名称" clearable size="mini"
+                        style="width: 200px" @keyup.enter.native="towerRecord.pageNum = 1; queryUpdate()" />
+                </el-col>
+                <el-col :span="1.5" :offset="1">
+                    <el-button type="primary" icon="el-icon-search" size="mini" @click="towerRecord.pageNum = 1; queryUpdate()">搜索</el-button>
+                </el-col>
+            </el-row>
+
+            <el-table v-loading="towerRecord.loading" :data="towerRecord.list" border size="mini" style="margin-top: 20px;">
                 <el-table-column label="序号" align="center" type="index" />
                 <el-table-column label="ID" align="center" prop="userId" />
                 <el-table-column label="用户昵称" align="center" prop="nickName" />
@@ -193,7 +230,8 @@
                 <el-table-column label="商品等级" align="center" prop="level" />
                 <el-table-column label="抽中时间" align="center" prop="createTime" />
             </el-table>
-            <pagination v-show="towerRecord.total>0" :total="towerRecord.total" :page.sync="towerRecord.pageNum" :limit.sync="towerRecord.pageSize" @pagination="queryUpdate(form)" />
+            <pagination v-show="towerRecord.total > 0" :total="towerRecord.total" :page.sync="towerRecord.pageNum"
+                :limit.sync="towerRecord.pageSize" @pagination="queryUpdate(form)" />
         </el-dialog>
     </div>
 </template>
@@ -263,6 +301,8 @@ export default {
             towerRecord: {
                 pageNum: 1,
                 pageSize: 10,
+                userId: null,
+                commodityName: null,
                 total: 0,
                 list: [],
                 loading: false,
@@ -340,7 +380,9 @@ export default {
                 towerSuitId: this.id,
                 pageNum: this.towerRecord.pageNum,
                 pageSize: this.towerRecord.pageSize,
-                layers: this.towerRecord.row.layers
+                layers: this.towerRecord.row.layers,
+                userId: this.towerRecord.userId,
+                commodityName: this.towerRecord.commodityName,
             }).then(res => {
                 this.towerRecord.list = res.rows;
                 this.towerRecord.total = res.total;

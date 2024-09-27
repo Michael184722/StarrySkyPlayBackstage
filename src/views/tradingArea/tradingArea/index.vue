@@ -49,12 +49,12 @@
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="tradingAreaList">
+        <el-table v-loading="loading" :data="tradingAreaList" size="mini">
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="ID" align="center" prop="userId" />
             <el-table-column label="头像" align="center" prop="avatar">
                 <template slot-scope="scope">
-                    <ImagePreview :src="scope.row.avatar" width="50px" height="50px" />
+                    <ImagePreview :src="scope.row.avatar" width="35px" height="35px" />
                 </template>
             </el-table-column>
             <el-table-column label="昵称" align="center" prop="nickName" />
@@ -62,11 +62,12 @@
                 <template slot-scope="scope">
                     <el-popover placement="right" trigger="click">
                         <el-table v-if="scope.row.userPackageList.length" :data="scope.row.userPackageList">
-                            <el-table-column width="400" property="commodityName" label="商品名称"></el-table-column>
+                            <el-table-column width="400" property="commodityName" label="商品名称" />
+                            <el-table-column align="center" property="num" label="数量" />
                             <el-table-column width="200" label="商品等级" align="center" property="levelName" />
                             <el-table-column width="200" label="商品图片" align="center" property="commodityImg">
                                 <template slot-scope="scope">
-                                    <ImagePreview :src="scope.row.commodityImg" width="50px" height="50px" />
+                                    <ImagePreview :src="scope.row.commodityImg" width="35px" height="35px" />
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -90,10 +91,10 @@
                 </template>
             </el-table-column>
             <el-table-column label="一口价" align="center" prop="price" />
-            <el-table-column label="成交ID" align="center" prop="buyOpenId" />
+            <el-table-column label="成交ID" align="center" prop="buyOpenId" width="220" />
             <el-table-column label="成交头像" align="center" prop="dealAvatar">
                 <template slot-scope="scope">
-                    <ImagePreview :src="scope.row.dealAvatar" width="50px" height="50px" />
+                    <ImagePreview :src="scope.row.dealAvatar" width="35px" height="35px" />
                 </template>
             </el-table-column>
             <el-table-column label="成交昵称" align="center" prop="dealNickName" />
