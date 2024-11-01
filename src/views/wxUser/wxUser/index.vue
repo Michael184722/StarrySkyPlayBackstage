@@ -104,6 +104,7 @@
             <el-table-column label="身份证号" align="center" prop="idNo" width="150" />
             <el-table-column label="出生年月" align="center" prop="birth" width="100" />
             <el-table-column label="余额" align="center" prop="balance" width="80" />
+            <el-table-column label="辰币余额" align="center" prop="coin" width="100" />
             <el-table-column label="流水金额" align="center" prop="water" width="100" />
             <el-table-column label="积分余额" align="center" prop="integral" width="100" />
             <el-table-column label="背包总余额" align="center" prop="totalPrice" width="100" />
@@ -213,7 +214,10 @@
                     <el-input v-model="form.nickName" placeholder="请输入昵称" />
                 </el-form-item>
                 <el-form-item label="用户余额" prop="balance">
-                    <el-input v-model="form.balance" type="number" placeholder="请输入余额" />
+                    <el-input v-model="form.balance" type="number" placeholder="请输入余额" disabled />
+                </el-form-item>
+                <el-form-item label="辰币余额" prop="coin">
+                    <el-input v-model="form.coin" type="number" placeholder="请输入余额" />
                 </el-form-item>
                 <el-form-item label="消费金额" prop="totalMoney">
                     <el-input v-model="form.totalMoney" type="number" placeholder="请输入总金额">
@@ -648,18 +652,20 @@
                 <el-table-column label="交易场所" align="center" prop="floor">
                     <template slot-scope="scope">
                         <!-- 1-商城、2-全局套，3-打拳套，4-无限池，5-攀塔，9-交易区 -->
+                         <!-- {{scope.row.floor}} -->
                         <el-tag v-if="scope.row.floor == 1">商城</el-tag>
                         <el-tag v-if="scope.row.floor == 2">全局套</el-tag>
                         <el-tag v-if="scope.row.floor == 3">打拳套</el-tag>
                         <el-tag v-if="scope.row.floor == 4">无限池</el-tag>
                         <el-tag v-if="scope.row.floor == 5">攀塔</el-tag>
+                        <el-tag v-if="scope.row.floor == 8">发货</el-tag>
                         <el-tag v-if="scope.row.floor == 9">交易区</el-tag>
                     </template>
                 </el-table-column>
                 <!-- 交易方式 -->
                 <el-table-column label="交易方式" align="center" prop="tradeType">
                     <template slot-scope="scope">
-                        {{ scope.row.type == 1 ? "微信支付" : scope.row.type == 2 ? "余额支付" : "" }}
+                        {{ scope.row.type == 1 ? "微信支付" : scope.row.type == 2 ? "余额支付" : scope.row.type == 3 ? "辰币支付" : "" }}
                     </template>
                 </el-table-column>
                 <!-- 交易金额 -->
@@ -1241,8 +1247,9 @@ export default {
                         const d = new Big(Number(item.integral));
                         const e = new Big(Number(item.balance));
                         const f = new Big(Number(item.totalPrice));
+                        const g = new Big(Number(item.coin));
                         this.totalScore = Number(a.plus(d).toString());
-                        this.totalBalance = Number(b.plus(e).toString());
+                        this.totalBalance = Number(b.plus(e).plus(g).toString());
                         this.totalBalBack = Number(c.plus(f).toString());
                         // this.getBagList(item.openId, index == response.rows.length - 1);
                     }
@@ -1281,6 +1288,7 @@ export default {
                 totalMoney: null,
                 integral: null,
                 water: null,
+                coin: null,
                 isWarter: '1',
             };
             this.resetForm("form");
