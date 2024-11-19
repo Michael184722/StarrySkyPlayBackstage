@@ -103,6 +103,13 @@
                         <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="支付方式" prop="remark">
+                    <el-checkbox-group v-model="form.remark">
+                        <el-checkbox label="微信支付"></el-checkbox>
+                        <el-checkbox label="星币支付"></el-checkbox>
+                        <el-checkbox label="辰币支付"></el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
                 </el-form-item>
@@ -181,6 +188,9 @@ export default {
                 levelId: [
                     { required: true, message: "请选择查看等级下限", trigger: "change" }
                 ],
+                remark: [
+                    { required: true, message: "请选择支付方式", trigger: "change" }
+                ],
                 faceImg: [
                     { required: true, message: "请上传商品封面图片", trigger: "change" }
                 ],
@@ -222,6 +232,7 @@ export default {
                 num: null,
                 levelUpId: null,
                 levelId: null,
+                remark: [],
                 faceImg: null,
                 img: null,
                 content: null,
@@ -256,6 +267,7 @@ export default {
                 if (response.data.content && response.data.content.includes('<img src="')) {
                     this.form.content = response.data.content.replace('<img src="', '<img src="' + process.env.VUE_APP_BASE_API);
                 };
+                this.form.remark = this.form.remark.split(',');
                 this.open = true;
                 this.title = "修改商城商品管理";
             });
@@ -275,6 +287,7 @@ export default {
             this.$refs["form"].validate(valid => {
                 if (valid) {
                     let obj = { ...this.form };
+                    obj.remark = obj.remark.length ? obj.remark.join(',') : '';
                     obj.content && (obj.content = obj.content.replace(process.env.VUE_APP_BASE_API, ""));
                     if (obj.id != null) {
                         updateCommodity(obj).then(response => {

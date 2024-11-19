@@ -32,6 +32,7 @@
         <el-table v-loading="loading" :data="rechargeSetList">
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="金额" align="center" prop="money" />
+            <el-table-column label="赠送金额" align="center" prop="sendMoney" />
             <el-table-column label="排序" align="center" prop="sort" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
@@ -48,6 +49,9 @@
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
                 <el-form-item label="充值金额" prop="money">
                     <el-input v-model="form.money" type="number" placeholder="请输入充值金额" />
+                </el-form-item>
+                <el-form-item label="赠送金额" prop="sendMoney">
+                    <el-input v-model="form.sendMoney" type="number" placeholder="请输入赠送金额" />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input v-model="form.sort" type="number" placeholder="请输入排序" />
@@ -129,6 +133,7 @@ export default {
             this.form = {
                 id: null,
                 money: null,
+                sendMoney: null,
                 sort: null,
                 createBy: null,
                 createTime: null,

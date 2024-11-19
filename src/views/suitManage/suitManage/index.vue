@@ -73,6 +73,9 @@
         <!-- 添加或修改抽赏套管理对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="1600px" append-to-body>
             <el-form ref="form" :model="form" :rules="rules" label-width="110px">
+                <el-form-item label="排序" prop="remark">
+                    <el-input v-model="form.remark" type="number" placeholder="请输入排序" />
+                </el-form-item>
                 <el-form-item label="套名称" prop="suitName">
                     <el-input v-model="form.suitName" placeholder="请输入套名称" />
                 </el-form-item>
@@ -91,7 +94,7 @@
                 <el-form-item label="抽奖次数" prop="lotteryNum">
                     <el-input v-model="form.lotteryNum" type="number" placeholder="请输入抽奖次数" />
                 </el-form-item>
-                <el-form-item label="箱子数量" prop="boxNum" v-if="form.suitType != 4" :rules="[{ required: true, message: '请输入箱子数量', trigger: 'blur' }]">
+                <el-form-item label="箱子数量" prop="boxNum" v-if="form.suitType != 4 && form.suitType != 5" :rules="[{ required: true, message: '请输入箱子数量', trigger: 'blur' }]">
                     <el-input v-model="form.boxNum" type="number" placeholder="请输入盒子数量" :disabled="editType" />
                 </el-form-item>
                 <el-form-item label="查看等级上限" prop="levelUpId">
@@ -116,6 +119,14 @@
                     </template>
                     <el-button size="mini" type="primary" v-if="form.drawNum && form.drawNum.length < 4"
                         @click="form.drawNum.push(form.drawNum.length == 0 ? 1 : form.drawNum.length == 1 ? form.drawNum[0] + 2 : form.drawNum.length == 2 ? form.drawNum[1] + 2 : form.drawNum.length == 3 ? form.drawNum[2] + 5 : 100)">新增</el-button>
+                </el-form-item>
+                <!-- 支付方式 -->
+                <el-form-item label="支付方式" v-if="form.suitType != 5" prop="button" :rules="[{ required: true, type: 'array', message: '请选择支付方式', trigger: 'change' }]">
+                    <el-checkbox-group v-model="form.button">
+                        <el-checkbox label="微信支付"></el-checkbox>
+                        <el-checkbox label="星币支付"></el-checkbox>
+                        <el-checkbox label="辰币支付"></el-checkbox>
+                    </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="上/下架" prop="status">
                     <el-switch v-model="form.status" active-value="1" inactive-value="0" />
@@ -152,9 +163,9 @@
                             <template slot-scope="scope">{{ queryProducts(scope.row.commodityId, "price") }}</template>
                         </el-table-column>
                         <el-table-column label="商品参考价" prop="referencePrice" align="center" />
-                        <el-table-column label="商品倍数" prop="multiple" align="center" v-if="form.suitType == 4" />
+                        <el-table-column label="商品倍数" prop="multiple" align="center" v-if="form.suitType == 4 || form.suitType == 5" />
                         <el-table-column label="商品概率" prop="reference" align="center" />
-                        <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4" align="center">
+                        <el-table-column label="商品数量" prop="num" v-if="form.suitType != 4 && form.suitType != 5" align="center">
                             <template slot-scope="scope">
                                 <template v-if="scope.row.num && scope.row.num != 0">{{ scope.row.num }}</template>
                                 <el-form-item v-else :prop="'wxSuitCommodityList.' + scope.$index + '.num'" :rules="{ required: true, message: '请输入商品数量', trigger: 'blur' }">
@@ -162,7 +173,7 @@
                                 </el-form-item>
                             </template>
                         </el-table-column>
-                        <template v-if="form.suitType == 4">
+                        <template v-if="form.suitType == 4 || form.suitType == 5">
                             <el-table-column label="是否双倍赠送" align="center">
                                 <template slot-scope="scope">
                                     <el-switch v-model="scope.row.isDouble" active-value="1" inactive-value="0" :disabled="scope.row.isSend == 1" />
@@ -170,7 +181,7 @@
                                 </template>
                             </el-table-column>
                         </template>
-                        <template v-if="form.suitType == 4">
+                        <template v-if="form.suitType == 4 || form.suitType == 5">
                             <el-table-column label="赠送次数" align="center" width="160">
                                 <template slot-scope="scope">
                                     <el-input v-model="scope.row.sendNum" size="mini" type="number" placeholder="请输入赠送次数" />
@@ -186,12 +197,13 @@
                         </el-table-column>
                         <el-table-column label="是否售卖" prop="isSale" align="center">
                             <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 4" @change="sellChange($event, scope.row)" />
+                                <el-switch v-model="scope.row.isSale" active-value="1" inactive-value="0" :disabled="form.suitType == 4 || form.suitType == 5"
+                                    @change="sellChange($event, scope.row)" />
                             </template>
                         </el-table-column>
                         <el-table-column label="是否赠送" prop="isSend" align="center">
                             <template slot-scope="scope">
-                                <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 4 || scope.row.isDouble == 1"
+                                <el-switch v-model="scope.row.isSend" active-value="1" inactive-value="0" :disabled="form.suitType == 4 || form.suitType == 5 || scope.row.isDouble == 1"
                                     @change="giftsChange($event, scope.row)" />
                             </template>
                         </el-table-column>
@@ -215,7 +227,12 @@
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(true)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :value="dict.id">
+                            <div style="display: flex; align-items: center;">
+                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
+                            </div>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
@@ -224,13 +241,13 @@
                 <el-form-item label="商品单价">
                     <el-input :value="queryProducts(commodityForm.commodityId, 'price')" placeholder="请选择商品" disabled />
                 </el-form-item>
-                <el-form-item label="商品数量" prop="num" v-if="form.suitType != 4" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
+                <el-form-item label="商品数量" prop="num" v-if="form.suitType != 4 && form.suitType != 5" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
                     <el-input v-model="commodityForm.num" type="number" placeholder="请输入商品数量" />
                 </el-form-item>
                 <el-form-item label="参考价" prop="referencePrice">
                     <el-input v-model="commodityForm.referencePrice" type="number" placeholder="请输入商品参考价" />
                 </el-form-item>
-                <el-form-item label="抽中倍数" prop="multiple" v-if="form.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
+                <el-form-item label="抽中倍数" prop="multiple" v-if="form.suitType == 4 || form.suitType == 5" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
                     <el-input v-model="commodityForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10"
                         @input="commodityForm.multiple = commodityForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>
@@ -394,7 +411,12 @@
             <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(false)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :value="dict.id">
+                            <div style="display: flex; align-items: center;">
+                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
+                            </div>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
@@ -509,6 +531,7 @@ export default {
             form: {},
             // 表单校验
             rules: {
+                remark: [{ required: true, message: "请输入排序", trigger: "blur" }],
                 suitName: [{ required: true, message: "请输入套名称", trigger: "blur" }],
                 suitType: [{ required: true, message: "请选择套类型", trigger: "change" }],
                 levelUpId: [{ required: true, message: "请选择查看等级上限", trigger: "change" }],
@@ -523,6 +546,7 @@ export default {
                 2: "打拳套",
                 3: "积分池",
                 4: "无限池",
+                5: '隐藏无限池'
             },
             prTitle: "",
             openGoods: false,
@@ -595,7 +619,7 @@ export default {
             return val / 100;
         },
         commodityChange(type) {
-            type && (this.commodityForm.referencePrice = this.form.suitType == 4 ? this.queryProducts(this.commodityForm.commodityId, 'price') : this.form.suitType == 3 ? this.form.integral : this.form.price);
+            type && (this.commodityForm.referencePrice = this.form.suitType == 4 || this.form.suitType == 5 ? this.queryProducts(this.commodityForm.commodityId, 'price') : this.form.suitType == 3 ? this.form.integral : this.form.price);
             !type && (this.boxProductForm.referencePrice = this.lookInfo.suitType == 3 ? this.lookInfo.integral : this.lookInfo.price);
         },
         /** 查询抽赏套管理列表 */
@@ -619,11 +643,12 @@ export default {
         reset() {
             this.form = {
                 id: null,
+                remark: null,
                 suitName: null,
                 suitType: null,
                 price: null,
                 integral: null,
-                boxNum: null,
+                boxNum: 1,
                 levelUpId: null,
                 levelId: null,
                 status: "0",
@@ -631,6 +656,7 @@ export default {
                 faceImg: null,
                 lotteryNum: 0,
                 drawNum: [],
+                button: [],
                 wxSuitCommodityList: [],
             };
             this.resetForm("form");
@@ -704,6 +730,7 @@ export default {
                     this.form[key] = response.data[key];
                 };
                 this.form.drawNum = response.data.drawNum ? response.data.drawNum.split(',') : [];
+                this.form.button = response.data.button ? response.data.button.split(',') : [];
                 getDetail(id).then(res => {
                     this.lookInfo = res.data;
                     this.lookInfo.mapList.map(item => {
@@ -930,6 +957,7 @@ export default {
                     this.form[key] = response.data[key];
                 };
                 this.form.drawNum = response.data.drawNum ? response.data.drawNum.split(',') : [];
+                this.form.button = response.data.button ? response.data.button.split(',') : [];
                 this.open = true;
                 this.title = "修改抽赏套管理";
             });
@@ -947,6 +975,7 @@ export default {
                     });
                     obj.status == 1 && !obj.upTime ? obj.upTime = this.parseTime(new Date()) : '';
                     obj.drawNum = this.form.drawNum.length == 0 ? '' : this.form.drawNum.join(',');
+                    obj.button = this.form.button.length == 0 ? '' : this.form.button.join(',');
                     const submitType = () => {
                         if (obj.id != null) {
                             updateSuitManage(obj).then(response => {
@@ -1064,11 +1093,11 @@ export default {
                             isDouble: "0",
                             isSpecial: "0"
                         };
-                        if (this.form.suitType == 1 || this.form.suitType == 2 || this.form.suitType == 4) {
+                        if (this.form.suitType == 1 || this.form.suitType == 2 || this.form.suitType == 4 || this.form.suitType == 5) {
                             obj.isSale = "1";
                         }
                         this.form.suitType == 3 ? obj.isSale = '1' : "";
-                        this.form.suitType == 4 ? obj.sendNum = 0 : "";
+                        this.form.suitType == 4 || this.form.suitType == 5 ? obj.sendNum = 0 : "";
                         this.form.wxSuitCommodityList.push(obj);
                         this.openGoods = false;
                         console.log(this.form.wxSuitCommodityList, "this.form.wxSuitCommodityList");
@@ -1094,7 +1123,7 @@ export default {
                     item.sendNum = null;
                     return item;
                 });
-                if (this.form.suitType == 4) {
+                if (this.form.suitType == 4 || this.form.suitType == 5) {
                     this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
                         item.isSale = "1";
                         item.isSend = "0";

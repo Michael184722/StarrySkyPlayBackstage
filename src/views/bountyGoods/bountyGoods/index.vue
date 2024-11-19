@@ -78,6 +78,16 @@
                         <el-option v-for="dict in dict.type.level" :key="dict.value" :label="dict.label" :value="dict.value" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="抽奖套" prop="suitId">
+                    <el-select v-model="form.suitId" placeholder="请选择商品等级" clearable style="width: 100%;">
+                        <el-option v-for="dict in suitManageList" :key="dict.id" :label="dict.suitName" :value="dict.id">
+                            <div style="display: flex; align-items: center;">
+                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <div style="margin-left: 20px;">{{ dict.suitName }}</div>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="商品价格" prop="price">
                     <el-input v-model="form.price" type="number" placeholder="请输入价格">
                         <template slot="append">元</template>
@@ -104,6 +114,7 @@
 </template>
 
 <script>
+import { listSuitManage } from "@/api/suitManage/suitManage";
 import { listCommodity, getCommodity, delCommodity, addCommodity, updateCommodity } from "@/api/commodity/commodity";
 
 export default {
@@ -162,11 +173,16 @@ export default {
                 faceImg: [
                     { required: true, message: "请上传商品图", trigger: "change" }
                 ],
-            }
+            },
+            suitManageList: [],
         };
     },
     created() {
         this.getList();
+        listSuitManage({ suitType: 5 }).then(response => {
+            this.suitManageList = response.rows;
+            console.log(this.suitManageList, "suitManageList");
+        });
     },
     methods: {
         /** 查询商城商品管理列表 */
@@ -194,6 +210,7 @@ export default {
                 id: null,
                 commodityName: null,
                 level: null,
+                suitId: null,
                 price: null,
                 faceImg: null,
                 content: null,

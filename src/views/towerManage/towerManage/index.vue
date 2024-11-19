@@ -157,8 +157,12 @@
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;"
                         @change="commodityChange">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id"
-                            :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id"></el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :value="dict.id">
+                            <div style="display: flex; align-items: center;">
+                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
+                            </div>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
