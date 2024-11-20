@@ -121,7 +121,7 @@
                         @click="form.drawNum.push(form.drawNum.length == 0 ? 1 : form.drawNum.length == 1 ? form.drawNum[0] + 2 : form.drawNum.length == 2 ? form.drawNum[1] + 2 : form.drawNum.length == 3 ? form.drawNum[2] + 5 : 100)">新增</el-button>
                 </el-form-item>
                 <!-- 支付方式 -->
-                <el-form-item label="支付方式" v-if="form.suitType != 5" prop="button" :rules="[{ required: true, type: 'array', message: '请选择支付方式', trigger: 'change' }]">
+                <el-form-item label="支付方式" v-if="form.suitType != 3 && form.suitType != 5" prop="button" :rules="[{ required: true, type: 'array', message: '请选择支付方式', trigger: 'change' }]">
                     <el-checkbox-group v-model="form.button">
                         <el-checkbox label="微信支付"></el-checkbox>
                         <el-checkbox label="星币支付"></el-checkbox>
@@ -1116,6 +1116,7 @@ export default {
         /** 类型选择限制 */
         suitTypeChange() {
             this.$nextTick(() => {
+                this.form.button = [];
                 this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
                     item.isSale = '1';
                     item.isSend = '0';

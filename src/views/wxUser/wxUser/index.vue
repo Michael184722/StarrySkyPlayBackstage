@@ -427,6 +427,12 @@
                     </el-select>
                 </el-col>
                 <el-col :span="1.5" :offset="1">
+                    <el-select v-model="rechargeRecord.moneyType" placeholder="请选择币种" size="mini" clearable style="width: 135px;">
+                        <el-option label="星币" value="1"></el-option>
+                        <el-option label="辰币" value="2"></el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="1.5" :offset="1">
                     <el-date-picker v-model="rechargeRecord.createTime" type="datetimerange"
                         value-format="yyyy-MM-dd HH:mm:ss" range-separator="至" start-placeholder="开始日期"
                         end-placeholder="结束日期" size="mini" style="width: 280px;" />
@@ -449,9 +455,15 @@
                 <el-table-column label="充值方式" align="center" prop="type">
                     <template slot-scope="scope">{{ scope.row.type == 1 ? "微信" : "平台" }}</template>
                 </el-table-column>
+                <el-table-column label="充值币种" align="center" prop="type">
+                    <template slot-scope="scope">{{ scope.row.moneyType == 1 ? "星币" : "辰币" }}</template>
+                </el-table-column>
                 <el-table-column label="支付状态" align="center" prop="type">
                     <template slot-scope="scope">{{ scope.row.status == 1 ? "成功支付" : scope.row.status == 0 ? "取消支付" :
             "/" }}</template>
+                </el-table-column>
+                <el-table-column label="赠送辰币额度" align="center">
+                    <template slot-scope="scope">{{ scope.row.sendMoney }}</template>
                 </el-table-column>
                 <!-- 新余额 -->
                 <el-table-column label="新余额" align="center">
@@ -1107,6 +1119,7 @@ export default {
             rechargeRecord: {
                 type: null,
                 status: null,
+                moneyType: null,
                 createTime: [],
                 list: []
             }
@@ -1133,27 +1146,46 @@ export default {
             console.log(this.rechargeRecord.type == "", "PPP");
             if(this.rechargeRecord.type == "") this.rechargeRecord.type = null;
             if(this.rechargeRecord.status == '') this.rechargeRecord.status = null;
+            if(this.rechargeRecord.moneyType == '') this.rechargeRecord.moneyType = null;
             if (this.rechargeRecord.createTime == null) this.rechargeRecord.createTime = [];
+
             this.info.wxUserRecharges.forEach(item => {
-                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length == 0) {
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length == 0) {
                     arr.push(item);
                 };
-                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length == 0) {
+                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length == 0) {
                     if (item.type == this.rechargeRecord.type) arr.push(item);
                 };
-                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.createTime.length == 0) {
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length == 0) {
                     if (item.status == this.rechargeRecord.status) arr.push(item);
                 };
-                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length) {
+                if(this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.moneyType && this.rechargeRecord.createTime.length == 0) {
+                    if (item.moneyType == this.rechargeRecord.moneyType) arr.push(item);
+                }
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length) {
                     let a = new Date(item.createTime).getTime();
                     let b = new Date(this.rechargeRecord.createTime[0]).getTime();
                     let c = new Date(this.rechargeRecord.createTime[1]).getTime();
                     if (a >= b && a <= c) arr.push(item);
                 };
-                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.createTime.length == 0) {
+                // 1 2
+                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length == 0) {
                     if (item.type == this.rechargeRecord.type && item.status == this.rechargeRecord.status) arr.push(item);
                 };
-                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.createTime.length) {
+                // 1 3
+                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.moneyType && this.rechargeRecord.createTime.length == 0) {
+                    if (item.type == this.rechargeRecord.type && item.moneyType == this.rechargeRecord.moneyType) arr.push(item);
+                };
+                // 2 3
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.moneyType && this.rechargeRecord.createTime.length == 0) {
+                    if (item.status == this.rechargeRecord.status && item.moneyType == this.rechargeRecord.moneyType) arr.push(item);
+                };
+                // 1 2 3
+                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.moneyType && this.rechargeRecord.createTime.length == 0) {
+                    if (item.type == this.rechargeRecord.type && item.status == this.rechargeRecord.status && item.moneyType == this.rechargeRecord.moneyType) arr.push(item);
+                }
+                // 1 4
+                if (this.rechargeRecord.type && this.rechargeRecord.status == null && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length) {
                     if (item.type == this.rechargeRecord.type) {
                         let a = new Date(item.createTime).getTime();
                         let b = new Date(this.rechargeRecord.createTime[0]).getTime();
@@ -1161,7 +1193,8 @@ export default {
                         if (a >= b && a <= c) arr.push(item);
                     }
                 };
-                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.createTime.length) {
+                // 2 4
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status && this.rechargeRecord.moneyType == null && this.rechargeRecord.createTime.length) {
                     if (item.status == this.rechargeRecord.status) {
                         let a = new Date(item.createTime).getTime();
                         let b = new Date(this.rechargeRecord.createTime[0]).getTime();
@@ -1169,7 +1202,17 @@ export default {
                         if (a >= b && a <= c) arr.push(item);
                     }
                 };
-                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.createTime.length) {
+                // 3 4
+                if (this.rechargeRecord.type == null && this.rechargeRecord.status == null && this.rechargeRecord.moneyType && this.rechargeRecord.createTime.length) {
+                    if (item.moneyType == this.rechargeRecord.moneyType) {
+                        let a = new Date(item.createTime).getTime();
+                        let b = new Date(this.rechargeRecord.createTime[0]).getTime();
+                        let c = new Date(this.rechargeRecord.createTime[1]).getTime();
+                        if (a >= b && a <= c) arr.push(item);
+                    }
+                };
+                // 1 2 3 4
+                if (this.rechargeRecord.type && this.rechargeRecord.status && this.rechargeRecord.moneyType && this.rechargeRecord.createTime.length) {
                     if (item.type == this.rechargeRecord.type && item.status == this.rechargeRecord.status) {
                         let a = new Date(item.createTime).getTime();
                         let b = new Date(this.rechargeRecord.createTime[0]).getTime();

@@ -77,6 +77,9 @@
 		<!-- 添加或修改攀塔套管理对话框 -->
 		<el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
 			<el-form ref="form" :model="form" :rules="rules" label-width="110px">
+				<el-form-item label="排序" prop="sort">
+					<el-input v-model="form.sort" type="number" placeholder="请输入排序" />
+				</el-form-item>
 				<el-form-item label="套名称" prop="name">
 					<el-input v-model="form.name" placeholder="请输入套名称" />
 				</el-form-item>
@@ -95,9 +98,14 @@
 							:value="item.id" />
 					</el-select>
 				</el-form-item>
-				<!-- <el-form-item label="抽奖次数" prop="lotteryNum">
-					<el-input v-model="form.lotteryNum" type="number" placeholder="请输入抽奖次数" />
-				</el-form-item> -->
+				<!-- remark -->
+				<el-form-item label="支付方式" prop="remark" :rules="[{ required: true, type: 'array', message: '请选择支付方式', trigger: 'change' }]">
+                    <el-checkbox-group v-model="form.remark">
+                        <el-checkbox label="微信支付"></el-checkbox>
+                        <el-checkbox label="星币支付"></el-checkbox>
+                        <el-checkbox label="辰币支付"></el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
 				<el-form-item label="上架时间" prop="upTime">
 					<el-date-picker clearable v-model="form.upTime" type="date" value-format="yyyy-MM-dd"
 						placeholder="请选择上架时间" style="width: 100%;" />
@@ -163,6 +171,7 @@ export default {
 			form: {},
 			// 表单校验
 			rules: {
+				sort: [{ required: true, message: "请输入", trigger: 'blur' }],
 				name: [{ required: true, message: "请输入", trigger: 'blur' }],
 				price: [{ required: true, message: "请输入", trigger: 'blur' }],
 				levelUpId: [{ required: true, message: "请选择", trigger: 'change' }],
@@ -200,9 +209,11 @@ export default {
 		reset() {
 			this.form = {
 				id: null,
+				sort: null,
 				name: null,
 				price: null,
 				levelId: null,
+				remark: [],
 				levelUpId: null,
 				faceImg: null,
 				lotteryNum: 0,
@@ -244,6 +255,7 @@ export default {
 			const id = row.id || this.ids
 			getTower(id).then(response => {
 				this.form = response.data;
+				this.form.remark = this.form.remark ? this.form.remark.split(",") : [];
 				this.open = true;
 				this.title = "修改攀塔套管理";
 			});
@@ -264,14 +276,16 @@ export default {
 		submitForm() {
 			this.$refs["form"].validate(valid => {
 				if (valid) {
-					if (this.form.id != null) {
-						updateTower(this.form).then(response => {
+					let obj = { ...this.form };
+					obj.remark = obj.remark.join(",");
+					if (obj.id != null) {
+						updateTower(obj).then(response => {
 							this.$modal.msgSuccess("修改成功");
 							this.open = false;
 							this.getList();
 						});
 					} else {
-						addTower(this.form).then(response => {
+						addTower(obj).then(response => {
 							this.$modal.msgSuccess("新增成功");
 							this.open = false;
 							this.getList();
