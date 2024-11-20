@@ -84,10 +84,10 @@
                         <el-option v-for="(dict, key, index) in suitTypeData" :key="index" :label="dict" :value="key" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="单抽价格" prop="price" v-if="form.suitType != 3" :rules="[{ required: true, message: '请输入单抽价格', trigger: 'blur' }]">
+                <el-form-item label="单抽价格" prop="price" v-if="form.suitType != 3 && form.suitType != 5" :rules="[{ required: true, message: '请输入单抽价格', trigger: 'blur' }]">
                     <el-input v-model="form.price" type="number" placeholder="请输入单抽价格" />
                 </el-form-item>
-                <el-form-item label="单抽积分" prop="integral" v-else :rules="[{ required: true, message: '请输入单抽积分', trigger: 'blur' }]">
+                <el-form-item label="单抽积分" prop="integral" v-else-if="form.suitType != 5" :rules="[{ required: true, message: '请输入单抽积分', trigger: 'blur' }]">
                     <el-input v-model="form.integral" type="number" placeholder="请输入单抽积分" />
                 </el-form-item>
                 <!-- 抽奖次数 -->
@@ -97,18 +97,18 @@
                 <el-form-item label="箱子数量" prop="boxNum" v-if="form.suitType != 4 && form.suitType != 5" :rules="[{ required: true, message: '请输入箱子数量', trigger: 'blur' }]">
                     <el-input v-model="form.boxNum" type="number" placeholder="请输入盒子数量" :disabled="editType" />
                 </el-form-item>
-                <el-form-item label="查看等级上限" prop="levelUpId">
-                    <el-select v-model="form.levelUpId" placeholder="请选择查看等级" style="width: 100%;">
+                <el-form-item label="查看等级上限" prop="levelUpId" :rules="[{ required: true, message: '请选择查看等级上限', trigger: 'change' }]">
+                    <el-select v-model="form.levelUpId" placeholder="请选择查看等级" style="width: 100%;" :disabled="form.suitType == 5">
                         <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="查看等级下限" prop="levelId">
-                    <el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;">
+                <el-form-item label="查看等级下限" prop="levelId" :rules="[{ required: true, message: '请选择查看等级下限', trigger: 'change' }]">
+                    <el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;" :disabled="form.suitType == 5">
                         <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
                     </el-select>
                 </el-form-item>
                 <!-- 购买按钮设置 -->
-                <el-form-item label="购买按钮" prop="drawNum" :rules="[{ required: true, type: 'array', message: '请添加购买按钮', trigger: 'change' }]">
+                <el-form-item label="购买按钮" v-if="form.suitType != 5" prop="drawNum" :rules="[{ required: true, type: 'array', message: '请添加购买按钮', trigger: 'change' }]">
                     <template v-if="form.drawNum">
                         <el-tag v-for="(tag, index) in form.drawNum" :key="index" closable @click="clickBtn(index)" @close="form.drawNum = form.drawNum.filter((item, i) => index != i)"
                             class="formEltag">
@@ -227,9 +227,9 @@
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(true)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :value="dict.id">
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id">
                             <div style="display: flex; align-items: center;">
-                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <!-- <ImagePreview :src="dict.faceImg" width="30px" height="30px" /> -->
                                 <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
                             </div>
                         </el-option>
@@ -275,11 +275,11 @@
             <div class="sm-info">
                 <div>套名称：{{ lookInfo.suitName }}</div>
                 <div>
-                    套类型：{{ lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 4 ? "无限池" : "/" }}
+                    套类型：{{ lookInfo.suitType == 1 ? "全局套" : lookInfo.suitType == 2 ? "打拳套" : lookInfo.suitType == 3 ? "积分池" : lookInfo.suitType == 4 ? "无限池" : lookInfo.suitType == 5 ? "隐藏无限池" : "/" }}
                 </div>
                 <div v-if="lookInfo.suitType == 3">单抽积分：{{ lookInfo.integral }}积分</div>
                 <div v-else>单抽价格：{{ lookInfo.price }}元</div>
-                <div>查看等级：{{ lookInfo.levelName }}</div>
+                <div>查看等级：{{ lookInfo.levelName }}~{{ lookInfo.levelUpName }}</div>
                 <div>上下架：{{ lookInfo.status == 1 ? "上架" : "下架" }}</div>
             </div>
             <el-row :gutter="10" class="mb8" style="margin-top: 30px;">
@@ -339,8 +339,8 @@
                     <div class="sm-list-item-salesType" v-else-if="item.isSend == 1">赠送<span v-if="item.isSpecial == 1"> / 特效</span></div>
                     <div class="sm-list-item-salesType" v-else-if="item.isSale == 1">售卖<span v-if="item.isSpecial == 1"> / 特效</span></div>
 
-                    <div class="sm-list-item-type" v-if="lookInfo.suitType != 4">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
-                    <div class="sm-list-item-tips" v-if="lookInfo.suitType != 4 && item.num == 0">已售完</div>
+                    <div class="sm-list-item-type" v-if="lookInfo.suitType != 4 && lookInfo.suitType != 5">{{ item.num }}&nbsp;/&nbsp;{{ item.totalNum }}</div>
+                    <div class="sm-list-item-tips" v-if="lookInfo.suitType != 4 && lookInfo.suitType != 5 && item.num == 0">已售完</div>
                     <div class="sm-list-item-Fun">
                         <i class="el-icon-zoom-in" style="color: #FFF; font-size: 30px;" v-if="item.faceImg" @click="lookImage('ImagePreview', index + 1)"></i>
                         <i class="el-icon-edit-outline" style="color: #409EFF; font-size: 30px;" @click="editGoods(item, index)"></i>
@@ -411,9 +411,9 @@
             <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(false)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :value="dict.id">
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id">
                             <div style="display: flex; align-items: center;">
-                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <!-- <ImagePreview :src="dict.faceImg" width="30px" height="30px" /> -->
                                 <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
                             </div>
                         </el-option>
@@ -425,7 +425,7 @@
                 <el-form-item label="商品单价">
                     <el-input :value="queryProducts(boxProductForm.commodityId, 'price')" placeholder="请选择商品" disabled />
                 </el-form-item>
-                <el-form-item label="商品数量" prop="num" v-if="lookInfo.suitType != 4" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
+                <el-form-item label="商品数量" prop="num" v-if="lookInfo.suitType != 4 && lookInfo.suitType != 5" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
                     <el-input v-model="boxProductForm.num" type="number" placeholder="请输入商品数量" />
                 </el-form-item>
                 <el-form-item label="抽中倍数" prop="multiple" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
@@ -534,8 +534,6 @@ export default {
                 remark: [{ required: true, message: "请输入排序", trigger: "blur" }],
                 suitName: [{ required: true, message: "请输入套名称", trigger: "blur" }],
                 suitType: [{ required: true, message: "请选择套类型", trigger: "change" }],
-                levelUpId: [{ required: true, message: "请选择查看等级上限", trigger: "change" }],
-                levelId: [{ required: true, message: "请选择查看等级下限", trigger: "change" }],
                 lotteryNum: [{ required: true, message: "请输入抽奖次数", trigger: "blur" }],
                 status: [{ required: true, message: "请选择上/下架", trigger: "change" }],
                 faceImg: [{ required: true, message: "请上传封面图片", trigger: "change" }],
@@ -1116,7 +1114,18 @@ export default {
         /** 类型选择限制 */
         suitTypeChange() {
             this.$nextTick(() => {
+                this.form.boxNum = 1;
                 this.form.button = [];
+                this.form.drawNum = [];
+                this.form.price = null;
+                this.form.integral = null;
+                if(this.form.suitType == 5) {
+                    this.form.levelUpId = this.levelOptions[0].id;
+                    this.form.levelId = this.levelOptions[this.levelOptions.length - 1].id;
+                } else {
+                    this.form.levelId = null;
+                    this.form.levelUpId = null;
+                }
                 this.form.wxSuitCommodityList = this.form.wxSuitCommodityList.map(item => {
                     item.isSale = '1';
                     item.isSend = '0';

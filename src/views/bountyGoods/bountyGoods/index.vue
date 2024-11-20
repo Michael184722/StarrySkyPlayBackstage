@@ -245,6 +245,7 @@ export default {
             getCommodity(id).then(response => {
                 this.form = response.data;
                 this.form.level = response.data.level.toString();
+                this.form.suitId = Number(response.data.suitId);
                 this.open = true;
                 this.title = "修改商城商品管理";
             });
