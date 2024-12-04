@@ -409,7 +409,7 @@
         <!-- 新增盒子商品 -->
         <el-dialog title="新增商品" :visible.sync="openGoodType" width="1200px" append-to-body class="suitManage">
             <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
-                <el-form-item label="商品名称" prop="commodityId">
+                <el-form-item label="商品名称1" prop="commodityId">
                     <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(false)">
                         <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id">
                             <div style="display: flex; align-items: center;">
@@ -428,7 +428,7 @@
                 <el-form-item label="商品数量" prop="num" v-if="lookInfo.suitType != 4 && lookInfo.suitType != 5" :rules="[{ required: true, message: '请输入商品数量', trigger: 'blur' }]">
                     <el-input v-model="boxProductForm.num" type="number" placeholder="请输入商品数量" />
                 </el-form-item>
-                <el-form-item label="抽中倍数" prop="multiple" v-if="lookInfo.suitType == 4" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
+                <el-form-item label="抽中倍数" prop="multiple" v-if="lookInfo.suitType == 4 || lookInfo.suitType == 5" :rules="[{ required: true, message: '请输入抽中倍数', trigger: 'blur' }]">
                     <el-input v-model="boxProductForm.multiple" type="number" placeholder="请输入倍数" :maxlength="10"
                         @input="boxProductForm.multiple = boxProductForm.multiple.replace(/[^0-9]/g, '').slice(0, 10)"></el-input>
                 </el-form-item>

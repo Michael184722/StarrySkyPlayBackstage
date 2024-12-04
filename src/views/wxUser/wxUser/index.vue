@@ -40,6 +40,18 @@
                     <el-option label="降序" value="0" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="辰币排序" prop="coin">
+                <el-select v-model="coin" placeholder="请选择辰币排序" clearable style="width: 200px">
+                    <el-option label="升序" value="1" />
+                    <el-option label="降序" value="0" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="亏损排序" prop="loss">
+                <el-select v-model="loss" placeholder="请选择亏损排序" clearable style="width: 200px">
+                    <el-option label="升序" value="1" />
+                    <el-option label="降序" value="0" />
+                </el-select>
+            </el-form-item>
             <el-form-item label="创建日期" prop="daterange">
                 <el-date-picker clearable v-model="daterange" value-format="yyyy-MM-dd" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" style="width: 220px" />
             </el-form-item>
@@ -59,6 +71,9 @@
             </el-col>
             <el-col :span="1.5" :offset="1">
                 <el-button type="text" @click="copyText(totalBalance)">总余额：{{ totalBalance }} 元</el-button>
+            </el-col>
+            <el-col :span="1.5" :offset="1">
+                <el-button type="text" @click="copyText(coinTotal)">辰币总余额：{{ coinTotal }} 元</el-button>
             </el-col>
             <el-col :span="1.5" :offset="1">
                 <el-button type="text" @click="copyText(totalScore)">总积分：{{ totalScore }}</el-button>
@@ -99,6 +114,7 @@
             <el-table-column label="出生年月" align="center" prop="birth" width="100" />
             <el-table-column label="余额" align="center" prop="balance" width="80" />
             <el-table-column label="辰币余额" align="center" prop="coin" width="100" />
+            <el-table-column label="亏损" align="center" prop="loss" width="100" />
             <el-table-column label="流水金额" align="center" prop="water" width="100" />
             <el-table-column label="积分余额" align="center" prop="integral" width="100" />
             <el-table-column label="背包总余额" align="center" prop="totalPrice" width="100" />
@@ -963,6 +979,8 @@ export default {
             // 表单校验
             rules: {
             },
+            loss: null,
+            coin: null,
             water: null,
             level: null,
             balance: null,
@@ -1058,6 +1076,8 @@ export default {
             },
             // 总余额
             totalBalance: 0,
+            // 辰币余额
+            coinTotal: 0,
             // 总积分
             totalScore: 0,
             // 背包总余额
@@ -1217,6 +1237,16 @@ export default {
             } else {
                 this.queryParams.params.totalPrice = null;
             };
+            if (this.coin) {
+                this.queryParams.params.coin = this.coin;
+            } else {
+                this.queryParams.params.coin = null;
+            };
+            if (this.loss) {
+                this.queryParams.params.loss = this.loss;
+            } else {
+                this.queryParams.params.loss = null;
+            };
             listWxUser(this.addDateRange(this.queryParams, this.daterange)).then(response => {
                 this.wxUserList = response.rows;
                 this.total = response.total;
@@ -1227,6 +1257,7 @@ export default {
         // 获取计算总计
         getTotal() {
             listWxUser({ pageNum: 1, pageSize: 10000 }, false).then(response => {
+                this.coinTotal = 0;
                 this.totalScore = 0;
                 this.totalBalance = 0;
                 this.totalBalBack = 0;
@@ -1239,8 +1270,10 @@ export default {
                         const e = new Big(Number(item.balance));
                         const f = new Big(Number(item.totalPrice));
                         const g = new Big(Number(item.coin));
+                        const h = new Big(Number(this.coinTotal));
+                        this.coinTotal = Number(h.plus(g).toString());
                         this.totalScore = Number(a.plus(d).toString());
-                        this.totalBalance = Number(b.plus(e).plus(g).toString());
+                        this.totalBalance = Number(b.plus(e).toString());
                         this.totalBalBack = Number(c.plus(f).toString());
                         // this.getBagList(item.openId, index == response.rows.length - 1);
                     }
