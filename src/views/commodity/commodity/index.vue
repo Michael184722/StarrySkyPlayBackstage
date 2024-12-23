@@ -11,6 +11,12 @@
                     <el-option label="现货" value="2" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="是否是隐藏无限套" prop="isHidden" label-width="140px">
+                <el-select v-model="isHidden" placeholder="请选择" clearable>
+                    <el-option label="是" value="1" />
+                    <el-option label="否" value="0" />
+                </el-select>
+            </el-form-item>
             <el-form-item label="更新时间">
                 <el-date-picker v-model="dateRange" type="daterange" value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
             </el-form-item>
@@ -103,12 +109,26 @@
                         <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="抽奖套" prop="suitId">
+                    <el-select v-model="form.suitId" placeholder="请选择商品等级" clearable style="width: 100%;">
+                        <el-option v-for="dict in suitManageList" :key="dict.id" :label="dict.suitName" :value="dict.id">
+                            <div style="display: flex; align-items: center;">
+                                <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
+                                <div style="margin-left: 20px;">{{ dict.suitName }}</div>
+                            </div>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="支付方式" prop="remark">
                     <el-checkbox-group v-model="form.remark">
                         <el-checkbox label="微信支付"></el-checkbox>
                         <el-checkbox label="星币支付"></el-checkbox>
                         <el-checkbox label="辰币支付"></el-checkbox>
+                        <el-checkbox label="积分支付"></el-checkbox>
                     </el-checkbox-group>
+                </el-form-item>
+                <el-form-item label="积分兑换比例" v-if="form.remark.includes('积分支付')" prop="integralPercent" :rules="[{ required: true, message: '积分兑换比例不能为空', trigger: 'blur' }]">
+                    <el-input v-model="form.integralPercent" type="number" placeholder="一个单位币兑换多少积分" />
                 </el-form-item>
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
@@ -130,6 +150,7 @@
 
 <script>
 import { listLevelSet } from "@/api/levelSet/levelSet";
+import { listSuitManage } from "@/api/suitManage/suitManage";
 import { listCommodity, getCommodity, delCommodity, addCommodity, updateCommodity } from "@/api/commodity/commodity";
 
 export default {
@@ -161,10 +182,15 @@ export default {
                 commodityName: null,
                 cmType: null,
                 type: '1',
+                params: {
+                    isHidden: null,
+                }
             },
             dateRange: [],
             // 表单参数
-            form: {},
+            form: {
+                remark: []
+            },
             // 表单校验
             rules: {
                 commodityName: [
@@ -199,6 +225,8 @@ export default {
                 ],
             },
             levelOptions: [],
+            isHidden: null,
+            suitManageList: [],
         };
     },
     created() {
@@ -206,11 +234,22 @@ export default {
         listLevelSet().then(res => {
             this.levelOptions = res.rows;
         });
+        listSuitManage({ suitType: 5 }).then(response => {
+            this.suitManageList = response.rows;
+            console.log(this.suitManageList, "suitManageList");
+        });
+        console.log(this.form.remark, "form.remark");
+        
     },
     methods: {
         /** 查询商城商品管理列表 */
         getList() {
             this.loading = true;
+            if(this.isHidden) {
+                this.queryParams.params.isHidden = this.isHidden;
+            } else {
+                this.queryParams.params.isHidden && (this.queryParams.params.isHidden = null);
+            }
             listCommodity(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
                 this.commodityList = response.rows;
                 this.total = response.total;
@@ -232,7 +271,9 @@ export default {
                 num: null,
                 levelUpId: null,
                 levelId: null,
+                suitId: null,
                 remark: [],
+                integralPercent: null,
                 faceImg: null,
                 img: null,
                 content: null,
@@ -249,6 +290,7 @@ export default {
         /** 重置按钮操作 */
         resetQuery() {
             this.dateRange = [];
+            this.isHidden = null;
             this.resetForm("queryForm");
             this.handleQuery();
         },
@@ -273,7 +315,6 @@ export default {
             });
         },
         handleStatusChange(row) {
-            console.log(row.status, ":::");
             let text = row.status === "1" ? "上架" : "下架";
             updateCommodity({ id: row.id, status: row.status }).then(() => {
                 this.$modal.msgSuccess(text + "成功");
@@ -288,6 +329,7 @@ export default {
                 if (valid) {
                     let obj = { ...this.form };
                     obj.remark = obj.remark.length ? obj.remark.join(',') : '';
+                    // if(!this.form.remark.includes("积分支付")) obj.integralPercent = null;
                     obj.content && (obj.content = obj.content.replace(process.env.VUE_APP_BASE_API, ""));
                     if (obj.id != null) {
                         updateCommodity(obj).then(response => {

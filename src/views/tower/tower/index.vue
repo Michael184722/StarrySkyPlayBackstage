@@ -59,7 +59,7 @@
 					<span>{{ parseTime(scope.row.upTime, '{y}-{m}-{d}') }}</span>
 				</template>
 			</el-table-column>
-			<el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+			<el-table-column label="操作" align="center" width="240px">
 				<template slot-scope="scope">
 					<el-button size="mini" type="text" @click="towerInformation(scope.row)"
 						v-hasPermi="['tower:tower:edit']">塔信息</el-button>
@@ -67,6 +67,8 @@
 						v-hasPermi="['tower:tower:edit']">修改</el-button>
 					<el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
 						v-hasPermi="['tower:tower:remove']">删除</el-button>
+					<el-button size="mini" type="text" icon="el-icon-delete" @click="recordDelete(scope.row)"
+						v-hasPermi="['tower:tower:remove']">删除记录</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -132,7 +134,7 @@
 <script>
 import { listLevelSet } from "@/api/levelSet/levelSet";
 import towerManage from "../../towerManage/towerManage/index.vue";
-import { listTower, getTower, delTower, addTower, updateTower } from "@/api/tower/tower";
+import { listTower, getTower, delTower, addTower, updateTower, delRecord } from "@/api/tower/tower";
 
 export default {
 	name: "Tower",
@@ -297,8 +299,17 @@ export default {
 		/** 删除按钮操作 */
 		handleDelete(row) {
 			const ids = row.id || this.ids;
-			this.$modal.confirm('是否确认删除攀塔套管理编号为"' + ids + '"的数据项？').then(function () {
+			this.$modal.confirm('是否确认删除攀塔套？').then(function () {
 				return delTower(ids);
+			}).then(() => {
+				this.getList();
+				this.$modal.msgSuccess("删除成功");
+			}).catch(() => { });
+		},
+		recordDelete(row) {
+			const ids = row.id || this.ids;
+			this.$modal.confirm('是否确认删除攀塔记录？').then(function () {
+				return delRecord(ids);
 			}).then(() => {
 				this.getList();
 				this.$modal.msgSuccess("删除成功");

@@ -16,6 +16,12 @@
                     <el-option label="现货" value="2" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="是否是隐藏无限套" prop="isHidden" label-width="140px">
+                <el-select v-model="isHidden" placeholder="请选择" clearable>
+                    <el-option label="是" value="1" />
+                    <el-option label="否" value="0" />
+                </el-select>
+            </el-form-item>
             <el-form-item label="金额排序" prop="price">
                 <el-select v-model="price" placeholder="请选择排序" clearable>
                     <el-option label="正序" value="0" />
@@ -149,10 +155,12 @@ export default {
                 level: null,
                 type: "2",
                 params: {
-                    price: null
+                    price: null,
+                    isHidden: null,
                 }
             },
             price: null,
+            isHidden: null,
             dateRange: [],
             // 表单参数
             form: {},
@@ -193,6 +201,11 @@ export default {
             } else {
                 this.queryParams.params.price && (this.queryParams.params.price = null);
             }
+            if(this.isHidden) {
+                this.queryParams.params.isHidden = this.isHidden;
+            } else {
+                this.queryParams.params.isHidden && (this.queryParams.params.isHidden = null);
+            }
             listCommodity(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
                 this.commodityList = response.rows;
                 this.total = response.total;
@@ -227,6 +240,7 @@ export default {
         /** 重置按钮操作 */
         resetQuery() {
             this.price = null;
+            this.isHidden = null;
             this.dateRange = [];
             this.queryParams.params.price && (this.queryParams.params.price = null);
             this.resetForm("queryForm");

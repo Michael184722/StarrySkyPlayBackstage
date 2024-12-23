@@ -33,6 +33,7 @@
             <el-table-column label="序号" type="index" width="55" align="center" />
             <el-table-column label="金额" align="center" prop="money" />
             <el-table-column label="赠送金额" align="center" prop="sendMoney" />
+            <el-table-column label="赠送次数" align="center" prop="sendNum" />
             <el-table-column label="排序" align="center" prop="sort" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
@@ -52,6 +53,9 @@
                 </el-form-item>
                 <el-form-item label="赠送金额" prop="sendMoney">
                     <el-input v-model="form.sendMoney" type="number" placeholder="请输入赠送金额" />
+                </el-form-item>
+                <el-form-item label="赠送次数" prop="sendNum">
+                    <el-input v-model="form.sendNum" type="number" placeholder="请输入赠送次数" />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input v-model="form.sort" type="number" placeholder="请输入排序" />
@@ -134,6 +138,7 @@ export default {
                 id: null,
                 money: null,
                 sendMoney: null,
+                sendNum: null,
                 sort: null,
                 createBy: null,
                 createTime: null,

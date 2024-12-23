@@ -227,12 +227,7 @@
             <el-form ref="commodityForm" :model="commodityForm" :rules="commodityRules" label-width="100px">
                 <el-form-item label="商品名称" prop="commodityId">
                     <el-select v-model="commodityForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(true)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id">
-                            <div style="display: flex; align-items: center;">
-                                <!-- <ImagePreview :src="dict.faceImg" width="30px" height="30px" /> -->
-                                <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
-                            </div>
-                        </el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元) + ' + dict.levelName" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">
@@ -411,12 +406,7 @@
             <el-form ref="boxProductForm" :model="boxProductForm" :rules="boxProductRules" label-width="120px">
                 <el-form-item label="商品名称1" prop="commodityId">
                     <el-select v-model="boxProductForm.commodityId" filterable placeholder="请选择商品名称" style="width: 100%;" @change="commodityChange(false)">
-                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元)'" :value="dict.id">
-                            <div style="display: flex; align-items: center;">
-                                <!-- <ImagePreview :src="dict.faceImg" width="30px" height="30px" /> -->
-                                <div style="margin-left: 20px;">{{ dict.commodityName + '(' + dict.price + '元)' }}</div>
-                            </div>
-                        </el-option>
+                        <el-option v-for="dict in goodsOptions" :key="dict.id" :label="dict.commodityName + '(' + dict.price + '元) - ' + dict.levelName" :value="dict.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品等级">

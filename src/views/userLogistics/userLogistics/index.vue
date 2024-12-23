@@ -125,9 +125,9 @@
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" v-if="scope.row.status != 0 && scope.row.status != 2" @click="handleUpdate(scope.row, '修改')">修改</el-button>
                     <el-button size="mini" type="text" v-if="scope.row.status == 0" @click="handleUpdate(scope.row, '审核')" v-hasPermi="['userLogistics:userLogistics:edit']">审核</el-button>
-                    <el-tag v-if="scope.row.status == 1" style="margin-left: 20px;">已审核</el-tag>
+                    <el-tag v-if="scope.row.status == 1" style="margin-left: 20px;margin-right: 20px;">已审核</el-tag>
                     <!-- <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['userLogistics:userLogistics:edit']">修改</el-button> -->
-                    <!-- <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['userLogistics:userLogistics:remove']">删除</el-button> -->
+                    <el-button size="mini" type="text" @click="handleDelete(scope.row)" v-hasPermi="['userLogistics:userLogistics:remove']">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -310,7 +310,7 @@ export default {
         /** 删除按钮操作 */
         handleDelete(row) {
             const ids = row.id || this.ids;
-            this.$modal.confirm('是否确认删除物流信息编号为"' + ids + '"的数据项？').then(function () {
+            this.$modal.confirm('是否确认删除？').then(function () {
                 return delUserLogistics(ids);
             }).then(() => {
                 this.getList();

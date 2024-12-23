@@ -42,3 +42,10 @@ export function delTower(id) {
     method: 'delete'
   })
 }
+
+export function delRecord(id) {
+  return request({
+    url: '/towerRecord/towerRecord/deleteTowerRecord?id=' + id,
+    method: 'delete'
+  })
+}
