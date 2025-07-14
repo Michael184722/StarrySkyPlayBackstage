@@ -1,8 +1,10 @@
 <template>
     <div class="app-container">
-        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
+            label-width="68px">
             <el-form-item label="商品名称" prop="commodityName">
-                <el-input v-model="queryParams.commodityName" placeholder="请输入商品名称" clearable @keyup.enter.native="handleQuery" />
+                <el-input v-model="queryParams.commodityName" placeholder="请输入商品名称" clearable
+                    @keyup.enter.native="handleQuery" />
             </el-form-item>
             <!-- 筛选预售和现货 -->
             <el-form-item label="商品类型" prop="cmType">
@@ -18,7 +20,8 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="更新时间">
-                <el-date-picker v-model="dateRange" type="daterange" value-format="yyyy-MM-dd" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
+                <el-date-picker v-model="dateRange" type="daterange" value-format="yyyy-MM-dd" range-separator="至"
+                    start-placeholder="开始日期" end-placeholder="结束日期" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -28,7 +31,8 @@
 
         <el-row :gutter="10" class="mb8">
             <el-col :span="1.5">
-                <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd" v-hasPermi="['commodity:commodity:add']">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd"
+                    v-hasPermi="['commodity:commodity:add']">新增</el-button>
             </el-col>
             <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -64,22 +68,26 @@
             <!-- 上下架 -->
             <el-table-column label="上下架" align="center" prop="status">
                 <template slot-scope="scope">
-                    <el-switch v-model="scope.row.status" active-value="1" inactive-value="0" @change="handleStatusChange(scope.row)"></el-switch>
+                    <el-switch v-model="scope.row.status" active-value="1" inactive-value="0"
+                        @change="handleStatusChange(scope.row)"></el-switch>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['commodity:commodity:edit']">修改</el-button>
-                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['commodity:commodity:remove']">删除</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+                        v-hasPermi="['commodity:commodity:edit']">修改</el-button>
+                    <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+                        v-hasPermi="['commodity:commodity:remove']">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize" @pagination="getList" />
 
         <!-- 添加或修改商城商品管理对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="110px" size="mini">
+            <el-form ref="formRef" :model="form" :rules="rules" label-width="110px" size="mini">
                 <el-form-item label="商品名称" prop="commodityName">
                     <el-input v-model="form.commodityName" placeholder="请输入商品名称" />
                 </el-form-item>
@@ -96,22 +104,26 @@
                 </el-form-item>
                 <el-form-item label="预售/现货" prop="cmType">
                     <el-select v-model="form.cmType" placeholder="请选择" style="width: 100%;">
-                        <el-option v-for="(item, index) in [{ label: '预售', value: '1' }, { label: '现货', value: '2' }]" :key="index" :label="item.label" :value="item.value"></el-option>
+                        <el-option v-for="(item, index) in [{ label: '预售', value: '1' }, { label: '现货', value: '2' }]"
+                            :key="index" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="查看等级上限" prop="levelUpId">
                     <el-select v-model="form.levelUpId" placeholder="请选择查看等级" style="width: 100%;">
-                        <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
+                        <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level"
+                            :value="item.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="查看等级下限" prop="levelId">
                     <el-select v-model="form.levelId" placeholder="请选择查看等级" style="width: 100%;">
-                        <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level" :value="item.id" />
+                        <el-option v-for="(item, index) in levelOptions" :key="index" :label="item.level"
+                            :value="item.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="抽奖套" prop="suitId">
                     <el-select v-model="form.suitId" placeholder="请选择商品等级" clearable style="width: 100%;">
-                        <el-option v-for="dict in suitManageList" :key="dict.id" :label="dict.suitName" :value="dict.id">
+                        <el-option v-for="dict in suitManageList" :key="dict.id" :label="dict.suitName"
+                            :value="dict.id">
                             <div style="display: flex; align-items: center;">
                                 <ImagePreview :src="dict.faceImg" width="30px" height="30px" />
                                 <div style="margin-left: 20px;">{{ dict.suitName }}</div>
@@ -127,9 +139,19 @@
                         <el-checkbox label="积分支付"></el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
-                <el-form-item label="积分兑换比例" v-if="form.remark.includes('积分支付')" prop="integralPercent" :rules="[{ required: true, message: '积分兑换比例不能为空', trigger: 'blur' }]">
-                    <el-input v-model="form.integralPercent" type="number" placeholder="一个单位币兑换多少积分" />
+                <el-form-item label="星币" v-if="form.remark.includes('星币支付')" prop="sog"
+                    :rules="[{ required: true, message: '请输入星币', trigger: 'blur' }]">
+                    <el-input v-model="form.sog" type="number" placeholder="请输入星币" />
                 </el-form-item>
+                <el-form-item label="辰币" v-if="form.remark.includes('辰币支付')" prop="coin"
+                    :rules="[{ required: true, message: '请输入辰币', trigger: 'blur' }]">
+                    <el-input v-model="form.coin" type="number" placeholder="请输入辰币" />
+                </el-form-item>
+                <el-form-item label="积分" v-if="form.remark.includes('积分支付')" prop="points"
+                    :rules="[{ required: true, message: '请输入积分', trigger: 'blur' }]">
+                    <el-input v-model="form.points" type="number" placeholder="请输入积分" />
+                </el-form-item>
+                <!-- integralPercent -->
                 <el-form-item label="封面图片" prop="faceImg">
                     <ImageUpload v-model="form.faceImg" :limit="1" />
                 </el-form-item>
@@ -189,7 +211,10 @@ export default {
             dateRange: [],
             // 表单参数
             form: {
-                remark: []
+                remark: [],
+                sog: 0,
+                coin: "",
+                points: "",
             },
             // 表单校验
             rules: {
@@ -236,16 +261,13 @@ export default {
         });
         listSuitManage({ suitType: 5 }).then(response => {
             this.suitManageList = response.rows;
-            console.log(this.suitManageList, "suitManageList");
         });
-        console.log(this.form.remark, "form.remark");
-        
     },
     methods: {
         /** 查询商城商品管理列表 */
         getList() {
             this.loading = true;
-            if(this.isHidden) {
+            if (this.isHidden) {
                 this.queryParams.params.isHidden = this.isHidden;
             } else {
                 this.queryParams.params.isHidden && (this.queryParams.params.isHidden = null);
@@ -273,6 +295,9 @@ export default {
                 levelId: null,
                 suitId: null,
                 remark: [],
+                sog: 0,
+                coin: "",
+                points: "",
                 integralPercent: null,
                 faceImg: null,
                 img: null,
@@ -280,7 +305,7 @@ export default {
                 type: '1',
                 cmType: '2'
             };
-            this.resetForm("form");
+            this.resetForm("formRef");
         },
         /** 搜索按钮操作 */
         handleQuery() {
@@ -303,9 +328,20 @@ export default {
         /** 修改按钮操作 */
         handleUpdate(row) {
             this.reset();
+            // this.resetForm("formRef");
             const id = row.id || this.ids
             getCommodity(id).then(response => {
-                this.form = response.data;
+                for(let key in response.data) this.form[key] = response.data[key];
+                if(this.form.integralPercent) {
+                    this.form.integralPercent.split(',').map(item => {
+                        if(item.includes('1-')) this.form.sog = item.split("-")[1];
+                        if(item.includes('2-')) this.form.coin = item.split("-")[1];
+                        if(item.includes('3-')) this.form.points = item.split("-")[1];
+                        // if(item.includes('1-')) this.$set(this.form, 'sog', Number(item.split('-')[1]));
+                        // if(item.includes('2-')) this.$set(this.form, 'coin', Number(item.split('-')[1]));
+                        // if(item.includes('3-')) this.$set(this.form, 'points', Number(item.split('-')[1]));
+                    });
+                };
                 if (response.data.content && response.data.content.includes('<img src="')) {
                     this.form.content = response.data.content.replace('<img src="', '<img src="' + process.env.VUE_APP_BASE_API);
                 };
@@ -325,11 +361,23 @@ export default {
         },
         /** 提交按钮 */
         submitForm() {
-            this.$refs["form"].validate(valid => {
+            this.$refs["formRef"].validate(valid => {
                 if (valid) {
+                    let arr = [];
                     let obj = { ...this.form };
+                    delete obj.sog;
+                    delete obj.coin;
+                    delete obj.points;
+                    obj.remark.map(item => {
+                        if(item == "星币支付") arr.push(this.form.sog);
+                        if(item == "辰币支付") arr.push(this.form.coin);
+                        if(item == "积分支付") arr.push(this.form.points);
+                    });
+                    let a = this.form.sog && obj.remark.includes("星币支付") ? "1-" + this.form.sog : "";
+                    let b = this.form.coin && obj.remark.includes("辰币支付") ?  ",2-" + this.form.coin : "";
+                    let c = this.form.points && obj.remark.includes("积分支付") ? ",3-" + this.form.points : "";
+                    obj.integralPercent = a + b + c;
                     obj.remark = obj.remark.length ? obj.remark.join(',') : '';
-                    // if(!this.form.remark.includes("积分支付")) obj.integralPercent = null;
                     obj.content && (obj.content = obj.content.replace(process.env.VUE_APP_BASE_API, ""));
                     if (obj.id != null) {
                         updateCommodity(obj).then(response => {
